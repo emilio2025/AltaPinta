@@ -10,10 +10,16 @@ import { AuthService } from '../auth.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
+import { SelectModule } from 'primeng/select';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
+
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule, HttpClientModule, FormsModule],
+  imports: [
+    CommonModule, RouterModule, HttpClientModule, FormsModule,
+    SelectModule, PaginatorModule
+  ],
   templateUrl: './menu.html',
   styleUrls: ['./menu.css']
 })
@@ -24,14 +30,19 @@ export class MenuComponent implements OnInit {
 
   categorias: any[] = [];
   tipos: any[] = [];
+  deportes: any[] = [];
 
   favoritosIds: number[] = [];
   busqueda: string = "";
   contadorCarrito = 0;
   tipoSeleccionado: string = '';
   categoriaSeleccionada: string = '';
+  deporteSeleccionado: string = '';
   tallas: any[] = [];
   tallaSeleccionada: any = null;
+
+  // Panel de filtros plegable en movil
+  filtrosAbiertos = false;
 
   // Paginacion. El backend numera las paginas desde 0.
   pagina = 0;
@@ -54,8 +65,8 @@ export class MenuComponent implements OnInit {
     this.cargarProductos();
     this.cargarCategorias();
     this.cargarTipos();
+    this.cargarDeportes();
     this.cargarFavoritos();
-    this.cargarTipos();
     this.cargarTallas();
 
     this.carritoService.contadorObservable$
@@ -78,6 +89,7 @@ export class MenuComponent implements OnInit {
       nombre: this.busqueda,
       categoria: this.categoriaSeleccionada,
       tipo: this.tipoSeleccionado,
+      deporte: this.deporteSeleccionado,
       talla: this.tallaSeleccionada?.nombre,
       page: this.pagina,
       size: this.tamanoPagina
@@ -86,6 +98,29 @@ export class MenuComponent implements OnInit {
       this.totalPaginas = res.totalPages;
       this.totalResultados = res.totalElements;
     });
+  }
+
+  /** Filtros activos, para pintarlos como fichas retirables. */
+  get filtrosActivos(): { etiqueta: string; quitar: () => void }[] {
+    const fichas: { etiqueta: string; quitar: () => void }[] = [];
+
+    if (this.categoriaSeleccionada) {
+      fichas.push({ etiqueta: this.categoriaSeleccionada, quitar: () => this.filtrarCategoria(this.categoriaSeleccionada) });
+    }
+    if (this.deporteSeleccionado) {
+      fichas.push({ etiqueta: this.deporteSeleccionado, quitar: () => this.filtrarDeporte(this.deporteSeleccionado) });
+    }
+    if (this.tipoSeleccionado) {
+      fichas.push({ etiqueta: this.tipoSeleccionado, quitar: () => this.filtrarTipo(this.tipoSeleccionado) });
+    }
+    if (this.tallaSeleccionada) {
+      fichas.push({ etiqueta: `Talla ${this.tallaSeleccionada.nombre}`, quitar: () => { this.tallaSeleccionada = null; this.reiniciarYFiltrar(); } });
+    }
+    return fichas;
+  }
+
+  get hayFiltros(): boolean {
+    return this.filtrosActivos.length > 0 || !!this.busqueda.trim();
   }
 
   /** Vuelve a la primera pagina: al cambiar un filtro, seguir en la 5 no tiene sentido. */
@@ -120,6 +155,15 @@ export class MenuComponent implements OnInit {
     this.reiniciarYFiltrar();
   }
 
+  filtrarDeporte(deporte:string){
+    this.deporteSeleccionado = this.deporteSeleccionado === deporte ? '' : deporte;
+    this.reiniciarYFiltrar();
+  }
+
+  cargarDeportes(){
+    this.productoService.getDeportes().subscribe(res => this.deportes = res);
+  }
+
   /**
    * El desplegable de tallas ya trae su propia opcion "Todas", y [(ngModel)]
    * actualiza tallaSeleccionada antes de que salte (change), asi que aqui solo
@@ -133,6 +177,7 @@ export class MenuComponent implements OnInit {
     this.busqueda = '';
     this.categoriaSeleccionada = '';
     this.tipoSeleccionado = '';
+    this.deporteSeleccionado = '';
     this.tallaSeleccionada = null;
     this.reiniciarYFiltrar();
   }
@@ -150,6 +195,18 @@ export class MenuComponent implements OnInit {
 
   paginaAnterior(){ this.irAPagina(this.pagina - 1); }
   paginaSiguiente(){ this.irAPagina(this.pagina + 1); }
+
+  /** Indice del primer elemento de la pagina, que es lo que espera p-paginator. */
+  get primerElemento(): number {
+    return this.pagina * this.tamanoPagina;
+  }
+
+  /** El paginador de PrimeNG informa del indice; aqui se traduce a numero de pagina. */
+  onCambioPagina(evento: PaginatorState) {
+    this.pagina = evento.page ?? 0;
+    this.aplicarFiltros();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   cargarFavoritos() {
     this.favService.getFavoritos().subscribe({

@@ -1,136 +1,193 @@
-<head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-</head>
+<!-- ============================================================
+     Catálogo de AltaPinta
+     Cabecera fija, filtros en columna lateral (plegables en móvil) y
+     cuadrícula de producto con paginador de PrimeNG.
+     ============================================================ -->
 
-<nav class="navbar navbar-expand-lg menu-top shadow-sm">
-  <div class="container-fluid d-flex align-items-center">
-      <div class="d-flex align-items-center logo-box " role="button" (click)="irMenu()"></div>
-      <!--<i class="bi bi-list menu-icon " role="button" (click)="irMenu()"></i>-->
+<header class="ap-cabecera">
+  <div class="ap-cabecera__barra">
 
-      <ul class="navbar-nav gap-4 fw-semibold nav-categorias">
-          <li class="nav-item" *ngFor="let c of categorias">
-              <a class="nav-link" (click)="irCategoria(c.nombre)">
-                {{ c.nombre.toUpperCase() }}
-              </a>
-          </li>
-      </ul>
+    <a class="ap-logo" (click)="irMenu()">ALTA<span>PINTA</span></a>
 
-      <div class="search-box" >
-        <i class="bi bi-search"></i>
-        <input type="text" 
-               [(ngModel)]="busqueda" 
-               placeholder="Buscar..."
-               (input)="buscar()">
+    <nav class="ap-nav">
+      <button type="button"
+              *ngFor="let c of categorias"
+              class="ap-nav__enlace"
+              [class.ap-nav__enlace--activo]="categoriaSeleccionada === c.nombre"
+              (click)="filtrarCategoria(c.nombre)">
+        {{ c.nombre }}
+      </button>
+    </nav>
+
+    <div class="ap-cabecera__acciones">
+      <div class="ap-buscador">
+        <i class="pi pi-search"></i>
+        <input type="text"
+               [(ngModel)]="busqueda"
+               placeholder="Buscar productos"
+               (input)="buscar()"
+               aria-label="Buscar productos">
       </div>
 
-      <div class="icons">
-        <i class="bi bi-person-fill" role="button" (click)="irPerfil()"></i>
-        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i>
+      <button type="button" class="ap-icono" (click)="irFavoritos()" aria-label="Favoritos">
+        <i class="pi pi-heart"></i>
+      </button>
 
-        <div class="cart-icon" role="button" (click)="irCarrito()">
-          <i class="bi bi-cart"></i>
-          <span class="badge" *ngIf="contadorCarrito > 0">
-            {{ contadorCarrito }}
-          </span>
-        </div>
+      <button type="button" class="ap-icono ap-icono--contador" (click)="irCarrito()" aria-label="Carrito">
+        <i class="pi pi-shopping-bag"></i>
+        <span class="ap-contador" *ngIf="contadorCarrito > 0">{{ contadorCarrito }}</span>
+      </button>
 
-        <div class="logout" role="button" (click)="cerrarSesion()">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Cerrar Sesión</span>
-        </div>
-      </div>
-  </div>
-</nav>
+      <button type="button" class="ap-icono" (click)="irPerfil()" aria-label="Mi perfil">
+        <i class="pi pi-user"></i>
+      </button>
 
-<div class="espacio">
-  .
-</div>
-
-<div class="filtro-tipo">
-  <button *ngFor="let t of tipos"
-          class="btn btn-sm me-2"
-          [class.btn-secondary]="tipoSeleccionado === t.nombre"
-          [class.btn-outline-secondary]="tipoSeleccionado !== t.nombre"
-          (click)="filtrarTipo(t.nombre)">
-    {{ t.nombre }}
-  </button>
-
-  <button class="btn btn-outline-dark btn-sm" (click)="limpiarFiltros()">
-    Todos
-  </button>
-</div>
-
-<hr>
-
-<div class="filtro-talla">
-  <select [(ngModel)]="tallaSeleccionada" (change)="cambiarTalla()">
-    <option [ngValue]="null">Todas las tallas</option>
-
-    <option *ngFor="let t of tallas" [ngValue]="t">
-      {{ t.nombre }}
-    </option>
-  </select>
-</div>
-
-<div class="container mt-4">
-  <h3 class="mb-4 fw-bold">
-    Productos Disponibles
-    <small class="text-muted fs-6" *ngIf="totalResultados">
-      ({{ totalResultados }})
-    </small>
-  </h3>
-
-  <p *ngIf="totalResultados === 0" class="text-muted">
-    No se encontraron productos con esos filtros.
-  </p>
-
-  <div class="row row-cols-1 row-cols-md-3 g-4">
-
-    <div class="col" *ngFor="let p of filtrados">
-      <div class="card product-card">
-
-        <button class="fav-btn"
-          [class.favorito]="esFavorito(p.id)">
-          <i
-            class="bi"
-            [ngClass]="esFavorito(p.id) ? 'bi-heart-fill text-danger' : 'bi-heart'"
-            (click)="toggleFavorito(p.id, $event)">
-          </i>
-        </button>
-
-        <button class="cart-btn"
-            (click)="agregarCarrito(p)">
-          <i class="bi bi-cart-plus-fill"></i>
-        </button>
-
-        <img [src]="p.imagenUrl" class="product-img" alt="{{p.nombre}}" (click)="verDetalles(p)" onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
-
-        <div class="card-body text-center">
-          <h6 class="fw-semibold">{{ p.nombre }}</h6>
-        </div>
-      </div>
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno" (click)="cerrarSesion()">
+        Salir
+      </button>
     </div>
 
   </div>
+</header>
 
-  <!-- Paginacion: solo si hay mas de una pagina -->
-  <nav class="d-flex justify-content-center mt-4" *ngIf="totalPaginas > 1">
-    <ul class="pagination">
-      <li class="page-item" [class.disabled]="pagina === 0">
-        <button class="page-link" type="button"
-                (click)="paginaAnterior()" [disabled]="pagina === 0">
-          Anterior
+<!-- ---------- Encabezado del catálogo ---------- -->
+<div class="ap-catalogo__intro">
+  <span class="ap-etiqueta">Catálogo</span>
+  <h1 class="ap-titulo-seccion">
+    {{ categoriaSeleccionada || deporteSeleccionado || 'Todos los productos' }}
+  </h1>
+</div>
+
+<div class="ap-catalogo">
+
+  <!-- ---------- Columna de filtros ---------- -->
+  <button type="button" class="ap-filtros__toggle" (click)="filtrosAbiertos = !filtrosAbiertos">
+    <i class="pi" [ngClass]="filtrosAbiertos ? 'pi-times' : 'pi-sliders-h'"></i>
+    {{ filtrosAbiertos ? 'Cerrar filtros' : 'Filtros' }}
+  </button>
+
+  <aside class="ap-filtros" [class.ap-filtros--abiertos]="filtrosAbiertos">
+
+    <div class="ap-filtros__grupo" *ngIf="deportes.length">
+      <h3 class="ap-filtros__titulo">Deporte</h3>
+      <div class="ap-filtros__lista">
+        <button type="button"
+                *ngFor="let d of deportes"
+                class="ap-filtro"
+                [class.ap-filtro--activo]="deporteSeleccionado === d.nombre"
+                (click)="filtrarDeporte(d.nombre)">
+          <i class="pi" [ngClass]="d.icono || 'pi-bolt'"></i>
+          {{ d.nombre }}
         </button>
-      </li>
-      <li class="page-item disabled">
-        <span class="page-link">Página {{ pagina + 1 }} de {{ totalPaginas }}</span>
-      </li>
-      <li class="page-item" [class.disabled]="pagina >= totalPaginas - 1">
-        <button class="page-link" type="button"
-                (click)="paginaSiguiente()" [disabled]="pagina >= totalPaginas - 1">
-          Siguiente
+      </div>
+    </div>
+
+    <div class="ap-filtros__grupo" *ngIf="categorias.length">
+      <h3 class="ap-filtros__titulo">Categoría</h3>
+      <div class="ap-filtros__lista">
+        <button type="button"
+                *ngFor="let c of categorias"
+                class="ap-filtro"
+                [class.ap-filtro--activo]="categoriaSeleccionada === c.nombre"
+                (click)="filtrarCategoria(c.nombre)">
+          {{ c.nombre }}
         </button>
-      </li>
-    </ul>
-  </nav>
+      </div>
+    </div>
+
+    <div class="ap-filtros__grupo" *ngIf="tipos.length">
+      <h3 class="ap-filtros__titulo">Tipo de prenda</h3>
+      <div class="ap-filtros__lista">
+        <button type="button"
+                *ngFor="let t of tipos"
+                class="ap-filtro"
+                [class.ap-filtro--activo]="tipoSeleccionado === t.nombre"
+                (click)="filtrarTipo(t.nombre)">
+          {{ t.nombre }}
+        </button>
+      </div>
+    </div>
+
+    <div class="ap-filtros__grupo">
+      <h3 class="ap-filtros__titulo">Talla</h3>
+      <p-select [options]="tallas"
+                [(ngModel)]="tallaSeleccionada"
+                optionLabel="nombre"
+                placeholder="Todas las tallas"
+                [showClear]="true"
+                styleClass="w-full"
+                (onChange)="cambiarTalla()">
+      </p-select>
+    </div>
+
+    <button type="button" class="ap-boton ap-boton--fantasma ap-boton--bloque"
+            *ngIf="hayFiltros"
+            (click)="limpiarFiltros()">
+      <i class="pi pi-times"></i> Limpiar todo
+    </button>
+
+  </aside>
+
+  <!-- ---------- Resultados ---------- -->
+  <main class="ap-catalogo__resultados">
+
+    <div class="ap-catalogo__barra">
+      <span class="ap-etiqueta">
+        {{ totalResultados }} {{ totalResultados === 1 ? 'producto' : 'productos' }}
+      </span>
+    </div>
+
+    <div class="ap-fichas" *ngIf="filtrosActivos.length">
+      <button type="button" class="ap-ficha"
+              *ngFor="let f of filtrosActivos"
+              (click)="f.quitar()">
+        {{ f.etiqueta }} <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <p *ngIf="totalResultados === 0" class="ap-vacio">
+      <i class="pi pi-inbox"></i>
+      No encontramos productos con esos filtros.
+    </p>
+
+    <div class="ap-cuadricula">
+      <article class="ap-producto" *ngFor="let p of filtrados" (click)="verDetalles(p)">
+        <div class="ap-producto__imagen">
+          <span class="ap-insignia" *ngIf="p.deporte">{{ p.deporte.nombre }}</span>
+
+          <button type="button" class="ap-favorito"
+                  [class.ap-favorito--activo]="esFavorito(p.id)"
+                  (click)="toggleFavorito(p.id, $event)"
+                  aria-label="Añadir a favoritos">
+            <i class="pi" [ngClass]="esFavorito(p.id) ? 'pi-heart-fill' : 'pi-heart'"></i>
+          </button>
+
+          <img [src]="p.imagenUrl" [alt]="p.nombre"
+               onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
+
+          <div class="ap-producto__acciones">
+            <button type="button" class="ap-producto__accion"
+                    (click)="agregarCarrito(p); $event.stopPropagation()">
+              Ver tallas
+            </button>
+          </div>
+        </div>
+
+        <div class="ap-producto__info">
+          <span class="ap-producto__meta" *ngIf="p.tipoPrenda">{{ p.tipoPrenda.nombre }}</span>
+          <h3 class="ap-producto__nombre">{{ p.nombre }}</h3>
+          <div class="ap-producto__precio">S/ {{ p.precio }}</div>
+        </div>
+      </article>
+    </div>
+
+    <p-paginator *ngIf="totalResultados > tamanoPagina"
+                 [first]="primerElemento"
+                 [rows]="tamanoPagina"
+                 [totalRecords]="totalResultados"
+                 (onPageChange)="onCambioPagina($event)"
+                 styleClass="ap-paginador">
+    </p-paginator>
+
+  </main>
 </div>
