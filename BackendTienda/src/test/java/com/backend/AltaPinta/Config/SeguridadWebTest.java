@@ -18,12 +18,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
+import static com.backend.AltaPinta.Config.PermisosAssert.denegado;
+import static com.backend.AltaPinta.Config.PermisosAssert.permitido;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Pruebas de las reglas de autorizacion: quien puede llamar a que endpoint.
@@ -68,21 +69,6 @@ class SeguridadWebTest {
     // Dependencias de CategoriaController
     @MockBean private CategoriaRepository categoriaRepo;
 
-    /** Ni 401 ni 403: la peticion atraveso la capa de seguridad. */
-    private void permitido(ResultActions resultado) throws Exception {
-        resultado.andExpect(status().is(not401ni403()));
-    }
-
-    private static org.hamcrest.Matcher<Integer> not401ni403() {
-        return org.hamcrest.Matchers.not(org.hamcrest.Matchers.isOneOf(401, 403));
-    }
-
-    /** Rechazado por la capa de seguridad. */
-    private void denegado(ResultActions resultado) throws Exception {
-        resultado.andExpect(status().is(
-                org.hamcrest.Matchers.isOneOf(401, 403)));
-    }
-
     // ============================================================
     @Nested
     @DisplayName("Catalogo publico (sin iniciar sesion)")
@@ -92,7 +78,7 @@ class SeguridadWebTest {
         @WithAnonymousUser
         @DisplayName("Cualquiera puede ver el listado de productos")
         void listarProductosEsPublico() throws Exception {
-            org.mockito.Mockito.when(productoRepo.findAll()).thenReturn(List.of());
+            when(productoRepo.findAll()).thenReturn(List.of());
 
             permitido(mockMvc.perform(get("/productos")));
         }
@@ -101,7 +87,7 @@ class SeguridadWebTest {
         @WithAnonymousUser
         @DisplayName("Cualquiera puede ver las categorias")
         void listarCategoriasEsPublico() throws Exception {
-            org.mockito.Mockito.when(categoriaRepo.findAll()).thenReturn(List.of());
+            when(categoriaRepo.findAll()).thenReturn(List.of());
 
             permitido(mockMvc.perform(get("/categorias")));
         }
@@ -190,7 +176,7 @@ class SeguridadWebTest {
         @WithMockUser(username = "cliente@unamba.edu.pe", authorities = "ROLE_USER")
         @DisplayName("Un cliente si puede ver SUS pedidos")
         void clienteVeSusPedidos() throws Exception {
-            org.mockito.Mockito.when(pedidoRepo.findByClienteCorreo("cliente@unamba.edu.pe"))
+            when(pedidoRepo.findByClienteCorreo("cliente@unamba.edu.pe"))
                     .thenReturn(List.of());
 
             permitido(mockMvc.perform(get("/pedido/mis-pedidos")));
@@ -224,7 +210,7 @@ class SeguridadWebTest {
         @WithMockUser(authorities = "ROLE_ADMIN")
         @DisplayName("Un administrador si puede listar los pedidos de todos")
         void adminListaTodosLosPedidos() throws Exception {
-            org.mockito.Mockito.when(pedidoRepo.findAll()).thenReturn(List.of());
+            when(pedidoRepo.findAll()).thenReturn(List.of());
 
             permitido(mockMvc.perform(get("/pedido/todos")));
         }

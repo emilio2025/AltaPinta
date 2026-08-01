@@ -65,14 +65,22 @@ public class SecurityConfig {
 
                         // Públicas
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/categorias/**").permitAll()
+
+                        // Catálogo: LECTURA pública (cualquiera puede navegar la tienda)
+                        .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/tipos/**").permitAll()
-                        .requestMatchers("/tallas/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/tallas/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/productos/tipos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/imagenes/**").permitAll()
 
-                        // SOLO ADMIN
+                        // Catálogo: ESCRITURA solo admin.
+                        // Antes /categorias/** y /tallas/** eran permitAll para todos los
+                        // métodos, así que cualquier anónimo podía crear categorías y tallas.
+                        // Estas reglas van después de los GET de arriba, que ya los permiten.
+                        .requestMatchers("/categorias/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/tallas/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/tipos/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority("ROLE_ADMIN")
