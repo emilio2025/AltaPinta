@@ -1,155 +1,143 @@
-<head> 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> 
-</head> 
+<!-- ============================================================
+     Carrito
+     Lista de artículos a la izquierda, resumen fijo a la derecha.
+     ============================================================ -->
 
-<nav class="navbar navbar-expand-lg menu-top shadow-sm"> 
-  <div class="container-fluid d-flex align-items-center"> 
-      <div class="d-flex align-items-center logo-box " role="button" (click)="irMenu()"></div> 
-      <!--<i class="bi bi-list menu-icon " role="button" (click)="irMenu()"></i>--> 
-      <ul class="navbar-nav gap-4 fw-semibold nav-categorias"> 
-          <li class="nav-item" *ngFor="let c of categorias"> 
-              <a class="nav-link" (click)="irCategoria(c.nombre)"> 
-                {{ c.nombre.toUpperCase() }} 
-              </a> 
-          </li> 
-      </ul> 
+<header class="ap-cabecera">
+  <div class="ap-cabecera__barra">
+    <a class="ap-logo" (click)="irMenu()">ALTA<span>PINTA</span></a>
 
-      <div class="icons"> 
-        <i class="bi bi-person-fill"role="button" (click)="irPerfil()"></i>
-        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i> 
- 
-        <div class="cart-icon" role="button" (click)="irCarrito()"> 
-          <i class="bi bi-cart"></i> 
-          <span class="badge" *ngIf="contadorCarrito > 0"> 
-            {{ contadorCarrito }} 
-          </span> 
-        </div> 
+    <nav class="ap-nav">
+      <button type="button" *ngFor="let c of categorias"
+              class="ap-nav__enlace" (click)="irCategoria(c.nombre)">
+        {{ c.nombre }}
+      </button>
+    </nav>
 
-        <div class="logout" role="button" (click)="cerrarSesion()"> 
-          <i class="bi bi-box-arrow-in-right"></i> 
-          <span>Cerrar Sesión</span> 
-        </div> 
-      </div> 
-  </div> 
-</nav> 
-
-<div class="container my-5"> 
-  <div class="mb-4"> 
-    <h4 class="fw-bold">
-      TU CARRITO 
-      <span class="text-muted fs-6">({{ items.length }} ARTÍCULOS)</span>
-    </h4> 
-    <p class="text-muted small"> 
-      Los artículos en tu carrito no están reservados. Finaliza tu compra para asegurarlos. 
-    </p> 
-  </div> 
-
-  <div class="row"> 
-    <div class="col-lg-8"> 
-
-      <div *ngIf="items.length === 0" class="alert alert-warning"> 
-        Tu carrito está vacío 
-      </div> 
-
-      <div *ngFor="let i of items" class="cart-item d-flex mb-4 p-3"> 
-        <div class="cart-img"> 
-          <img 
-            [src]="i.imagenUrl"
-            alt="{{ i.nombre }}"
-            width="100"
-            onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
-        </div> 
-
-        <div class="flex-grow-1 ms-3"> 
-          <div class="d-flex justify-content-between"> 
-            <h6 class="fw-semibold mb-1">
-              {{ i.nombre }}
-              <span class="badge bg-secondary" *ngIf="i.tallaNombre">Talla: {{ i.tallaNombre }}</span>
-            </h6>
-
-            <button 
-              class="btn btn-sm btn-outline-danger"
-              (click)="eliminar(i)">
-              <i class="bi bi-x-lg"></i> 
-            </button> 
-          </div> 
-
-          <div class="d-flex align-items-center justify-content-between mt-2"> 
-            <div class="quantity-control">
-              <button class="btn btn-qty" (click)="decrementar(i)">−</button>
-
-              <input
-                type="number"
-                class="form-control form-control-sm text-center"
-                [(ngModel)]="i.cantidad"
-                (ngModelChange)="actualizarCantidad(i)"
-                min="0"
-              />
-
-              <button class="btn btn-qty" (click)="incrementar(i)">+</button>
-            </div>
-
-            <div class="fw-bold"> 
-              S/ {{ i.cantidad * i.precio | number:'1.2-2' }} 
-            </div> 
-          </div> 
-        </div> 
-      </div> 
-    </div> 
-
-    <div class="col-lg-4">
-  <div class="summary-box">
-
-    <h6 class="summary-title">
-      <i class="bi bi-receipt-cutoff"></i> Resumen de pedido
-    </h6>
-
-    <div class="summary-row">
-      <span>{{ items.length }} productos</span>
-      <span>S/ {{ total | number:'1.2-2' }}</span>
+    <div class="ap-cabecera__acciones">
+      <button type="button" class="ap-icono" (click)="irFavoritos()" aria-label="Favoritos">
+        <i class="pi pi-heart"></i>
+      </button>
+      <button type="button" class="ap-icono" (click)="irCarrito()" aria-label="Carrito">
+        <i class="pi pi-shopping-bag"></i>
+      </button>
+      <button type="button" class="ap-icono" (click)="irPerfil()" aria-label="Mi perfil">
+        <i class="pi pi-user"></i>
+      </button>
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno" (click)="cerrarSesion()">
+        Salir
+      </button>
     </div>
+  </div>
+</header>
 
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Tipo de envío</label>
-      <select class="form-select" [(ngModel)]="tipoEnvio" (change)="calcularTotal()">
-        <option value="RECOJO">Recojo en tienda</option>
-        <option value="ENVIO">Envío a domicilio</option>
-      </select>
-    </div>
+<div class="ap-carrito">
 
-    <div class="mb-3" *ngIf="tipoEnvio === 'ENVIO'">
-      <label class="form-label fw-semibold">Departamento de envío</label>
-      <select class="form-select" [(ngModel)]="envioSeleccionado" (change)="calcularTotal()">
-        <option *ngFor="let e of envios" [ngValue]="e">
-          {{ e.lugar }} - S/ {{ e.costo }}
-        </option>
-      </select>
-    </div>
+  <div class="ap-carrito__intro">
+    <span class="ap-etiqueta">Tu compra</span>
+    <h1 class="ap-titulo-seccion">Carrito</h1>
+  </div>
 
-    <div class="summary-row">
-      <span>Entrega</span>
-      <span class="envio-gratis" *ngIf="tipoEnvio === 'RECOJO'">Gratis</span>
-      <span class="envio-costo" *ngIf="tipoEnvio === 'ENVIO'">
-        S/ {{ envioSeleccionado?.costo | number:'1.2-2' }}
-      </span>
-    </div>
-
-    <hr>
-
-    <div class="summary-total">
-      <span>Total</span>
-      <span>S/ {{ total | number:'1.2-2' }}</span>
-    </div>
-
-    <button class="btn btn-checkout" (click)="irPagar()">
-      <i class="bi bi-wallet-fill"></i> Ir a pagar
+  <!-- ---------- Carrito vacío ---------- -->
+  <div class="ap-carrito__vacio" *ngIf="items.length === 0">
+    <i class="pi pi-shopping-bag"></i>
+    <h2>Tu carrito está vacío</h2>
+    <p>Aún no has añadido ningún producto.</p>
+    <button type="button" class="ap-boton ap-boton--acento" (click)="irMenu()">
+      Ver catálogo
     </button>
+  </div>
 
-    <small class="summary-secure">
-      <i class="bi bi-shield-lock-fill"></i> Pago 100% seguro
-    </small>
+  <!-- ---------- Con artículos ---------- -->
+  <div class="ap-carrito__cuerpo" *ngIf="items.length > 0">
+
+    <!-- Artículos -->
+    <section class="ap-carrito__lista">
+      <article class="ap-linea" *ngFor="let i of items">
+
+        <div class="ap-linea__imagen">
+          <img [src]="i.imagenUrl" [alt]="i.nombre"
+               onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
+        </div>
+
+        <div class="ap-linea__datos">
+          <h3 class="ap-linea__nombre">{{ i.nombre }}</h3>
+          <span class="ap-linea__talla" *ngIf="i.tallaNombre">Talla {{ i.tallaNombre }}</span>
+          <span class="ap-linea__unitario">S/ {{ i.precio | number:'1.2-2' }} c/u</span>
+        </div>
+
+        <div class="ap-linea__cantidad">
+          <button type="button" class="ap-cantidad__boton"
+                  (click)="decrementar(i)" aria-label="Quitar una unidad">
+            <i class="pi pi-minus"></i>
+          </button>
+          <input type="number" class="ap-cantidad__campo"
+                 [(ngModel)]="i.cantidad"
+                 (change)="actualizarCantidad(i)"
+                 min="1" aria-label="Cantidad">
+          <button type="button" class="ap-cantidad__boton"
+                  (click)="incrementar(i)" aria-label="Añadir una unidad">
+            <i class="pi pi-plus"></i>
+          </button>
+        </div>
+
+        <div class="ap-linea__importe">
+          S/ {{ i.cantidad * i.precio | number:'1.2-2' }}
+        </div>
+
+        <button type="button" class="ap-linea__quitar"
+                (click)="eliminar(i)" aria-label="Quitar del carrito">
+          <i class="pi pi-trash"></i>
+        </button>
+
+      </article>
+    </section>
+
+    <!-- Resumen -->
+    <aside class="ap-resumen">
+      <h2 class="ap-resumen__titulo">Resumen</h2>
+
+      <div class="ap-resumen__fila">
+        <span>{{ items.length }} {{ items.length === 1 ? 'producto' : 'productos' }}</span>
+        <span>S/ {{ total | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="ap-resumen__campo">
+        <label for="tipoEnvio">Entrega</label>
+        <select id="tipoEnvio" [(ngModel)]="tipoEnvio" (change)="calcularTotal()">
+          <option value="RECOJO">Recojo en tienda</option>
+          <option value="ENVIO">Envío a domicilio</option>
+        </select>
+      </div>
+
+      <div class="ap-resumen__campo" *ngIf="tipoEnvio === 'ENVIO'">
+        <label for="destino">Destino</label>
+        <select id="destino" [(ngModel)]="envioSeleccionado" (change)="calcularTotal()">
+          <option *ngFor="let e of envios" [ngValue]="e">
+            {{ e.lugar }} — S/ {{ e.costo }}
+          </option>
+        </select>
+      </div>
+
+      <div class="ap-resumen__fila">
+        <span>Coste de entrega</span>
+        <span class="ap-resumen__gratis" *ngIf="tipoEnvio === 'RECOJO'">Gratis</span>
+        <span *ngIf="tipoEnvio === 'ENVIO'">S/ {{ envioSeleccionado?.costo | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="ap-resumen__total">
+        <span>Total</span>
+        <span>S/ {{ total | number:'1.2-2' }}</span>
+      </div>
+
+      <button type="button" class="ap-boton ap-boton--acento ap-boton--bloque" (click)="irPagar()">
+        <i class="pi pi-credit-card"></i> Ir a pagar
+      </button>
+
+      <p class="ap-resumen__seguro">
+        <i class="pi pi-lock"></i> Pago seguro
+      </p>
+    </aside>
 
   </div>
-</div>
-  </div> 
 </div>

@@ -1,75 +1,70 @@
-<header>
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-</header>
+<!-- ============================================================
+     Checkout
+     Una sola columna centrada: aquí el objetivo es que no haya
+     distracciones y el pago se complete.
+     ============================================================ -->
 
-<div class="container my-5">
-  <div class="checkout-card mx-auto">
+<div class="ap-checkout">
+  <div class="ap-checkout__caja">
 
-    <div class="checkout-header">
-      <div class="icon-circle">
-        <i class="bi bi-credit-card-fill"></i>
-      </div>
-      <h3>Pago seguro</h3>
-      <p>Estás a un paso de completar tu outfit</p>
+    <header class="ap-checkout__cabecera">
+      <span class="ap-etiqueta">Último paso</span>
+      <h1 class="ap-checkout__titulo">Pago</h1>
+      <p class="ap-checkout__texto">Revisa el método de pago y confirma tu pedido.</p>
+    </header>
+
+    <!-- ---------- Pago completado ---------- -->
+    <div class="ap-checkout__exito" *ngIf="exito">
+      <i class="pi pi-check-circle"></i>
+      <h2>Pago realizado</h2>
+      <p *ngIf="pedidoResponse">
+        Entrega estimada: <strong>{{ pedidoResponse.tiempoEntrega }}</strong>
+      </p>
     </div>
 
-    <form (ngSubmit)="pagar()" #form="ngForm">
+    <!-- ---------- Formulario ---------- -->
+    <form (ngSubmit)="pagar()" #form="ngForm" *ngIf="!exito">
 
-      <div class="mb-4">
-        <label class="form-label fw-semibold">
-          <i class="bi bi-wallet-fill me-1 text-accent"></i>
-          Método de pago
-        </label>
-
-        <select class="form-select tarjeta-select"
+      <div class="ap-campo">
+        <label for="tarjeta">Método de pago</label>
+        <select id="tarjeta"
                 [(ngModel)]="tarjetaSeleccionada"
                 name="tarjeta"
                 required>
-
           <option [ngValue]="null">Selecciona una tarjeta</option>
-
           <option *ngFor="let t of tarjetas" [ngValue]="t">
-            {{ t?.marca || 'TARJETA' }}
-            •••• {{ t?.numero?.slice(-4) }}
-            — S/ {{ t?.saldo | number:'1.2-2' }}
+            {{ t?.marca || 'Tarjeta' }} ···· {{ t?.numero?.slice(-4) }} — S/ {{ t?.saldo | number:'1.2-2' }}
           </option>
         </select>
       </div>
 
-      <button class="btn btn-pagar w-100" [disabled]="loading">
-        <i class="bi bi-bag-check-fill me-2"></i>
-        {{ loading ? 'Procesando...' : ('Pagar S/ ' + (total | number:'1.2-2')) }}
+      <button type="button" class="ap-checkout__nueva" (click)="AgregarTarjeta()">
+        <i class="pi pi-plus"></i> Añadir una tarjeta nueva
       </button>
 
-      <div *ngIf="error" class="alert alert-danger mt-3">
-        <i class="bi bi-x-circle-fill me-2"></i>
-        {{ error }}
+      <div class="ap-checkout__total">
+        <span>Total a pagar</span>
+        <strong>S/ {{ total | number:'1.2-2' }}</strong>
       </div>
 
-      <div *ngIf="exito" class="alert alert-success mt-3">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        ¡Pago realizado con éxito!
-      </div>
+      <button type="submit" class="ap-boton ap-boton--acento ap-boton--bloque"
+              [disabled]="loading || !tarjetaSeleccionada">
+        <i class="pi" [ngClass]="loading ? 'pi-spinner pi-spin' : 'pi-lock'"></i>
+        {{ loading ? 'Procesando...' : 'Confirmar pedido' }}
+      </button>
+
+      <p class="ap-checkout__error" *ngIf="error">
+        <i class="pi pi-exclamation-circle"></i> {{ error }}
+      </p>
+
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--bloque" (click)="volver()">
+        <i class="pi pi-arrow-left"></i> Volver al carrito
+      </button>
     </form>
 
-    <div class="nueva-tarjeta" (click)="AgregarTarjeta()">
-      <i class="bi bi-plus-lg"></i>
-      <span>Agregar nueva tarjeta</span>
-    </div>
-
-    <button class="btn btn-volver" type="button" (click)="volver()">
-      <i class="bi bi-arrow-left"></i> Volver
-    </button>
-
-    <div class="checkout-footer">
-      <i class="bi bi-shield-lock-fill"></i>
-      Pago protegido · Datos encriptados
-    </div>
-
-    <strong *ngIf="pedidoResponse">
-      Tiempo estimado de entrega: {{ pedidoResponse.tiempoEntrega }}
-    </strong>
+    <p class="ap-checkout__pie">
+      <i class="pi pi-shield"></i> Pago protegido · Datos cifrados
+    </p>
 
   </div>
 </div>
