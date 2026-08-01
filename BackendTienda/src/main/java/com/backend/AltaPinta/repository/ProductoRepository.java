@@ -32,11 +32,13 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
         FROM Producto p
         LEFT JOIN p.categoria c
         LEFT JOIN p.tipoPrenda tp
+        LEFT JOIN p.deporte d
         LEFT JOIN p.tallasDisponibles pt
         LEFT JOIN pt.talla t
         WHERE (:nombre IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%')))
           AND (:categoria IS NULL OR LOWER(c.nombre) = LOWER(:categoria))
           AND (:tipo IS NULL OR LOWER(tp.nombre) = LOWER(:tipo))
+          AND (:deporte IS NULL OR LOWER(d.nombre) = LOWER(:deporte))
           AND (:talla IS NULL OR t.nombre = :talla)
         """,
         countQuery = """
@@ -44,17 +46,20 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
         FROM Producto p
         LEFT JOIN p.categoria c
         LEFT JOIN p.tipoPrenda tp
+        LEFT JOIN p.deporte d
         LEFT JOIN p.tallasDisponibles pt
         LEFT JOIN pt.talla t
         WHERE (:nombre IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%')))
           AND (:categoria IS NULL OR LOWER(c.nombre) = LOWER(:categoria))
           AND (:tipo IS NULL OR LOWER(tp.nombre) = LOWER(:tipo))
+          AND (:deporte IS NULL OR LOWER(d.nombre) = LOWER(:deporte))
           AND (:talla IS NULL OR t.nombre = :talla)
         """)
     Page<Producto> buscar(
             @Param("nombre") String nombre,
             @Param("categoria") String categoria,
             @Param("tipo") String tipo,
+            @Param("deporte") String deporte,
             @Param("talla") String talla,
             Pageable pageable
     );

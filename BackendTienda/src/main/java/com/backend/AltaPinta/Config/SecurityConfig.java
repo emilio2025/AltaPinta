@@ -70,6 +70,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/tipos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/tallas/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/deportes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/productos/tipos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/imagenes/**").permitAll()
@@ -80,6 +81,7 @@ public class SecurityConfig {
                         // Estas reglas van después de los GET de arriba, que ya los permiten.
                         .requestMatchers("/categorias/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/tallas/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/deportes/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/tipos/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("ROLE_ADMIN")

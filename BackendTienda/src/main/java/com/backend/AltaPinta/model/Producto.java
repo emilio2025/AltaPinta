@@ -39,6 +39,12 @@ public class Producto {
     @JoinColumn(name = "tipo_prenda_id")
     private TipoPrenda tipoPrenda;
 
+    // Deporte al que va dirigida la prenda. Admite null: los productos
+    // cargados antes de introducir este campo no lo tienen asignado.
+    @ManyToOne
+    @JoinColumn(name = "deporte_id")
+    private Deporte deporte;
+
     // Tallas disponibles para este producto, cada una con su propio stock.
     // Se gestionan explícitamente vía ProductoTallaRepository (ver ProductoController),
     // no por cascade, para evitar sorpresas al guardar/editar el producto base.
@@ -109,6 +115,14 @@ public class Producto {
 
     public void setTipoPrenda(TipoPrenda tipoPrenda) {
         this.tipoPrenda = tipoPrenda;
+    }
+
+    public Deporte getDeporte() {
+        return deporte;
+    }
+
+    public void setDeporte(Deporte deporte) {
+        this.deporte = deporte;
     }
 
     public List<ProductoTalla> getTallasDisponibles() {

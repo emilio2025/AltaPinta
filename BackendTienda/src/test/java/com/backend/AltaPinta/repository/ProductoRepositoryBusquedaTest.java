@@ -36,6 +36,7 @@ class ProductoRepositoryBusquedaTest {
     @Autowired private TipoPrendaRepository tipoRepo;
     @Autowired private TallaRepository tallaRepo;
     @Autowired private ProductoTallaRepository productoTallaRepo;
+    @Autowired private DeporteRepository deporteRepo;
 
     private Categoria mujer;
     private Categoria varon;
@@ -92,8 +93,73 @@ class ProductoRepositoryBusquedaTest {
     }
 
     private Page<Producto> buscar(String nombre, String categoria, String tipo, String talla, int pagina, int tamano) {
-        return productoRepo.buscar(nombre, categoria, tipo, talla,
+        return productoRepo.buscar(nombre, categoria, tipo, null, talla,
                 PageRequest.of(pagina, tamano, Sort.by("id")));
+    }
+
+    private Page<Producto> buscarPorDeporte(String deporte) {
+        return productoRepo.buscar(null, null, null, deporte, null,
+                PageRequest.of(0, 20, Sort.by("id")));
+    }
+
+    // ============================================================
+    @Nested
+    @DisplayName("Filtro por deporte")
+    class FiltroDeporte {
+
+        private Deporte running;
+        private Deporte yoga;
+
+        @BeforeEach
+        void catalogo() {
+            running = deporte("Running");
+            yoga = deporte("Yoga");
+
+            conDeporte(producto("Short ligero", mujer, pantalon, tallaM), running);
+            conDeporte(producto("Camiseta transpirable", varon, polo, tallaM), running);
+            conDeporte(producto("Legging alta compresion", mujer, pantalon, tallaL), yoga);
+            // Producto sin deporte asignado: los del catalogo original estan asi.
+            producto("Prenda sin clasificar", mujer, polo, tallaM);
+        }
+
+        private Deporte deporte(String nombre) {
+            Deporte d = new Deporte();
+            d.setNombre(nombre);
+            return deporteRepo.save(d);
+        }
+
+        private void conDeporte(Producto p, Deporte d) {
+            p.setDeporte(d);
+            productoRepo.save(p);
+        }
+
+        @Test
+        @DisplayName("Filtra los productos de un deporte")
+        void filtraPorDeporte() {
+            assertEquals(2, buscarPorDeporte("Running").getTotalElements());
+            assertEquals(1, buscarPorDeporte("Yoga").getTotalElements());
+        }
+
+        @Test
+        @DisplayName("No distingue mayusculas")
+        void sinDistinguirMayusculas() {
+            assertEquals(2, buscarPorDeporte("running").getTotalElements());
+            assertEquals(2, buscarPorDeporte("RUNNING").getTotalElements());
+        }
+
+        @Test
+        @DisplayName("Sin filtro de deporte aparecen tambien los productos sin asignar")
+        void sinFiltroSalenTodos() {
+            // El LEFT JOIN con deporte es lo que mantiene visible la prenda
+            // sin clasificar; con un INNER JOIN desapareceria del catalogo.
+            assertEquals(4, buscarPorDeporte(null).getTotalElements());
+        }
+
+        @Test
+        @DisplayName("Un deporte sin productos devuelve pagina vacia")
+        void deporteSinProductos() {
+            assertEquals(0, buscarPorDeporte("Basquet").getTotalElements());
+        }
     }
 
     // ============================================================

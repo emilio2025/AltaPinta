@@ -1,0 +1,265 @@
+/* ============================================================
+   AltaPinta — estilos globales
+
+   Identidad de tienda deportiva: base monocroma para que mande la
+   fotografía del producto, tipografía condensada en mayúsculas para
+   títulos y navegación, y un único acento para llamadas a la acción.
+
+   El orden de capas importa: PrimeNG se declara antes que las
+   utilidades de Tailwind, así una clase suelta de Tailwind puede
+   ajustar un componente sin recurrir a !important.
+   ============================================================ */
+
+@layer theme, base, primeng, utilities;
+
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+/* ---------- Tokens de marca ---------- */
+:root {
+  --ap-negro: #0a0a0a;
+  --ap-blanco: #ffffff;
+  --ap-gris-100: #f4f4f4;
+  --ap-gris-200: #e8e8e8;
+  --ap-gris-400: #a3a3a3;
+  --ap-gris-600: #525252;
+  --ap-acento: #d4ff3f;          /* lima: solo para CTA y estados activos */
+  --ap-acento-oscuro: #b8e02c;
+  --ap-alerta: #e11d48;
+
+  --ap-borde: 1px solid var(--ap-gris-200);
+  --ap-transicion: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Base ---------- */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ap-blanco);
+  color: var(--ap-negro);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ---------- Utilidades de marca ---------- */
+
+/* Título de sección con la barra de acento a la izquierda */
+.ap-titulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.ap-titulo-seccion::before {
+  content: "";
+  width: 4px;
+  height: 1.5em;
+  background: var(--ap-acento);
+}
+
+/* Etiqueta pequeña en mayúsculas (categorías, deportes, metadatos) */
+.ap-etiqueta {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ap-gris-600);
+}
+
+/* Botón principal: negro, recto, con inversión al pasar el ratón */
+.ap-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  border: 2px solid var(--ap-negro);
+  background: var(--ap-negro);
+  color: var(--ap-blanco);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--ap-transicion), color var(--ap-transicion);
+}
+.ap-boton:hover {
+  background: var(--ap-blanco);
+  color: var(--ap-negro);
+}
+
+.ap-boton--acento {
+  background: var(--ap-acento);
+  border-color: var(--ap-acento);
+  color: var(--ap-negro);
+}
+.ap-boton--acento:hover {
+  background: var(--ap-negro);
+  border-color: var(--ap-negro);
+  color: var(--ap-blanco);
+}
+
+.ap-boton--fantasma {
+  background: transparent;
+  color: var(--ap-negro);
+}
+
+/* ---------- Tarjeta de producto ---------- */
+.ap-producto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--ap-blanco);
+  cursor: pointer;
+}
+
+.ap-producto__imagen {
+  position: relative;
+  overflow: hidden;
+  background: var(--ap-gris-100);
+  aspect-ratio: 3 / 4;
+}
+
+.ap-producto__imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ap-producto:hover .ap-producto__imagen img {
+  transform: scale(1.04);
+}
+
+/* Acciones que aparecen al pasar el ratón sobre la tarjeta */
+.ap-producto__acciones {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  gap: 1px;
+  transform: translateY(100%);
+  transition: transform var(--ap-transicion);
+}
+.ap-producto:hover .ap-producto__acciones,
+.ap-producto:focus-within .ap-producto__acciones {
+  transform: translateY(0);
+}
+
+/* En pantallas táctiles no hay hover: las acciones se quedan visibles */
+@media (hover: none) {
+  .ap-producto__acciones {
+    transform: translateY(0);
+  }
+}
+
+.ap-producto__accion {
+  flex: 1;
+  padding: 0.7rem;
+  border: 0;
+  background: var(--ap-negro);
+  color: var(--ap-blanco);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--ap-transicion);
+}
+.ap-producto__accion:hover {
+  background: var(--ap-acento);
+  color: var(--ap-negro);
+}
+
+.ap-producto__info {
+  padding: 0.85rem 0 0;
+}
+
+.ap-producto__nombre {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.35;
+  /* Dos líneas como máximo: mantiene la cuadrícula alineada */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ap-producto__precio {
+  margin-top: 0.35rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+/* Insignia sobre la imagen (deporte, agotado, novedad) */
+.ap-insignia {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  padding: 0.28rem 0.6rem;
+  background: var(--ap-blanco);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ap-insignia--acento { background: var(--ap-acento); }
+.ap-insignia--agotado { background: var(--ap-negro); color: var(--ap-blanco); }
+
+/* Corazón de favorito */
+.ap-favorito {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 2;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background var(--ap-transicion), transform var(--ap-transicion);
+}
+.ap-favorito:hover { transform: scale(1.1); }
+.ap-favorito--activo { color: var(--ap-alerta); }
+
+/* ---------- Cuadrícula de productos ---------- */
+.ap-cuadricula {
+  display: grid;
+  gap: 1.5rem 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 768px)  { .ap-cuadricula { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .ap-cuadricula { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* ---------- Ajustes puntuales de PrimeNG ---------- */
+.p-button {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.p-paginator {
+  background: transparent;
+  border: 0;
+}

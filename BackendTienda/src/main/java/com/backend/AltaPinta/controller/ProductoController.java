@@ -91,6 +91,7 @@ public class ProductoController {
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String categoria,
             @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String deporte,
             @RequestParam(required = false) String talla,
             @PageableDefault(size = 12, sort = "id") Pageable pageable
     ) {
@@ -98,6 +99,7 @@ public class ProductoController {
                 normalizar(nombre),
                 normalizar(categoria),
                 normalizar(tipo),
+                normalizar(deporte),
                 normalizar(talla),
                 pageable
         );

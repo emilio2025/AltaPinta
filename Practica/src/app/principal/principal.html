@@ -1,193 +1,260 @@
-<head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-</head>
+<!-- ============================================================
+     Portada de AltaPinta
+     Cabecera fija, hero a pantalla ancha, deportes en cuadricula y
+     resultados que sustituyen al contenido de portada al filtrar.
+     ============================================================ -->
 
-<nav class="navbar navbar-expand-lg menu-top shadow-sm">
-  <div class="container-fluid d-flex align-items-center">
+<!-- ---------- Cabecera ---------- -->
+<header class="ap-cabecera">
+  <div class="ap-cabecera__barra">
 
-      <div class="d-flex align-items-center logo-box"></div>
-      <!--<i class="bi bi-list menu-icon me-3" role="button" (click)="irMenu()"></i>-->
+    <a class="ap-logo" (click)="limpiarFiltros()">ALTA<span>PINTA</span></a>
 
-      <ul class="navbar-nav mx-auto gap-4 fw-semibold nav-categorias">
-          <li class="nav-item" *ngFor="let c of categorias">
-              <a class="nav-link" (click)="filtrarCategoria(c.nombre)">{{ c.nombre.toUpperCase() }}</a>
-          </li>
-      </ul>
+    <nav class="ap-nav">
+      <button type="button"
+              *ngFor="let c of categorias"
+              class="ap-nav__enlace"
+              [class.ap-nav__enlace--activo]="categoriaSeleccionada === c.nombre"
+              (click)="filtrarCategoria(c.nombre)">
+        {{ c.nombre }}
+      </button>
+    </nav>
 
-      <div class="search-box">
-        <i class="bi bi-search"></i>
-        <input type="text" [(ngModel)]="busqueda" placeholder="Buscar..." (input)="buscar()">
+    <div class="ap-cabecera__acciones">
+      <div class="ap-buscador">
+        <i class="pi pi-search"></i>
+        <input type="text"
+               [(ngModel)]="busqueda"
+               placeholder="Buscar productos"
+               (input)="buscar()"
+               aria-label="Buscar productos">
       </div>
 
-      <div class="icons">
-        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i>
-        <i class="bi bi-cart" role="button" (click)="irCarrito()"></i>
-        <i class="bi bi-person-circle" role="button" (click)="irLogin()"></i>Iniciar Sesion
-      </div>
+      <button type="button" class="ap-icono" (click)="irFavoritos()" aria-label="Favoritos">
+        <i class="pi pi-heart"></i>
+      </button>
+      <button type="button" class="ap-icono" (click)="irCarrito()" aria-label="Carrito">
+        <i class="pi pi-shopping-bag"></i>
+      </button>
+      <button type="button" class="ap-boton ap-boton--pequeno" (click)="irLogin()">
+        Iniciar sesión
+      </button>
+    </div>
 
   </div>
-</nav>
+</header>
 
-<section *ngIf="mostrandoResultados" class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h2 class="subtitulo-seccion mb-0">
-            Resultados
-            <small class="text-muted fs-6" *ngIf="totalResultados">
-                ({{ totalResultados }} {{ totalResultados === 1 ? 'producto' : 'productos' }})
-            </small>
-        </h2>
-        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="limpiarFiltros()">
-            Limpiar filtros
+<!-- ============================================================
+     RESULTADOS — sustituyen a la portada cuando hay filtros activos
+     ============================================================ -->
+<section *ngIf="mostrandoResultados" class="ap-seccion">
+
+  <div class="ap-resultados__cabecera">
+    <div>
+      <span class="ap-etiqueta">Catálogo</span>
+      <h2 class="ap-titulo-seccion">{{ tituloResultados }}</h2>
+    </div>
+    <div class="ap-resultados__meta">
+      <span class="ap-etiqueta" *ngIf="totalResultados">
+        {{ totalResultados }} {{ totalResultados === 1 ? 'producto' : 'productos' }}
+      </span>
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno"
+              (click)="limpiarFiltros()">
+        <i class="pi pi-times"></i> Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros activos como fichas retirables -->
+  <div class="ap-fichas" *ngIf="categoriaSeleccionada || deporteSeleccionado">
+    <button type="button" class="ap-ficha" *ngIf="categoriaSeleccionada"
+            (click)="filtrarCategoria(categoriaSeleccionada)">
+      {{ categoriaSeleccionada }} <i class="pi pi-times"></i>
+    </button>
+    <button type="button" class="ap-ficha" *ngIf="deporteSeleccionado"
+            (click)="filtrarDeporte(deporteSeleccionado)">
+      {{ deporteSeleccionado }} <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <p *ngIf="totalResultados === 0" class="ap-vacio">
+    <i class="pi pi-inbox"></i>
+    No encontramos productos con esos criterios.
+  </p>
+
+  <div class="ap-cuadricula">
+    <article class="ap-producto" *ngFor="let p of filtrados" (click)="verDetalles(p)">
+      <div class="ap-producto__imagen">
+        <span class="ap-insignia" *ngIf="p.deporte">{{ p.deporte.nombre }}</span>
+
+        <button type="button" class="ap-favorito"
+                [class.ap-favorito--activo]="esFavorito(p.id)"
+                (click)="agregarFavorito(p); $event.stopPropagation()"
+                aria-label="Añadir a favoritos">
+          <i class="pi" [ngClass]="esFavorito(p.id) ? 'pi-heart-fill' : 'pi-heart'"></i>
         </button>
-    </div>
 
-    <p *ngIf="totalResultados === 0" class="text-muted mt-3">
-        No se encontraron productos con esos criterios.
-    </p>
+        <img [src]="p.imagenUrl" [alt]="p.nombre"
+             onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
 
-    <div class="row row-cols-1 row-cols-md-4 g-4">
-        <div class="col" *ngFor="let p of filtrados">
-            
-            <div class="card-filter">
-                
-                <img [src]="p.imagenUrl" onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
-
-                <div class="card-info">
-                    <h5>{{ p.nombre }}</h5>
-                    <span class="precio">S/. {{ p.precio }}</span>
-                </div>
-
-                <div class="card-bottom">
-                    <i class="bi bi-heart"
-                    (click)="agregarFavorito(p)"
-                    [ngClass]="{ 'text-danger': esFavorito(p.id) }">
-                    </i>
-                    <i class="bi bi-cart" (click)="agregarCarrito(p)"></i>
-                </div>
-
-            </div>
-
+        <div class="ap-producto__acciones">
+          <button type="button" class="ap-producto__accion"
+                  (click)="agregarCarrito(p); $event.stopPropagation()">
+            Añadir al carrito
+          </button>
         </div>
-    </div>
+      </div>
 
-    <!-- Paginacion: solo tiene sentido si hay mas de una pagina -->
-    <nav class="d-flex justify-content-center mt-4" *ngIf="totalPaginas > 1">
-        <ul class="pagination">
-            <li class="page-item" [class.disabled]="pagina === 0">
-                <button class="page-link" type="button"
-                        (click)="paginaAnterior()" [disabled]="pagina === 0">
-                    Anterior
-                </button>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">Página {{ pagina + 1 }} de {{ totalPaginas }}</span>
-            </li>
-            <li class="page-item" [class.disabled]="pagina >= totalPaginas - 1">
-                <button class="page-link" type="button"
-                        (click)="paginaSiguiente()" [disabled]="pagina >= totalPaginas - 1">
-                    Siguiente
-                </button>
-            </li>
-        </ul>
-    </nav>
+      <div class="ap-producto__info">
+        <h3 class="ap-producto__nombre">{{ p.nombre }}</h3>
+        <div class="ap-producto__precio">S/ {{ p.precio }}</div>
+      </div>
+    </article>
+  </div>
+
+  <nav class="ap-paginacion" *ngIf="totalPaginas > 1">
+    <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno"
+            (click)="paginaAnterior()" [disabled]="pagina === 0">
+      <i class="pi pi-arrow-left"></i> Anterior
+    </button>
+    <span class="ap-etiqueta">Página {{ pagina + 1 }} de {{ totalPaginas }}</span>
+    <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno"
+            (click)="paginaSiguiente()" [disabled]="pagina >= totalPaginas - 1">
+      Siguiente <i class="pi pi-arrow-right"></i>
+    </button>
+  </nav>
 </section>
 
+<!-- ============================================================
+     PORTADA — visible mientras no hay filtros
+     ============================================================ -->
+<ng-container *ngIf="!mostrandoResultados">
 
-<section class="hero-principal container mt-5">
-    <h1 class="titulo-hero">Nuevas Tendencias para Tu Estilo</h1>
-    <p class="texto-hero">
-        Descubre prendas únicas para hombres, mujeres y niños. 
-        Lleva tu look al siguiente nivel con las colecciones más recientes.</p>
-
-    <div class="row g-4 mt-4">
-        <div class="col-md-6" *ngFor="let h of productosHero">
-            <div class="hero-img-box" (click)="verDetalles(h)">
-                <img [src]="h.imagenUrl" onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;" alt="{{h.nombre}}">
-                <div class="hero-info">
-                <h5 class="titulo-card">{{ h.nombre }}</h5>
-                <span class="precio-card">S/. {{ h.precio }}</span>
-                </div>
-            </div>
-        </div>
+  <!-- Hero -->
+  <section class="ap-hero">
+    <div class="ap-hero__contenido">
+      <span class="ap-hero__kicker">Nueva temporada</span>
+      <h1 class="ap-hero__titulo">Entrena<br>sin excusas</h1>
+      <p class="ap-hero__texto">
+        Ropa deportiva para rendir en cada sesión. Tejidos técnicos,
+        cortes que acompañan el movimiento.
+      </p>
+      <div class="ap-hero__acciones">
+        <button type="button" class="ap-boton ap-boton--acento" (click)="irMenu()">
+          Ver catálogo
+        </button>
+        <button type="button" class="ap-boton ap-boton--claro"
+                *ngIf="deportes.length"
+                (click)="filtrarDeporte(deportes[0].nombre)">
+          {{ deportes[0].nombre }}
+        </button>
+      </div>
     </div>
-</section>
+  </section>
 
-<section class="container mt-5">
-    <h2 class="subtitulo-seccion">Tendencias en Bebés y Niños</h2>
+  <!-- Deportes en cuadricula -->
+  <section class="ap-seccion" *ngIf="deportes.length">
+    <span class="ap-etiqueta">Compra por</span>
+    <h2 class="ap-titulo-seccion">Deporte</h2>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col" *ngFor="let p of productosBebes">
-            <div class="card card-bebe shadow-sm" (click)="verDetalles(p)">
-                <img [src]="p.imagenUrl" onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
-                <h5 class="titulo-card">{{ p.nombre }}</h5>
-                <span class="precio-card">S/. {{ p.precio }}</span>
-            </div>
-        </div>
+    <div class="ap-deportes">
+      <button type="button" class="ap-deporte"
+              *ngFor="let d of deportes"
+              (click)="filtrarDeporte(d.nombre)">
+        <i class="pi" [ngClass]="d.icono || 'pi-bolt'"></i>
+        <span>{{ d.nombre }}</span>
+      </button>
     </div>
-</section>
+  </section>
 
-<section class="container mt-5">
-    <h2 class="subtitulo-seccion">Encabezado de sección</h2>
+  <!-- Categorias en cuadricula -->
+  <section class="ap-seccion" *ngIf="categorias.length">
+    <span class="ap-etiqueta">Compra por</span>
+    <h2 class="ap-titulo-seccion">Categoría</h2>
 
-    <div class="row g-4 align-items-center">
-        <div class="col-md-6">
-            <ul class="lista-info">
-                <li><b>Prendas Premium y Cómodas</b><br>Prendas suaves, cómodas y modernas 
-                                                    <br>pensadas para los más pequeños.</li>
-                <li><b>Estilo que Habla por Ti</b><br>Encuentra conjuntos, mamelucos, accesorios 
-                                                    <br>y más, elaborados con materiales pensados 
-                                                    <br>para su bienestar.</li>
-                <li><b>Todo para tu estilo diario</b><br>Ideales para el día a día, sesiones de fotos o 
-                                                    <br>salidas especiales, acompañando cada etapa 
-                                                    <br>de su crecimiento.</li>
-            </ul>
-        </div>
-
-        <div class="col-md-3"><img class="img-final" src="https://assetspwa.liverpool.com.mx/assets/digital/landing/bebes/img/2025/blp_bebe_mameluco_011025.jpg"></div>
-        <div class="col-md-3"><img class="img-final" src="https://m.media-amazon.com/images/I/71lDTcZkmzL._SL1500_.jpg"></div>
+    <div class="ap-categorias">
+      <button type="button" class="ap-categoria"
+              *ngFor="let c of categorias"
+              (click)="filtrarCategoria(c.nombre)">
+        <span class="ap-categoria__nombre">{{ c.nombre }}</span>
+        <i class="pi pi-arrow-right"></i>
+      </button>
     </div>
-</section>
+  </section>
 
-<footer class="footer-alta-pinta mt-5 pt-5 pb-4">
+  <!-- Destacados -->
+  <section class="ap-seccion" *ngIf="productosHero.length">
+    <span class="ap-etiqueta">Lo más buscado</span>
+    <h2 class="ap-titulo-seccion">Destacados</h2>
 
-    <div class="container">
-        <div class="row">
-
-            <div class="col-md-4 mb-4">
-                <h2 class="footer-titulo">ALTA PINTA</h2>
-                <p class="footer-texto">
-                    Moda con estilo, comodidad y tendencia para toda la familia.
-                    Hombre – Mujer – Bebés – Niños.
-                </p>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <h5 class="footer-sub">Información</h5>
-                <ul class="footer-list">
-                    <li><i class="bi bi-geo-alt"></i> Abancay, Perú</li>
-                    <li><i class="bi bi-telephone"></i> +51 972 651 891</li>
-                    <li><i class="bi bi-envelope"></i> altapintaunambao@gmail.com</li>
-                    <li><i class="bi bi-clock"></i> Lunes a Sábado — 9:00 am a 8:00 pm</li>
-                </ul>
-            </div>
-
-            <div class="col-md-4">
-                <h5 class="footer-sub">Síguenos</h5>
-                <div class="footer-redes">
-                    <a href="https://www.facebook.com/profile.php?id=61586115221681"><i class="bi bi-facebook"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                    <a href="#"><i class="bi bi-tiktok"></i></a>
-                    <a href="#"><i class="bi bi-whatsapp"></i></a>
-                </div>
-            </div>
-
+    <div class="ap-cuadricula">
+      <article class="ap-producto" *ngFor="let h of productosHero" (click)="verDetalles(h)">
+        <div class="ap-producto__imagen">
+          <span class="ap-insignia ap-insignia--acento" *ngIf="h.deporte">{{ h.deporte.nombre }}</span>
+          <img [src]="h.imagenUrl" [alt]="h.nombre"
+               onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
+          <div class="ap-producto__acciones">
+            <button type="button" class="ap-producto__accion"
+                    (click)="agregarCarrito(h); $event.stopPropagation()">
+              Añadir al carrito
+            </button>
+          </div>
         </div>
-
-        <hr>
-        <p class="footer-copy text-center mb-0">
-            © 2025 Alta Pinta — Todos los derechos reservados.
-        </p>
+        <div class="ap-producto__info">
+          <h3 class="ap-producto__nombre">{{ h.nombre }}</h3>
+          <div class="ap-producto__precio">S/ {{ h.precio }}</div>
+        </div>
+      </article>
     </div>
+  </section>
 
+  <!-- Bebes y ninos -->
+  <section class="ap-seccion" *ngIf="productosBebes.length">
+    <span class="ap-etiqueta">Para los más pequeños</span>
+    <h2 class="ap-titulo-seccion">Bebés y niños</h2>
+
+    <div class="ap-cuadricula">
+      <article class="ap-producto" *ngFor="let p of productosBebes" (click)="verDetalles(p)">
+        <div class="ap-producto__imagen">
+          <img [src]="p.imagenUrl" [alt]="p.nombre"
+               onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
+          <div class="ap-producto__acciones">
+            <button type="button" class="ap-producto__accion"
+                    (click)="agregarCarrito(p); $event.stopPropagation()">
+              Añadir al carrito
+            </button>
+          </div>
+        </div>
+        <div class="ap-producto__info">
+          <h3 class="ap-producto__nombre">{{ p.nombre }}</h3>
+          <div class="ap-producto__precio">S/ {{ p.precio }}</div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Franja de valores -->
+  <section class="ap-valores">
+    <div class="ap-valor">
+      <i class="pi pi-truck"></i>
+      <strong>Envío a todo el Perú</strong>
+      <span>24 a 48 h en Lima</span>
+    </div>
+    <div class="ap-valor">
+      <i class="pi pi-refresh"></i>
+      <strong>Cambios sin coste</strong>
+      <span>30 días para decidir</span>
+    </div>
+    <div class="ap-valor">
+      <i class="pi pi-shield"></i>
+      <strong>Pago seguro</strong>
+      <span>Tus datos, protegidos</span>
+    </div>
+  </section>
+
+</ng-container>
+
+<footer class="ap-pie">
+  <span class="ap-logo ap-logo--claro">ALTA<span>PINTA</span></span>
+  <p>Ropa deportiva · UNAMBA · Ingeniería de Software II</p>
 </footer>
-

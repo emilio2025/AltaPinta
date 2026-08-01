@@ -44,11 +44,19 @@ export interface Pagina<T> {
   last: boolean;
 }
 
+/** Deporte al que va dirigida una prenda. */
+export interface Deporte {
+  id: number;
+  nombre: string;
+  icono?: string;
+}
+
 /** Criterios de busqueda del catalogo. Todos opcionales. */
 export interface FiltrosProducto {
   nombre?: string;
   categoria?: string;
   tipo?: string;
+  deporte?: string;
   talla?: string;
   page?: number;
   size?: number;
@@ -78,6 +86,7 @@ export class ProductoService {
     if (filtros.nombre?.trim())    params = params.set('nombre', filtros.nombre.trim());
     if (filtros.categoria?.trim()) params = params.set('categoria', filtros.categoria.trim());
     if (filtros.tipo?.trim())      params = params.set('tipo', filtros.tipo.trim());
+    if (filtros.deporte?.trim())   params = params.set('deporte', filtros.deporte.trim());
     if (filtros.talla?.trim())     params = params.set('talla', filtros.talla.trim());
 
     return this.http.get<Pagina<Producto>>(`${this.URL}/productos`, { params });
@@ -89,6 +98,7 @@ export class ProductoService {
   getPorCategoria(nombre:string){ return this.http.get<any[]>(`${this.URL}/productos/categoria/${nombre}`); }
 
   getTipos(){ return this.http.get<any[]>(`${this.URL}/tipos`); }
+  getDeportes(){ return this.http.get<Deporte[]>(`${this.URL}/deportes`); }
   getPorTipo(nombre:string){ return this.http.get<any[]>(`${this.URL}/productos/tipo/${nombre}`); }
 
   getTallas(){ return this.http.get<any[]>(`${this.URL}/tallas`); }

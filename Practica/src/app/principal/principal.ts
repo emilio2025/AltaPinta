@@ -27,6 +27,8 @@ export class PrincipalComponent implements OnInit {
   categoriaSeleccionada: string = "";
 
   categorias: any[] = [];
+  deportes: any[] = [];
+  deporteSeleccionado: string = "";
 
   // Paginacion. El backend numera las paginas desde 0.
   pagina = 0;
@@ -54,12 +56,22 @@ export class PrincipalComponent implements OnInit {
 
     this.cargarDestacados();
     this.cargarCategorias();
+    this.cargarDeportes();
     this.cargarFavoritos();
   }
 
-  /** True cuando hay una busqueda o una categoria activa. */
+  /** True cuando hay algun filtro activo: entonces se muestra la cuadricula. */
   get mostrandoResultados(): boolean {
-    return !!this.busqueda.trim() || !!this.categoriaSeleccionada;
+    return !!this.busqueda.trim() || !!this.categoriaSeleccionada || !!this.deporteSeleccionado;
+  }
+
+  /** Texto que resume que se esta viendo, para la cabecera de resultados. */
+  get tituloResultados(): string {
+    if (this.busqueda.trim()) return `"${this.busqueda.trim()}"`;
+    if (this.deporteSeleccionado && this.categoriaSeleccionada) {
+      return `${this.deporteSeleccionado} · ${this.categoriaSeleccionada}`;
+    }
+    return this.deporteSeleccionado || this.categoriaSeleccionada || 'Resultados';
   }
 
   /**
@@ -90,11 +102,16 @@ export class PrincipalComponent implements OnInit {
     this.productoService.getCategorias().subscribe(res => this.categorias = res);
   }
 
+  cargarDeportes(){
+    this.productoService.getDeportes().subscribe(res => this.deportes = res);
+  }
+
   /** Pide al backend la pagina actual con los filtros activos. */
   cargarPagina(){
     this.productoService.buscar({
       nombre: this.busqueda,
       categoria: this.categoriaSeleccionada,
+      deporte: this.deporteSeleccionado,
       page: this.pagina,
       size: this.tamanoPagina
     }).subscribe(res => {
@@ -111,6 +128,12 @@ export class PrincipalComponent implements OnInit {
     this.cargarPagina();
   }
 
+  filtrarDeporte(deporte: string){
+    this.deporteSeleccionado = this.deporteSeleccionado === deporte ? "" : deporte;
+    this.pagina = 0;
+    this.cargarPagina();
+  }
+
   buscar(){
     this.terminoBuscado.next(this.busqueda);
   }
@@ -118,6 +141,7 @@ export class PrincipalComponent implements OnInit {
   limpiarFiltros(){
     this.busqueda = "";
     this.categoriaSeleccionada = "";
+    this.deporteSeleccionado = "";
     this.pagina = 0;
     this.filtrados = [];
     this.totalPaginas = 0;
