@@ -106,6 +106,17 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!--
+			Base de datos en memoria para las pruebas de repositorio
+			(@DataJpaTest). Solo con scope test: no se empaqueta con la
+			aplicacion, que sigue usando MySQL.
+		-->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>

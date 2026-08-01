@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,13 +25,24 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     Double totalVendido();
 
     // Ventas por día
+    // Se consulta por rango [inicio, fin) en vez de con DATE(p.fecha):
+    //   - DATE() no es una función estándar de HQL, así que Hibernate la
+    //     pasaba tal cual al SQL y solo funcionaba en MySQL.
+    //   - Aplicar una función sobre la columna impide usar un índice sobre
+    //     fecha; comparar por rango sí lo aprovecha.
     @Query("""
         SELECT COALESCE(SUM(p.total),0)
         FROM Pedido p
         WHERE p.estado = 'PAGADO'
-        AND DATE(p.fecha) = :fecha
+        AND p.fecha >= :inicio
+        AND p.fecha < :fin
     """)
-    Double ventasPorDia(LocalDate fecha);
+    Double ventasEntre(LocalDateTime inicio, LocalDateTime fin);
+
+    /** Ventas de un día completo, de las 00:00 inclusive a las 00:00 del día siguiente. */
+    default Double ventasPorDia(LocalDate fecha) {
+        return ventasEntre(fecha.atStartOfDay(), fecha.plusDays(1).atStartOfDay());
+    }
 
     // Ventas por mes
     @Query("""
