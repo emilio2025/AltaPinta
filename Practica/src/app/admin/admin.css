@@ -174,3 +174,40 @@ body {
 .en-transito { background: rgba(255, 193, 7, 0.7); color: #333; } 
 .en-destino { background: rgba(0, 188, 212, 0.7); color: #fff; }
 .entregado { background: rgba(96, 125, 139, 0.7); }  
+
+/* ============================================================
+   Deportes
+   ============================================================ */
+.card-deportes {
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.chip-deporte {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.5rem 0.4rem 0.75rem;
+  border: 1px solid #0a0a0a;
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.chip-deporte i.pi { font-size: 0.8rem; color: #d4ff3f; }
+
+.chip-deporte__quitar {
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+.chip-deporte__quitar:hover { background: #e11d48; }

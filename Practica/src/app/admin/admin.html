@@ -108,6 +108,63 @@
     </div>
   </div>
 
+  <!-- DEPORTES -->
+  <div class="card card-deportes mb-4">
+    <div class="card-body">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-lightning-charge me-2"></i> Deportes
+      </h6>
+
+      <p class="text-muted small mb-3">
+        Cada producto se asigna a un deporte desde la pantalla de productos.
+        Al eliminar un deporte, los productos que lo usen quedan sin asignar.
+      </p>
+
+      <!-- Alta -->
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-5">
+          <label class="form-label small fw-semibold">Nombre</label>
+          <input type="text" class="form-control"
+                 [(ngModel)]="nuevoDeporte.nombre"
+                 name="nuevoDeporteNombre"
+                 placeholder="Ej. Natación"
+                 (keyup.enter)="crearDeporte()">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold">Icono</label>
+          <select class="form-select" [(ngModel)]="nuevoDeporte.icono" name="nuevoDeporteIcono">
+            <option *ngFor="let ic of iconosDisponibles" [value]="ic">{{ ic }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button type="button" class="btn btn-dark w-100"
+                  [disabled]="!nuevoDeporte.nombre.trim()"
+                  (click)="crearDeporte()">
+            <i class="bi bi-plus-lg"></i> Añadir
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert-info py-2 small" *ngIf="deporteMensaje">{{ deporteMensaje }}</div>
+
+      <!-- Listado -->
+      <div class="d-flex flex-wrap gap-2">
+        <span class="chip-deporte" *ngFor="let d of deportes">
+          <i class="pi" [ngClass]="d.icono || 'pi-bolt'"></i>
+          {{ d.nombre }}
+          <button type="button" class="chip-deporte__quitar"
+                  (click)="eliminarDeporte(d)"
+                  [attr.aria-label]="'Eliminar ' + d.nombre">
+            <i class="bi bi-x"></i>
+          </button>
+        </span>
+        <span class="text-muted small" *ngIf="deportes.length === 0">
+          Todavía no hay deportes registrados.
+        </span>
+      </div>
+    </div>
+  </div>
+
   <!-- PEDIDOS / CAMBIO DE ESTADO -->
 <div class="card card-pedidos-estado mb-4">
   <div class="card-body">

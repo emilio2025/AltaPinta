@@ -97,3 +97,15 @@ body{
 @keyframes fadeInDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0)}}
 @keyframes nube{0%{transform:translateY(0);}100%{transform:translateY(30px);}}
+
+/* Insignia de deporte en la tabla de productos */
+.badge-deporte {
+  display: inline-block;
+  padding: 0.25rem 0.55rem;
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

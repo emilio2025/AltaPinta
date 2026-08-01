@@ -20,6 +20,7 @@ export class ProductoComponent implements OnInit {
   categorias: any[] = [];
   tipos: any[] = [];
   tallas: any[] = [];
+  deportes: any[] = [];
 
   producto = {
     id: null,
@@ -29,6 +30,7 @@ export class ProductoComponent implements OnInit {
     imagenUrl: '',
     categoria: null,
     tipoPrenda: null,
+    deporte: null,
   }
 
   // Tallas múltiples: una fila por cada talla global, con checkbox + stock propio
@@ -57,11 +59,25 @@ export class ProductoComponent implements OnInit {
     this.listar();
     this.service.getCategorias().subscribe(res => this.categorias = res);
     this.service.getTipos().subscribe(res => this.tipos = res);
+    this.service.getDeportes().subscribe(res => this.deportes = res);
     this.service.getTallas().subscribe(res => {
       this.tallas = res;
       this.reiniciarTallasForm();
     });
     this.reiniciarImagenesForm();
+  }
+
+  /**
+   * Comparador para los desplegables de categoria, tipo y deporte.
+   *
+   * [ngValue] compara por referencia, y al editar un producto sus objetos
+   * anidados vienen de una peticion distinta que la de los desplegables:
+   * son iguales en contenido pero no la misma instancia, asi que el select
+   * salia en blanco aunque el producto tuviera valor. Comparando por id
+   * queda preseleccionado.
+   */
+  mismoId(a: any, b: any): boolean {
+    return a?.id === b?.id;
   }
 
   /** Recarga desde la primera pagina. Se usa tras crear, editar o eliminar. */
@@ -215,7 +231,7 @@ export class ProductoComponent implements OnInit {
   limpiar(){
     this.producto = {
       id:null, nombre:'', descripcion:'', precio:0, imagenUrl:'',
-      categoria:null, tipoPrenda:null
+      categoria:null, tipoPrenda:null, deporte:null
     }
     this.reiniciarImagenesForm();
     this.reiniciarTallasForm();

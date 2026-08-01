@@ -6,6 +6,7 @@ import { TarjetaService } from '../../services/tarjeta.service';
 import { ProductoService } from '../../services/producto.service';
 import { PedidoService } from '../../services/pedido.service';
 import { AuditoriaService } from '../../services/auditoria.service';
+import { DeporteService } from '../../services/deporte.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 
@@ -41,15 +42,59 @@ export class AdminDashboardComponent implements OnInit {
   // RF054: Auditoría
   auditoria: any[] = [];
 
+  // --- Deportes ---
+  deportes: any[] = [];
+  nuevoDeporte = { nombre: '', icono: 'pi-bolt' };
+  deporteMensaje = '';
+
+  /** Iconos de PrimeIcons entre los que elegir al crear un deporte. */
+  readonly iconosDisponibles = [
+    'pi-bolt', 'pi-forward', 'pi-circle', 'pi-star',
+    'pi-heart', 'pi-compass', 'pi-sun', 'pi-flag'
+  ];
+
   constructor(
     private reporteService: ReporteService,
     private tarjetaService: TarjetaService,
     private productoService: ProductoService,
     private pedidoService: PedidoService,
     private auditoriaService: AuditoriaService,
+    private deporteService: DeporteService,
     private router: Router,
     private authService: AuthService,
   ) {}
+
+  // ---------- Deportes ----------
+  cargarDeportes() {
+    this.deporteService.listar().subscribe(res => this.deportes = res);
+  }
+
+  crearDeporte() {
+    const nombre = this.nuevoDeporte.nombre.trim();
+    if (!nombre) return;
+
+    this.deporteService.crear({ nombre, icono: this.nuevoDeporte.icono }).subscribe({
+      next: () => {
+        this.deporteMensaje = `Deporte "${nombre}" creado`;
+        this.nuevoDeporte = { nombre: '', icono: 'pi-bolt' };
+        this.cargarDeportes();
+      },
+      error: err => this.deporteMensaje = err.error?.message || 'No se pudo crear el deporte'
+    });
+  }
+
+  eliminarDeporte(d: any) {
+    // Los productos que lo tengan asignado quedaran sin deporte, no se borran.
+    if (!confirm(`¿Eliminar el deporte "${d.nombre}"? Los productos que lo usen quedarán sin deporte asignado.`)) return;
+
+    this.deporteService.eliminar(d.id).subscribe({
+      next: () => {
+        this.deporteMensaje = `Deporte "${d.nombre}" eliminado`;
+        this.cargarDeportes();
+      },
+      error: err => this.deporteMensaje = err.error?.message || 'No se pudo eliminar el deporte'
+    });
+  }
 
   ngOnInit() {
     this.reporteService.total().subscribe(res => {
@@ -59,6 +104,7 @@ export class AdminDashboardComponent implements OnInit {
 
     this.cargarPedidos();
     this.cargarAuditoria();
+    this.cargarDeportes();
   }
 
   cargarAuditoria() {
