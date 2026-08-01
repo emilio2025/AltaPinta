@@ -7,6 +7,8 @@ import { FavoritoService } from '../../services/favorito.service';
 import { ProductoService } from '../../services/producto.service';
 import { CarritoService } from '../../services/carrito.service';
 import { AuthService } from '../auth.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-menu',
@@ -23,12 +25,22 @@ export class MenuComponent implements OnInit {
   categorias: any[] = [];
   tipos: any[] = [];
 
-  favoritosIds: number[] = [];   
+  favoritosIds: number[] = [];
   busqueda: string = "";
   contadorCarrito = 0;
   tipoSeleccionado: string = '';
+  categoriaSeleccionada: string = '';
   tallas: any[] = [];
   tallaSeleccionada: any = null;
+
+  // Paginacion. El backend numera las paginas desde 0.
+  pagina = 0;
+  readonly tamanoPagina = 12;
+  totalPaginas = 0;
+  totalResultados = 0;
+
+  // Evita lanzar una consulta por cada tecla pulsada en el buscador.
+  private terminoBuscado = new Subject<string>();
 
   constructor(
     private productoService: ProductoService,
@@ -48,17 +60,38 @@ export class MenuComponent implements OnInit {
 
     this.carritoService.contadorObservable$
     .subscribe(c => this.contadorCarrito = c);
+
+    this.terminoBuscado
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => this.reiniciarYFiltrar());
   }
 
+  /**
+   * Pide al backend la pagina actual con todos los filtros activos.
+   *
+   * Antes cada filtro trabajaba por su cuenta sobre el catalogo ya
+   * descargado y se pisaban entre si: elegir un tipo descartaba la
+   * categoria seleccionada. Ahora los cuatro viajan juntos en la consulta.
+   */
   aplicarFiltros() {
-    this.filtrados = this.productos.filter(p => {
-
-      const cumpleTalla =
-        !this.tallaSeleccionada ||
-        p.tallasDisponibles?.some((pt: any) => pt.talla?.nombre === this.tallaSeleccionada.nombre);
-
-      return cumpleTalla;
+    this.productoService.buscar({
+      nombre: this.busqueda,
+      categoria: this.categoriaSeleccionada,
+      tipo: this.tipoSeleccionado,
+      talla: this.tallaSeleccionada?.nombre,
+      page: this.pagina,
+      size: this.tamanoPagina
+    }).subscribe(res => {
+      this.filtrados = res.content;
+      this.totalPaginas = res.totalPages;
+      this.totalResultados = res.totalElements;
     });
+  }
+
+  /** Vuelve a la primera pagina: al cambiar un filtro, seguir en la 5 no tiene sentido. */
+  private reiniciarYFiltrar() {
+    this.pagina = 0;
+    this.aplicarFiltros();
   }
 
   cargarTallas(){
@@ -66,10 +99,7 @@ export class MenuComponent implements OnInit {
   }
 
   cargarProductos(){
-    this.productoService.getTodos().subscribe(res=>{
-      this.productos = res;
-      this.filtrados = res;
-    });
+    this.aplicarFiltros();
   }
 
   cargarCategorias(){
@@ -81,18 +111,45 @@ export class MenuComponent implements OnInit {
   }
 
   filtrarTipo(tipo:string){
-    this.productoService.getPorTipo(tipo).subscribe(res => this.filtrados = res);
+    this.tipoSeleccionado = this.tipoSeleccionado === tipo ? '' : tipo;
+    this.reiniciarYFiltrar();
   }
 
   filtrarCategoria(cat:string){
-    this.productoService.getPorCategoria(cat).subscribe(res => this.filtrados = res);
+    this.categoriaSeleccionada = this.categoriaSeleccionada === cat ? '' : cat;
+    this.reiniciarYFiltrar();
+  }
+
+  /**
+   * El desplegable de tallas ya trae su propia opcion "Todas", y [(ngModel)]
+   * actualiza tallaSeleccionada antes de que salte (change), asi que aqui solo
+   * hay que recargar: alternar el valor lo dejaria siempre en null.
+   */
+  cambiarTalla(){
+    this.reiniciarYFiltrar();
+  }
+
+  limpiarFiltros(){
+    this.busqueda = '';
+    this.categoriaSeleccionada = '';
+    this.tipoSeleccionado = '';
+    this.tallaSeleccionada = null;
+    this.reiniciarYFiltrar();
   }
 
   buscar(){
-    this.filtrados = this.productos.filter(p =>
-      p.nombre.toLowerCase().includes(this.busqueda.toLowerCase())
-    );
+    this.terminoBuscado.next(this.busqueda);
   }
+
+  irAPagina(n: number){
+    if (n < 0 || n >= this.totalPaginas) return;
+    this.pagina = n;
+    this.aplicarFiltros();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  paginaAnterior(){ this.irAPagina(this.pagina - 1); }
+  paginaSiguiente(){ this.irAPagina(this.pagina + 1); }
 
   cargarFavoritos() {
     this.favService.getFavoritos().subscribe({

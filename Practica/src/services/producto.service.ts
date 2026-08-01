@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 
 export interface Talla {
@@ -33,6 +33,27 @@ export interface TipoPrenda {
   nombre: string;
 }
 
+/** Respuesta paginada de Spring Data. */
+export interface Pagina<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;        // pagina actual, empezando en 0
+  size: number;
+  first: boolean;
+  last: boolean;
+}
+
+/** Criterios de busqueda del catalogo. Todos opcionales. */
+export interface FiltrosProducto {
+  nombre?: string;
+  categoria?: string;
+  tipo?: string;
+  talla?: string;
+  page?: number;
+  size?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,7 +63,26 @@ export class ProductoService {
 
   constructor(private http: HttpClient) {}
 
-  getTodos(){ return this.http.get<any[]>(`${this.URL}/productos`); }
+  /**
+   * Catalogo paginado con filtros opcionales.
+   *
+   * Los filtros se resuelven en el backend: la busqueda cubre el catalogo
+   * entero, no solo los productos ya descargados. Los valores vacios no se
+   * envian para que el servidor los trate como "sin filtro".
+   */
+  buscar(filtros: FiltrosProducto = {}): Observable<Pagina<Producto>> {
+    let params = new HttpParams()
+      .set('page', filtros.page ?? 0)
+      .set('size', filtros.size ?? 12);
+
+    if (filtros.nombre?.trim())    params = params.set('nombre', filtros.nombre.trim());
+    if (filtros.categoria?.trim()) params = params.set('categoria', filtros.categoria.trim());
+    if (filtros.tipo?.trim())      params = params.set('tipo', filtros.tipo.trim());
+    if (filtros.talla?.trim())     params = params.set('talla', filtros.talla.trim());
+
+    return this.http.get<Pagina<Producto>>(`${this.URL}/productos`, { params });
+  }
+
   getUno(id:number){ return this.http.get<any>(`${this.URL}/productos/${id}`); }
 
   getCategorias(){ return this.http.get<any[]>(`${this.URL}/categorias`); }
@@ -86,8 +126,9 @@ export class ProductoService {
     );
   }
 
-  listar(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(`${this.URL}/productos`);
+  /** Alias historico de buscar(); se mantiene porque lo usa el panel de admin. */
+  listar(page = 0, size = 12): Observable<Pagina<Producto>> {
+    return this.buscar({ page, size });
   }
 
 }

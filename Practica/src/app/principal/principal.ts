@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { FavoritoService } from '../../services/favorito.service';
 import { ProductoService } from '../../services/producto.service';
 import { RouterModule } from '@angular/router';
+import { forkJoin, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-menu',
@@ -16,15 +18,25 @@ import { RouterModule } from '@angular/router';
 })
 export class PrincipalComponent implements OnInit {
 
-  productosHero: any[] = [];     
-  productosBebes: any[] = [];    
-  productos: any[] = [];       
-  filtrados: any[] = [];         
+  productosHero: any[] = [];
+  productosBebes: any[] = [];
+  filtrados: any[] = [];
   favoritosIds: number[] = [];
 
   busqueda: string = "";
+  categoriaSeleccionada: string = "";
 
   categorias: any[] = [];
+
+  // Paginacion. El backend numera las paginas desde 0.
+  pagina = 0;
+  readonly tamanoPagina = 12;
+  totalPaginas = 0;
+  totalResultados = 0;
+
+  // El buscador dispara una peticion por pulsacion; el debounce espera a que
+  // el usuario deje de escribir para no lanzar una consulta por letra.
+  private terminoBuscado = new Subject<string>();
 
   constructor(
     private productoService: ProductoService,
@@ -33,47 +45,94 @@ export class PrincipalComponent implements OnInit {
   ){}
 
   ngOnInit(): void {
-    this.cargarProductos();
+    this.terminoBuscado
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        this.pagina = 0;
+        this.cargarPagina();
+      });
+
+    this.cargarDestacados();
     this.cargarCategorias();
     this.cargarFavoritos();
   }
 
- cargarProductos(){
-    this.productoService.getTodos().subscribe(res => {
+  /** True cuando hay una busqueda o una categoria activa. */
+  get mostrandoResultados(): boolean {
+    return !!this.busqueda.trim() || !!this.categoriaSeleccionada;
+  }
 
-      console.log(" Productos cargados:", res); 
+  /**
+   * Portada: unas pocas prendas de muestra. Se piden por categoria y con
+   * tamaño de pagina pequeño, en lugar de descargar el catalogo entero y
+   * filtrarlo aqui como se hacia antes.
+   */
+  cargarDestacados(){
+    const adultos = this.productoService.buscar({ categoria: 'Mujer', size: 10 });
+    const varon = this.productoService.buscar({ categoria: 'Varón', size: 10 });
+    const bebes = this.productoService.buscar({ categoria: 'Bebé', size: 10 });
+    const ninos = this.productoService.buscar({ categoria: 'Niños', size: 10 });
 
-      this.productos = res;
-      this.filtrados = res;
-
-      let HM = res.filter(p => 
-        p.categoria?.nombre?.toLowerCase() === "mujer" ||
-        p.categoria?.nombre?.toLowerCase() === "varón"
-      );
-
-      this.productosHero = HM.sort(() => Math.random() - 0.5).slice(0, 2);
-
-      this.productosBebes = res.filter(p => 
-        p.categoria?.nombre?.toLowerCase() === "bebé" ||
-        p.categoria?.nombre?.toLowerCase() === "niños"
-      ).sort(() => Math.random() - 0.5).slice(0, 3);
-
+    forkJoin([adultos, varon]).subscribe(([m, v]) => {
+      this.productosHero = this.muestraAleatoria([...m.content, ...v.content], 2);
     });
+
+    forkJoin([bebes, ninos]).subscribe(([b, n]) => {
+      this.productosBebes = this.muestraAleatoria([...b.content, ...n.content], 3);
+    });
+  }
+
+  private muestraAleatoria(productos: any[], cuantos: number): any[] {
+    return [...productos].sort(() => Math.random() - 0.5).slice(0, cuantos);
   }
 
   cargarCategorias(){
     this.productoService.getCategorias().subscribe(res => this.categorias = res);
   }
 
-  filtrarCategoria(cat:string){
-    this.productoService.getPorCategoria(cat).subscribe(res => this.filtrados = res);
+  /** Pide al backend la pagina actual con los filtros activos. */
+  cargarPagina(){
+    this.productoService.buscar({
+      nombre: this.busqueda,
+      categoria: this.categoriaSeleccionada,
+      page: this.pagina,
+      size: this.tamanoPagina
+    }).subscribe(res => {
+      this.filtrados = res.content;
+      this.totalPaginas = res.totalPages;
+      this.totalResultados = res.totalElements;
+    });
+  }
+
+  filtrarCategoria(cat: string){
+    // Volver a pulsar la misma categoria la desactiva.
+    this.categoriaSeleccionada = this.categoriaSeleccionada === cat ? "" : cat;
+    this.pagina = 0;
+    this.cargarPagina();
   }
 
   buscar(){
-    this.filtrados = this.productos.filter(p =>
-      p.nombre.toLowerCase().includes(this.busqueda.toLowerCase())
-    );
+    this.terminoBuscado.next(this.busqueda);
   }
+
+  limpiarFiltros(){
+    this.busqueda = "";
+    this.categoriaSeleccionada = "";
+    this.pagina = 0;
+    this.filtrados = [];
+    this.totalPaginas = 0;
+    this.totalResultados = 0;
+  }
+
+  irAPagina(n: number){
+    if (n < 0 || n >= this.totalPaginas) return;
+    this.pagina = n;
+    this.cargarPagina();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  paginaAnterior(){ this.irAPagina(this.pagina - 1); }
+  paginaSiguiente(){ this.irAPagina(this.pagina + 1); }
 
   cargarFavoritos(){
     this.favService.getFavoritos().subscribe((r:any[]) => {

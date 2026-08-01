@@ -28,8 +28,22 @@
   </div>
 </nav>
 
-<section *ngIf="busqueda || filtrados.length !== productos.length" class="container mt-5">
-    <h2 class="subtitulo-seccion">Resultados</h2>
+<section *ngIf="mostrandoResultados" class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h2 class="subtitulo-seccion mb-0">
+            Resultados
+            <small class="text-muted fs-6" *ngIf="totalResultados">
+                ({{ totalResultados }} {{ totalResultados === 1 ? 'producto' : 'productos' }})
+            </small>
+        </h2>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="limpiarFiltros()">
+            Limpiar filtros
+        </button>
+    </div>
+
+    <p *ngIf="totalResultados === 0" class="text-muted mt-3">
+        No se encontraron productos con esos criterios.
+    </p>
 
     <div class="row row-cols-1 row-cols-md-4 g-4">
         <div class="col" *ngFor="let p of filtrados">
@@ -55,6 +69,27 @@
 
         </div>
     </div>
+
+    <!-- Paginacion: solo tiene sentido si hay mas de una pagina -->
+    <nav class="d-flex justify-content-center mt-4" *ngIf="totalPaginas > 1">
+        <ul class="pagination">
+            <li class="page-item" [class.disabled]="pagina === 0">
+                <button class="page-link" type="button"
+                        (click)="paginaAnterior()" [disabled]="pagina === 0">
+                    Anterior
+                </button>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">Página {{ pagina + 1 }} de {{ totalPaginas }}</span>
+            </li>
+            <li class="page-item" [class.disabled]="pagina >= totalPaginas - 1">
+                <button class="page-link" type="button"
+                        (click)="paginaSiguiente()" [disabled]="pagina >= totalPaginas - 1">
+                    Siguiente
+                </button>
+            </li>
+        </ul>
+    </nav>
 </section>
 
 

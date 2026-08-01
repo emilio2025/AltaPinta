@@ -33,6 +33,7 @@ export class AdminDashboardComponent implements OnInit {
 
   // Productos
   productos: any[] = [];
+  totalProductos = 0;
 
   // Pedidos
   pedidos: any[] = [];
@@ -91,8 +92,13 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   // --- Cargar productos ---
+  // El panel solo muestra un resumen, asi que pide la primera pagina en vez
+  // del catalogo completo. El total real viene en totalProductos.
   cargarProductos() {
-    this.productoService.listar().subscribe(res => this.productos = res);
+    this.productoService.listar(0, 10).subscribe(res => {
+      this.productos = res.content;
+      this.totalProductos = res.totalElements;
+    });
   }
 
   // --- Pedidos y actualización de estado ---

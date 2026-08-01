@@ -45,9 +45,11 @@ export class ProductoComponent implements OnInit {
   subiendoImagen = false;
   mensajeError = '';
 
-  // RF038: Paginación
-  paginaActual = 1;
+  // RF038: Paginación (resuelta en el backend)
+  paginaActual = 1;          // la tabla numera desde 1
   tamanoPagina = 10;
+  totalPaginas = 1;
+  totalResultados = 0;
 
   constructor(private service: ProductoService, private router: Router) {}
 
@@ -62,25 +64,33 @@ export class ProductoComponent implements OnInit {
     this.reiniciarImagenesForm();
   }
 
+  /** Recarga desde la primera pagina. Se usa tras crear, editar o eliminar. */
   listar(){
-    this.service.getTodos().subscribe(res => {
-      this.productos = res;
-      this.paginaActual = 1;
+    this.paginaActual = 1;
+    this.cargarPagina();
+  }
+
+  /**
+   * Trae del backend solo la pagina visible.
+   *
+   * Antes se descargaba el catalogo entero y se recortaba aqui con slice():
+   * la tabla mostraba 10 filas pero la peticion traia los 700 productos.
+   */
+  cargarPagina(){
+    this.service.buscar({
+      page: this.paginaActual - 1,   // el backend numera desde 0; la tabla desde 1
+      size: this.tamanoPagina
+    }).subscribe(res => {
+      this.productos = res.content;
+      this.totalPaginas = Math.max(1, res.totalPages);
+      this.totalResultados = res.totalElements;
     });
-  }
-
-  get totalPaginas(): number {
-    return Math.max(1, Math.ceil(this.productos.length / this.tamanoPagina));
-  }
-
-  get productosPaginados(): any[] {
-    const inicio = (this.paginaActual - 1) * this.tamanoPagina;
-    return this.productos.slice(inicio, inicio + this.tamanoPagina);
   }
 
   irAPagina(pagina: number) {
     if (pagina < 1 || pagina > this.totalPaginas) return;
     this.paginaActual = pagina;
+    this.cargarPagina();
   }
 
   // Stock total del producto = suma del stock de todas sus tallas

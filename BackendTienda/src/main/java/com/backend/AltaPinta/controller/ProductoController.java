@@ -12,6 +12,9 @@ import com.backend.AltaPinta.repository.TallaRepository;
 import com.backend.AltaPinta.service.ImagenService;
 import com.backend.AltaPinta.service.AuditoriaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -73,9 +76,37 @@ public class ProductoController {
         auditoriaService.registrar("Producto", id, "ELIMINAR", auth.getName(), null);
     }
 
-    // RF004 Listar productos
+    // RF004 Listar productos (paginado, con filtros opcionales)
+    //
+    // Devuelve una página, no la lista entera: el catálogo ya supera los 700
+    // productos y enviarlos todos en cada carga era la petición más pesada de
+    // la aplicación. Los filtros que antes se aplicaban en el navegador
+    // (nombre, categoría, tipo y talla) se resuelven ahora en la consulta,
+    // así que la búsqueda cubre el catálogo completo y no solo lo descargado.
+    //
+    // Los parámetros vacíos se normalizan a null para que la consulta los
+    // ignore: el navegador manda "" cuando el usuario borra el buscador.
     @GetMapping
-    public List<Producto> listar() { return repo.findAll(); }
+    public Page<Producto> listar(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String talla,
+            @PageableDefault(size = 12, sort = "id") Pageable pageable
+    ) {
+        return repo.buscar(
+                normalizar(nombre),
+                normalizar(categoria),
+                normalizar(tipo),
+                normalizar(talla),
+                pageable
+        );
+    }
+
+    /** Convierte a null los parámetros ausentes o en blanco. */
+    private String normalizar(String valor) {
+        return (valor == null || valor.isBlank()) ? null : valor.trim();
+    }
 
     // *** CLIENTE RF007 RF008 RF009 ***
     @GetMapping("/categoria/{nombre}")

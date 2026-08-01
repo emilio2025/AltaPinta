@@ -55,8 +55,7 @@
     {{ t.nombre }}
   </button>
 
-  <button class="btn btn-outline-dark btn-sm"
-          (click)="tipoSeleccionado=''; aplicarFiltros()">
+  <button class="btn btn-outline-dark btn-sm" (click)="limpiarFiltros()">
     Todos
   </button>
 </div>
@@ -64,7 +63,7 @@
 <hr>
 
 <div class="filtro-talla">
-  <select [(ngModel)]="tallaSeleccionada" (change)="aplicarFiltros()">
+  <select [(ngModel)]="tallaSeleccionada" (change)="cambiarTalla()">
     <option [ngValue]="null">Todas las tallas</option>
 
     <option *ngFor="let t of tallas" [ngValue]="t">
@@ -74,7 +73,16 @@
 </div>
 
 <div class="container mt-4">
-  <h3 class="mb-4 fw-bold">Productos Disponibles</h3>
+  <h3 class="mb-4 fw-bold">
+    Productos Disponibles
+    <small class="text-muted fs-6" *ngIf="totalResultados">
+      ({{ totalResultados }})
+    </small>
+  </h3>
+
+  <p *ngIf="totalResultados === 0" class="text-muted">
+    No se encontraron productos con esos filtros.
+  </p>
 
   <div class="row row-cols-1 row-cols-md-3 g-4">
 
@@ -104,4 +112,25 @@
     </div>
 
   </div>
+
+  <!-- Paginacion: solo si hay mas de una pagina -->
+  <nav class="d-flex justify-content-center mt-4" *ngIf="totalPaginas > 1">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="pagina === 0">
+        <button class="page-link" type="button"
+                (click)="paginaAnterior()" [disabled]="pagina === 0">
+          Anterior
+        </button>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">Página {{ pagina + 1 }} de {{ totalPaginas }}</span>
+      </li>
+      <li class="page-item" [class.disabled]="pagina >= totalPaginas - 1">
+        <button class="page-link" type="button"
+                (click)="paginaSiguiente()" [disabled]="pagina >= totalPaginas - 1">
+          Siguiente
+        </button>
+      </li>
+    </ul>
+  </nav>
 </div>
