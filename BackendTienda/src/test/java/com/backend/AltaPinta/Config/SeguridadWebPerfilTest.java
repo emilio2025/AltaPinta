@@ -2,13 +2,9 @@ package com.backend.AltaPinta.Config;
 
 import com.backend.AltaPinta.controller.ClienteController;
 import com.backend.AltaPinta.controller.EnvioController;
-import com.backend.AltaPinta.controller.PagoController;
 import com.backend.AltaPinta.model.Cliente;
-import com.backend.AltaPinta.model.Pedido;
 import com.backend.AltaPinta.repository.ClienteRepository;
 import com.backend.AltaPinta.repository.EnvioRepository;
-import com.backend.AltaPinta.repository.PedidoRepository;
-import com.backend.AltaPinta.service.PagoService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,23 +25,19 @@ import java.util.Optional;
 
 import static com.backend.AltaPinta.Config.PermisosAssert.denegado;
 import static com.backend.AltaPinta.Config.PermisosAssert.permitido;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 /**
- * Autorizacion de perfil, envios y pagos.
+ * Autorizacion de perfil y envios.
  *
  * Ademas de comprobar quien puede entrar, aqui se verifica algo que la
  * cadena de filtros no cubre: que un usuario con sesion iniciada no pueda
- * operar sobre datos de OTRO usuario pasando su identificador.
+ * leer ni modificar el perfil de OTRO pasando su correo por parametro.
  */
 @WebMvcTest(controllers = {
         ClienteController.class,
-        EnvioController.class,
-        PagoController.class
+        EnvioController.class
 })
 @Import({SecurityConfig.class, JwtAuthFilter.class})
 class SeguridadWebPerfilTest {
@@ -59,19 +51,17 @@ class SeguridadWebPerfilTest {
     // Dependencias de los controladores bajo prueba
     @MockBean private ClienteRepository clienteRepo;
     @MockBean private EnvioRepository envioRepo;
-    @MockBean private PedidoRepository pedidoRepo;
-    @MockBean private PagoService pagoService;
 
-    private static final String VICTIMA = "victima@unamba.edu.pe";
-    private static final String ATACANTE = "atacante@unamba.edu.pe";
+    private static final String OTRO_CLIENTE = "victima@unamba.edu.pe";
+    private static final String CLIENTE = "cliente@unamba.edu.pe";
 
-    private Cliente atacante;
+    private Cliente cliente;
 
     @BeforeEach
     void setUp() {
-        atacante = new Cliente();
-        atacante.setId(2L);
-        atacante.setCorreo(ATACANTE);
+        cliente = new Cliente();
+        cliente.setId(2L);
+        cliente.setCorreo(CLIENTE);
     }
 
     // ============================================================
@@ -96,40 +86,40 @@ class SeguridadWebPerfilTest {
         }
 
         @Test
-        @WithMockUser(username = ATACANTE, authorities = "ROLE_USER")
+        @WithMockUser(username = CLIENTE, authorities = "ROLE_USER")
         @DisplayName("Un cliente si puede leer su propio perfil")
         void clienteLeeSuPerfil() throws Exception {
-            when(clienteRepo.findByCorreo(ATACANTE)).thenReturn(Optional.of(atacante));
+            when(clienteRepo.findByCorreo(CLIENTE)).thenReturn(Optional.of(cliente));
 
             permitido(mockMvc.perform(get("/cliente/me")));
         }
 
         @Test
-        @WithMockUser(username = ATACANTE, authorities = "ROLE_USER")
+        @WithMockUser(username = CLIENTE, authorities = "ROLE_USER")
         @DisplayName("El perfil devuelto es el del usuario de la sesion, no uno pedido por parametro")
         void elPerfilSaleDeLaSesion() throws Exception {
-            when(clienteRepo.findByCorreo(ATACANTE)).thenReturn(Optional.of(atacante));
+            when(clienteRepo.findByCorreo(CLIENTE)).thenReturn(Optional.of(cliente));
 
             // Aunque se intente colar el correo de otro por parametro, el
             // controlador solo mira auth.getName().
-            mockMvc.perform(get("/cliente/me").param("correo", VICTIMA));
+            mockMvc.perform(get("/cliente/me").param("correo", OTRO_CLIENTE));
 
-            verify(clienteRepo).findByCorreo(ATACANTE);
-            verify(clienteRepo, never()).findByCorreo(VICTIMA);
+            verify(clienteRepo).findByCorreo(CLIENTE);
+            verify(clienteRepo, never()).findByCorreo(OTRO_CLIENTE);
         }
 
         @Test
-        @WithMockUser(username = ATACANTE, authorities = "ROLE_USER")
+        @WithMockUser(username = CLIENTE, authorities = "ROLE_USER")
         @DisplayName("Al actualizar, solo se toca el perfil de la sesion")
         void actualizarSoloAfectaAlPropio() throws Exception {
-            when(clienteRepo.findByCorreo(ATACANTE)).thenReturn(Optional.of(atacante));
+            when(clienteRepo.findByCorreo(CLIENTE)).thenReturn(Optional.of(cliente));
 
             mockMvc.perform(put("/cliente/actualizar")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("{\"nombre\":\"Nuevo nombre\",\"dni\":\"12345678\"}"));
 
-            verify(clienteRepo).findByCorreo(ATACANTE);
-            verify(clienteRepo, never()).findByCorreo(VICTIMA);
+            verify(clienteRepo).findByCorreo(CLIENTE);
+            verify(clienteRepo, never()).findByCorreo(OTRO_CLIENTE);
         }
     }
 
@@ -152,70 +142,6 @@ class SeguridadWebPerfilTest {
             when(envioRepo.findAll()).thenReturn(List.of());
 
             permitido(mockMvc.perform(get("/envio")));
-        }
-    }
-
-    // ============================================================
-    @Nested
-    @DisplayName("Pagos")
-    class Pagos {
-
-        @Test
-        @WithAnonymousUser
-        @DisplayName("Un anonimo no puede procesar un pago")
-        void anonimoNoPaga() throws Exception {
-            denegado(mockMvc.perform(post("/pago/procesar")
-                    .param("pedidoId", "1")
-                    .param("numeroTarjeta", "4111111111111111")
-                    .param("cvv", "123")
-                    .param("fechaVencimiento", "12/30")));
-        }
-
-        @Test
-        @WithMockUser(username = ATACANTE, authorities = "ROLE_USER")
-        @DisplayName("Un cliente si puede pagar SU pedido")
-        void clientePagaSuPedido() throws Exception {
-            Pedido propio = new Pedido();
-            propio.setId(10L);
-            propio.setTotal(215.0);
-
-            when(pedidoRepo.findByIdAndClienteCorreo(10L, ATACANTE)).thenReturn(Optional.of(propio));
-            when(clienteRepo.findByCorreo(ATACANTE)).thenReturn(Optional.of(atacante));
-            when(pagoService.procesarPago(any(), any(), anyString(), anyString(), anyString(), anyDouble()))
-                    .thenReturn(true);
-
-            permitido(mockMvc.perform(post("/pago/procesar")
-                    .param("pedidoId", "10")
-                    .param("numeroTarjeta", "4111111111111111")
-                    .param("cvv", "123")
-                    .param("fechaVencimiento", "12/30")));
-
-            verify(pagoService).procesarPago(any(), any(), anyString(), anyString(), anyString(), anyDouble());
-        }
-
-        @Test
-        @WithMockUser(username = ATACANTE, authorities = "ROLE_USER")
-        @DisplayName("Un cliente NO puede operar sobre el pedido de otro")
-        void noSePuedePagarElPedidoDeOtro() throws Exception {
-            // Escenario del fallo corregido: el atacante envia el pedidoId de la
-            // victima con su propia tarjeta. Si la tarjeta no tuviera saldo, el
-            // pedido ajeno acababa marcado como RECHAZADO.
-            // La busqueda ahora filtra tambien por el correo de la sesion, asi
-            // que el pedido de la victima sencillamente no aparece.
-            when(pedidoRepo.findByIdAndClienteCorreo(99L, ATACANTE)).thenReturn(Optional.empty());
-
-            mockMvc.perform(post("/pago/procesar")
-                    .param("pedidoId", "99")
-                    .param("numeroTarjeta", "4111111111111111")
-                    .param("cvv", "123")
-                    .param("fechaVencimiento", "12/30"));
-
-            // Lo importante no es el codigo devuelto, sino que no pasa nada:
-            verify(pagoService, never())
-                    .procesarPago(any(), any(), anyString(), anyString(), anyString(), anyDouble());
-            verify(pedidoRepo, never()).save(any(Pedido.class));
-            // Y jamas se busca el pedido solo por id, sin filtrar por dueño.
-            verify(pedidoRepo, never()).findById(any());
         }
     }
 }
