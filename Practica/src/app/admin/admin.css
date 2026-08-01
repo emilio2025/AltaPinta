@@ -1,0 +1,176 @@
+body {
+  background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+  font-family: 'Poppins', sans-serif;
+}
+
+.navbar {
+  border-radius: 0.8rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(5px);
+  cursor: pointer;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.navbar-brand:hover {
+  color: #000;
+}
+
+.nav-link {
+  color: #555;
+  font-weight: 500;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-link:hover {
+  color: #000;
+  background: rgba(0,0,0,0.05);
+  border-radius: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.nav-link.active {
+  font-weight: 600;
+  color: #000;
+}
+
+.card {
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1rem 2rem rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 70%);
+  animation: nubeMove 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes nubeMove {
+  0% { transform: rotate(0deg) translate(0,0); }
+  50% { transform: rotate(180deg) translate(20px, 10px); }
+  100% { transform: rotate(360deg) translate(0,0); }
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 1.5rem 3rem rgba(0,0,0,0.15);
+}
+
+.card-tarjeta {
+  background: linear-gradient(145deg, rgba(102, 126, 234, 0.267), rgba(118, 75, 162, 0.205));
+  color: #fff;
+  border-radius: 1.5rem; 
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-total {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.212), rgba(5, 150, 104, 0.137));
+  color: #504e4e;
+}
+
+.card-pedidos {
+  background: linear-gradient(135deg, rgba(59, 131, 246, 0.219), rgba(37, 100, 235, 0.219));
+  color: #535252;
+}
+
+.card-ventas {
+  background: linear-gradient(145deg, rgba(234, 178, 8, 0.199), rgba(202, 139, 4, 0.24));
+  color: #222222;
+}
+
+
+.card-pedidos-estado {
+  background: linear-gradient(145deg, rgba(107, 114, 128, 0.363), rgba(75, 85, 99, 0.411));
+  color: #3a3838;
+}
+
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  background: rgba(255,255,255,0.8);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.table tbody tr:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.card-pedidos-estado {
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-pedidos-estado::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle at 30% 30%, rgba(200,230,255,0.2), transparent 70%);
+  animation: nubeMove 25s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes nubeMove {
+  0% { transform: rotate(0deg) translate(0,0); }
+  50% { transform: rotate(180deg) translate(20px, 10px); }
+  100% { transform: rotate(360deg) translate(0,0); }
+}
+
+.table-pedidos {
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgba(255,255,255,0.9);
+}
+
+.table-pedidos thead {
+  background: rgba(100, 149, 237, 0.25); /* azul suave */
+  color: #333;
+  font-weight: 600;
+}
+
+.table-pedidos tbody tr {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.table-pedidos tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.3rem 0.7rem rgba(0,0,0,0.1);
+}
+
+.estado-badge {
+  padding: 0.5em 0.75em;
+  border-radius: 1rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.pagado { background: rgba(76, 175, 80, 0.7); } 
+.enviado { background: rgba(33, 150, 243, 0.7); }      
+.en-transito { background: rgba(255, 193, 7, 0.7); color: #333; } 
+.en-destino { background: rgba(0, 188, 212, 0.7); color: #fff; }
+.entregado { background: rgba(96, 125, 139, 0.7); }  

@@ -1,0 +1,189 @@
+.menu-top{
+    background: #fff;
+    border-bottom: 1px solid #ececec;
+}
+
+.logo-box{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    width:75px;
+    height:75px;
+    background:url('/assets/altaPinta.jpg') center/cover no-repeat;
+    background-size:cover;
+    background-position:center;
+    border-radius:5%;
+}
+
+.menu-icon{
+    font-size:22px;
+    cursor:pointer;
+}
+
+.nav-categorias .nav-link{
+    font-size:14px;
+    letter-spacing:.5px;
+    cursor:pointer;
+    color:#000;
+}
+
+.nav-categorias .nav-link:hover{
+    color:#f5bd23;
+    transition:.2s;
+}
+
+.icons{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.icons i{
+  font-size:20px;
+  cursor:pointer;
+}
+
+.icons i:hover{
+  color:#f8bd3f;
+}
+
+:root {
+  --primary: #ff914d;
+  --primary-dark: #e87f3f;
+  --secondary: #2f2f4f;
+  --bg: #f5f6fa;
+  --text: #333;
+}
+
+.perfil-container {
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+.perfil-sidebar {
+  background: #ffffff;
+  padding: 28px 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+}
+
+.avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.avatar i {
+  font-size: 50px;
+  color: #363434;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  padding: 18px;
+  border-radius: 50%;
+  box-shadow: 0 8px 18px rgba(65, 64, 64, 0.35);
+}
+
+.perfil-sidebar p {
+  margin-bottom: 22px;
+  color: var(--secondary);
+  letter-spacing: 0.4px;
+}
+
+.btn-menu {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  background: #eeeef1;
+  color: #555;
+  border: 1px solid #eaeaea;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-menu:hover {
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.btn-menu.active {
+  background: #ffffff;
+  border-left: 4px solid var(--primary);
+  color: var(--secondary);
+  box-shadow: 0 6px 16px rgba(61, 59, 58, 0.25);
+}
+
+.btn-menu.salir {
+  background: #f1f1f1;
+  color: #6c757d;
+}
+
+.btn-menu.salir:hover {
+  background: #ffe5e0;
+  color: #dc3545;
+}
+
+.perfil-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.perfil-header {
+  background: linear-gradient(135deg, #2f2f4f, #1f1f33);
+  color: #ffffff;
+  padding: 18px 22px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.btn-add-card {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #706a6a;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  padding: 6px 14px;
+  font-size: 14px;
+  transition: all 0.25s ease;
+}
+
+.btn-add-card i {
+  margin-right: 6px;
+}
+
+.btn-add-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(70, 67, 255, 0.35);
+}
+
+.perfil-body .table thead {
+  background: #f6f7fb;
+}
+
+.perfil-body .table th {
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+}
+
+.perfil-body .table td {
+  text-align: center;
+  color: #444;
+}
+
+.perfil-body .table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.perfil-body .table tbody tr:hover {
+  background: #fafafa;
+}
+
+.estado-vacio {
+  text-align: center;
+  padding: 30px 0;
+  color: #6c757d;
+  font-weight: 500;
+}

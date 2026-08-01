@@ -1,0 +1,135 @@
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<nav class="navbar navbar-expand-lg menu-top shadow-sm">
+  <div class="container-fluid d-flex align-items-center">
+      <div class="d-flex align-items-center logo-box " role="button" (click)="irMenu()"></div>
+      <ul class="navbar-nav gap-4 fw-semibold nav-categorias">
+          <li class="nav-item" *ngFor="let c of categorias">
+              <a class="nav-link" (click)="irCategoria(c.nombre)">
+                {{ c.nombre.toUpperCase() }}
+              </a>
+          </li>
+      </ul>
+
+      <div class="icons">
+        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i>
+
+        <div class="cart-icon" role="button" (click)="irCarrito()">
+          <i class="bi bi-cart"></i>
+          <span class="badge" *ngIf="contadorCarrito > 0">
+            {{ contadorCarrito }}
+          </span>
+        </div>
+
+        <div class="logout" role="button" (click)="cerrarSesion()">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Cerrar Sesión</span>
+        </div>
+      </div>
+  </div>
+</nav>
+
+<div class="container-fluid py-4 perfil-container">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="perfil-sidebar text-center">
+
+        <div class="avatar mb-2">
+          <i class="bi bi-person-circle"></i>
+        </div>
+
+        <p class="fw-bold">¡HOLA!</p>
+
+        <button class="btn btn-menu" (click)="irPerfil()">MI PERFIL</button>
+        <button class="btn btn-menu" (click)="irPedidos()">PEDIDOS</button>
+        <button class="btn btn-menu" (click)="irTarjetas()">TARJETAS DE CRÉDITO</button>
+        <button class="btn btn-menu active">MIS DIRECCIONES</button>
+        <button class="btn btn-menu" (click)="irFavoritos()">MIS FAVORITOS</button>
+        <button class="btn btn-menu salir" (click)="irMenu()">SALIR</button>
+
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="perfil-card">
+
+        <div class="perfil-header">Mis direcciones</div>
+
+        <div class="perfil-body">
+
+          <div *ngIf="cargando" class="estado-vacio">Cargando direcciones...</div>
+
+          <table class="table table-hover align-middle" *ngIf="!cargando && direcciones.length > 0">
+            <thead>
+              <tr>
+                <th>Etiqueta</th>
+                <th>Dirección</th>
+                <th>Distrito</th>
+                <th>Referencia</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of direcciones">
+                <td class="fw-semibold">{{ d.etiqueta }}</td>
+                <td>{{ d.direccionCompleta }}</td>
+                <td>{{ d.distrito }}</td>
+                <td>{{ d.referencia }}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning me-2" (click)="editar(d)">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="eliminar(d.id)">
+                    <i class="bi bi-trash3-fill"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="!cargando && direcciones.length === 0" class="estado-vacio">
+            No tienes direcciones registradas.
+          </div>
+
+        </div>
+      </div>
+
+      <button class="btn btn-add-card" (click)="nueva()" *ngIf="!mostrarFormulario">
+        <i class="bi bi-plus-circle"></i> Agregar dirección
+      </button>
+
+      <div class="card p-4 mt-3" *ngIf="mostrarFormulario">
+        <h6 class="fw-bold mb-3">{{ modoEdicion ? 'Editar dirección' : 'Nueva dirección' }}</h6>
+
+        <div class="alert alert-danger" *ngIf="mensajeError">{{ mensajeError }}</div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Etiqueta</label>
+            <input type="text" class="form-control" placeholder="Casa, Trabajo..." [(ngModel)]="direccion.etiqueta" name="etiqueta">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Distrito</label>
+            <input type="text" class="form-control" [(ngModel)]="direccion.distrito" name="distrito">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Dirección completa</label>
+            <input type="text" class="form-control" [(ngModel)]="direccion.direccionCompleta" name="direccionCompleta">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Referencia (opcional)</label>
+            <input type="text" class="form-control" [(ngModel)]="direccion.referencia" name="referencia">
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-success" (click)="guardar()">Guardar</button>
+          <button class="btn btn-outline-secondary" (click)="cancelar()">Cancelar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

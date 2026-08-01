@@ -1,0 +1,74 @@
+<div class="login-wrapper d-flex justify-content-center align-items-center">
+
+  <div class="login-container d-flex shadow">
+
+    <!-- ===== FORMULARIO ===== -->
+    <div class="login-box">
+
+      <!-- LOGO -->
+      <div class="logo-container"></div>
+
+      <h2 class="titulo-login">Inicia sesión</h2>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+      <form (ngSubmit)="onLoginSubmit()" class="form-small">
+
+        <div class="form-group mb-2">
+          <label>Email</label>
+          <input type="email" class="form-control input-custom" [(ngModel)]="loginData.correo" name="correo" required>
+        </div>
+
+        <div class="form-group mb-1">
+          <label>Contraseña</label>
+          <input type="password" class="form-control input-custom" [(ngModel)]="loginData.password" name="password" required>
+        </div>
+
+        <a class="forgot" routerLink="/forgot-password">
+          ¿Has olvidado tu contraseña?
+        </a>
+
+
+        <button type="submit" class="btn btn-dark w-100 btn-small mt-2">INICIAR SESIÓN</button>
+
+        <!-- ENVÍA A REGISTER -->
+        <button routerLink="/register" class="btn btn-outline-secondary w-100 btn-small mt-2">
+          REGISTRARME
+        </button>
+
+        <div class="text-muted tiny-text mt-2">
+          Al continuar acepto la Política de Privacidad
+        </div>
+
+        <div class="separator my-2"><span></span></div>
+
+        <button class="btn btn-light w-100 d-flex justify-content-center gap-2 btn-small mb-1">
+          <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" width="16">
+          CONTINUAR CON GOOGLE
+        </button>
+
+        <button class="btn btn-light w-100 d-flex justify-content-center gap-2 btn-small">
+          <img src="https://cdn-icons-png.flaticon.com/512/179/179309.png" width="16">
+          CONTINUAR CON APPLE
+        </button>
+
+      </form>
+
+      <!-- ===== FOOTER MINI ===== -->
+      <div class="footer-login text-center mt-3">
+        <span class="brand-mini">Alta Pinta</span>
+
+        <span class="social-line">
+          <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="15">
+          <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="15">
+          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" width="15">
+          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384015.png" width="15">
+        </span>
+      </div>
+    </div>
+
+    <!-- BANNER -->
+    <div class="login-banner"></div>
+
+  </div>
+</div>

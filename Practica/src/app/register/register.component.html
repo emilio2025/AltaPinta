@@ -1,0 +1,92 @@
+<div class="register-wrapper d-flex justify-content-center align-items-center">
+
+  <div class="register-container d-flex shadow">
+
+    <div class="register-box">
+
+      <div class="logo-container"></div>
+
+      <h2 class="fw-bold mb-4 text-center title-reg">
+        {{ isRegistered ? ': Verifica tu Correo' : ': Registro de Cliente' }}
+      </h2>
+
+      <div *ngIf="message" class="alert-success-reg">{{ message }}</div>
+      <div *ngIf="errorMessage" class="alert-error-reg">{{ errorMessage }}</div>
+
+      <form (ngSubmit)="onRegisterSubmit()" *ngIf="!isRegistered" #registerForm="ngForm">
+
+        <div class="reg-field">
+          <label>Nombre</label>
+          <input type="text" class="form-control input-reg" [(ngModel)]="registerData.nombre" name="nombre" required>
+        </div>
+
+        <div class="reg-field">
+          <label>Correo Electrónico</label>
+          <input type="email" class="form-control input-reg" [(ngModel)]="registerData.correo" name="correo" required>
+        </div>
+
+        <div class="reg-field">
+          <label>Contraseña</label>
+          <input type="password"
+                class="form-control input-reg"
+                [(ngModel)]="registerData.password"
+                name="password"
+                required
+                minlength="8"
+                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}"
+                #passwordField="ngModel">
+          <small class="text-muted" *ngIf="passwordField.invalid && passwordField.touched">
+            Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
+          </small>
+        </div>
+
+        <div class="reg-field">
+          <label>Dirección (Opcional)</label>
+          <input type="text" class="form-control input-reg" [(ngModel)]="registerData.direccion" name="direccion">
+        </div>
+
+        <div class="reg-field">
+          <label>DNI</label>
+          <input type="text"
+                class="form-control input-reg"
+                [(ngModel)]="registerData.dni"
+                name="dni"
+                maxlength="8"
+                required
+                pattern="[0-9]*"
+                oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+        </div>
+
+        <button type="submit" class="btn btn-dark w-100 mt-2" [disabled]="registerForm.invalid">Registrarse y Enviar Código</button>
+      </form>
+
+      <form (ngSubmit)="onVerifySubmit()" *ngIf="isRegistered">
+
+        <p class="text-muted mb-2 text-center">
+          Se ha enviado un código a <b>{{ verificationData.correo }}</b>
+        </p>
+
+        <div class="reg-field">
+          <label>Código de Verificación</label>
+          <input type="text" class="form-control input-reg" [(ngModel)]="verificationData.codigo" name="codigo" maxlength="6" pattern="\d{6}" required>
+        </div>
+
+        <button class="btn btn-dark w-100">Verificar Cuenta</button>
+      </form>
+
+      <p class="text-center mt-3">¿Ya tienes cuenta?
+        <a routerLink="/login" class="link-reg">Inicia Sesión</a>
+      </p>
+
+      <div class="store-footer">
+        <span class="store-name">Alta Pinta</span>
+        <i class="fab fa-facebook"></i>
+        <i class="fab fa-instagram"></i>
+        <i class="fab fa-tiktok"></i>
+      </div>
+
+    </div>
+
+    <div class="register-banner"></div>
+  </div>
+</div>

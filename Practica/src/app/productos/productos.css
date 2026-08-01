@@ -1,0 +1,99 @@
+body{
+    background: linear-gradient(135deg,#6ea8ff,#c084fc,#ff9cee);
+    background-size: 300% 300%;
+    animation: gradient 12s infinite alternate;
+    font-family: "Poppins", sans-serif;
+}
+
+.navbar {
+  border-radius: 0.8rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(5px);
+  cursor: pointer;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.navbar-brand:hover {
+  color: #000;
+}
+
+.nav-link {
+  color: #555;
+  font-weight: 500;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-link:hover {
+  color: #000;
+  background: rgba(0,0,0,0.05);
+  border-radius: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.nav-link.active {
+  font-weight: 600;
+  color: #000;
+}
+
+.titulo-animado{
+    animation: fadeInDown 1.3s ease;
+    color:#353333;
+    font-size:2.4rem;
+}
+
+.sombra-form{
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    border-radius:18px;
+    animation: fadeInUp 1.2s ease;
+}
+
+.input-glow{
+    background: rgba(255,255,255,0.7);
+    border-radius:10px;
+    transition:.3s;
+}
+.input-glow:focus{
+    box-shadow:0 0 15px #ffffffaa;
+    border-color:#fff;
+}
+
+.btn-gradiente{
+    background: linear-gradient(90deg,#ff7ecb,#6d9bff,#7cffcb);
+    background-size:300% 300%;
+    animation: btnGlow 5s infinite alternate;
+    color:white; font-size:18px; padding:10px;
+    border-radius:10px; font-weight:bold;
+}
+
+.table-gradient{
+    background:linear-gradient(90deg,#6d9bff,#c084fc,#ff7ecb);
+    color:white; font-size:17px;
+}
+.img-producto{ width:60px;height:60px;object-fit:cover;border-radius:10px; }
+
+.fila-hover:hover{
+    transform:scale(1.02);
+    transition:.3s;
+    background:#fff4;
+}
+
+.nubes,.nubes2{
+    position:fixed;width:200px;height:200px;
+    background:white;opacity:.25;border-radius:50%;
+    filter:blur(25px);
+    animation: nube 15s infinite alternate ease-in-out;
+}
+.nubes{ top:10%;left:10%; }
+.nubes2{ bottom:10%;right:15%;animation-duration:18s; }
+
+@keyframes gradient{0%{background-position:0 0;}100%{background-position:100% 100%;}}
+@keyframes btnGlow{0%{background-position:0%}100%{background-position:100%}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0)}}
+@keyframes nube{0%{transform:translateY(0);}100%{transform:translateY(30px);}}

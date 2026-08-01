@@ -1,0 +1,112 @@
+<head> 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> 
+</head> 
+
+<nav class="navbar navbar-expand-lg menu-top shadow-sm"> 
+  <div class="container-fluid d-flex align-items-center"> 
+      <div class="d-flex align-items-center logo-box " role="button" (click)="irMenu()"></div> 
+      <!--<i class="bi bi-list menu-icon " role="button" (click)="irMenu()"></i>--> 
+      <ul class="navbar-nav gap-4 fw-semibold nav-categorias"> 
+          <li class="nav-item" *ngFor="let c of categorias"> 
+              <a class="nav-link" (click)="irCategoria(c.nombre)"> 
+                {{ c.nombre.toUpperCase() }} 
+              </a> 
+          </li> 
+      </ul> 
+
+      <div class="icons"> 
+        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i> 
+ 
+        <div class="cart-icon" role="button" (click)="irCarrito()"> 
+          <i class="bi bi-cart"></i> 
+          <span class="badge" *ngIf="contadorCarrito > 0"> 
+            {{ contadorCarrito }} 
+          </span> 
+        </div> 
+
+        <div class="logout" role="button" (click)="cerrarSesion()"> 
+          <i class="bi bi-box-arrow-in-right"></i> 
+          <span>Cerrar Sesión</span> 
+        </div> 
+      </div> 
+  </div> 
+</nav> 
+
+<div class="container-fluid py-4 perfil-container">
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="perfil-sidebar text-center">
+
+        <div class="avatar mb-2">
+          <i class="bi bi-person-circle"></i>
+        </div>
+
+        <p class="fw-bold">¡HOLA!</p>
+
+        <button class="btn btn-menu active"(click)="irPerfil()">MI PERFIL</button>
+        <button class="btn btn-menu" (click)="irPedidos()">PEDIDOS</button>
+        <button class="btn btn-menu" (click)="irTarjetas()">TARJETAS DE CRÉDITO</button>
+        <button class="btn btn-menu" (click)="irFavoritos()">MIS FAVORITOS</button>
+        <button class="btn btn-menu salir" (click)="irMenu()">SALIR</button>
+
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="perfil-card">
+
+        <div class="perfil-header">Mis pedidos</div>
+
+        <div class="perfil-body">
+
+          <div *ngIf="cargando">Cargando pedidos...</div>
+
+          <table class="table table-bordered" *ngIf="pedidos.length > 0">
+            <thead>
+              <tr>
+                <th>Pedido ID</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Factura</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of pedidos">
+                <td>{{ p.id }}</td>
+                <td>{{ p.fecha | date:'short' }}</td>
+                <td>S/ {{ p.total }}</td>
+                <td>
+                  <span [class]="estadoBadge(p.estado)">
+                    {{ p.estado }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-info"
+                          (click)="descargarFactura(p.id)">
+                    <i class="bi bi-download"></i> Descargar
+                  </button>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-danger"
+                          *ngIf="esCancelable(p.estado)"
+                          (click)="cancelarPedido(p.id)">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="!cargando && pedidos.length === 0">
+            No has realizado pedidos aún.
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

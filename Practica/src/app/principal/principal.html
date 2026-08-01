@@ -1,0 +1,158 @@
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<nav class="navbar navbar-expand-lg menu-top shadow-sm">
+  <div class="container-fluid d-flex align-items-center">
+
+      <div class="d-flex align-items-center logo-box"></div>
+      <!--<i class="bi bi-list menu-icon me-3" role="button" (click)="irMenu()"></i>-->
+
+      <ul class="navbar-nav mx-auto gap-4 fw-semibold nav-categorias">
+          <li class="nav-item" *ngFor="let c of categorias">
+              <a class="nav-link" (click)="filtrarCategoria(c.nombre)">{{ c.nombre.toUpperCase() }}</a>
+          </li>
+      </ul>
+
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" [(ngModel)]="busqueda" placeholder="Buscar..." (input)="buscar()">
+      </div>
+
+      <div class="icons">
+        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i>
+        <i class="bi bi-cart" role="button" (click)="irCarrito()"></i>
+        <i class="bi bi-person-circle" role="button" (click)="irLogin()"></i>Iniciar Sesion
+      </div>
+
+  </div>
+</nav>
+
+<section *ngIf="busqueda || filtrados.length !== productos.length" class="container mt-5">
+    <h2 class="subtitulo-seccion">Resultados</h2>
+
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        <div class="col" *ngFor="let p of filtrados">
+            
+            <div class="card-filter">
+                
+                <img [src]="p.imagenUrl" onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
+
+                <div class="card-info">
+                    <h5>{{ p.nombre }}</h5>
+                    <span class="precio">S/. {{ p.precio }}</span>
+                </div>
+
+                <div class="card-bottom">
+                    <i class="bi bi-heart"
+                    (click)="agregarFavorito(p)"
+                    [ngClass]="{ 'text-danger': esFavorito(p.id) }">
+                    </i>
+                    <i class="bi bi-cart" (click)="agregarCarrito(p)"></i>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<section class="hero-principal container mt-5">
+    <h1 class="titulo-hero">Nuevas Tendencias para Tu Estilo</h1>
+    <p class="texto-hero">
+        Descubre prendas únicas para hombres, mujeres y niños. 
+        Lleva tu look al siguiente nivel con las colecciones más recientes.</p>
+
+    <div class="row g-4 mt-4">
+        <div class="col-md-6" *ngFor="let h of productosHero">
+            <div class="hero-img-box" (click)="verDetalles(h)">
+                <img [src]="h.imagenUrl" onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;" alt="{{h.nombre}}">
+                <div class="hero-info">
+                <h5 class="titulo-card">{{ h.nombre }}</h5>
+                <span class="precio-card">S/. {{ h.precio }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container mt-5">
+    <h2 class="subtitulo-seccion">Tendencias en Bebés y Niños</h2>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" *ngFor="let p of productosBebes">
+            <div class="card card-bebe shadow-sm" (click)="verDetalles(p)">
+                <img [src]="p.imagenUrl" onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
+                <h5 class="titulo-card">{{ p.nombre }}</h5>
+                <span class="precio-card">S/. {{ p.precio }}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container mt-5">
+    <h2 class="subtitulo-seccion">Encabezado de sección</h2>
+
+    <div class="row g-4 align-items-center">
+        <div class="col-md-6">
+            <ul class="lista-info">
+                <li><b>Prendas Premium y Cómodas</b><br>Prendas suaves, cómodas y modernas 
+                                                    <br>pensadas para los más pequeños.</li>
+                <li><b>Estilo que Habla por Ti</b><br>Encuentra conjuntos, mamelucos, accesorios 
+                                                    <br>y más, elaborados con materiales pensados 
+                                                    <br>para su bienestar.</li>
+                <li><b>Todo para tu estilo diario</b><br>Ideales para el día a día, sesiones de fotos o 
+                                                    <br>salidas especiales, acompañando cada etapa 
+                                                    <br>de su crecimiento.</li>
+            </ul>
+        </div>
+
+        <div class="col-md-3"><img class="img-final" src="https://assetspwa.liverpool.com.mx/assets/digital/landing/bebes/img/2025/blp_bebe_mameluco_011025.jpg"></div>
+        <div class="col-md-3"><img class="img-final" src="https://m.media-amazon.com/images/I/71lDTcZkmzL._SL1500_.jpg"></div>
+    </div>
+</section>
+
+<footer class="footer-alta-pinta mt-5 pt-5 pb-4">
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-4 mb-4">
+                <h2 class="footer-titulo">ALTA PINTA</h2>
+                <p class="footer-texto">
+                    Moda con estilo, comodidad y tendencia para toda la familia.
+                    Hombre – Mujer – Bebés – Niños.
+                </p>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <h5 class="footer-sub">Información</h5>
+                <ul class="footer-list">
+                    <li><i class="bi bi-geo-alt"></i> Abancay, Perú</li>
+                    <li><i class="bi bi-telephone"></i> +51 972 651 891</li>
+                    <li><i class="bi bi-envelope"></i> altapintaunambao@gmail.com</li>
+                    <li><i class="bi bi-clock"></i> Lunes a Sábado — 9:00 am a 8:00 pm</li>
+                </ul>
+            </div>
+
+            <div class="col-md-4">
+                <h5 class="footer-sub">Síguenos</h5>
+                <div class="footer-redes">
+                    <a href="https://www.facebook.com/profile.php?id=61586115221681"><i class="bi bi-facebook"></i></a>
+                    <a href="#"><i class="bi bi-instagram"></i></a>
+                    <a href="#"><i class="bi bi-tiktok"></i></a>
+                    <a href="#"><i class="bi bi-whatsapp"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <hr>
+        <p class="footer-copy text-center mb-0">
+            © 2025 Alta Pinta — Todos los derechos reservados.
+        </p>
+    </div>
+
+</footer>
+

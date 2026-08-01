@@ -1,0 +1,62 @@
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+<nav class="navbar navbar-expand-lg menu-top shadow-sm">
+    <div class="container-fluid d-flex align-items-center">
+
+        <div class="d-flex align-items-center logo-box" role="button" (click)="irMenu()"></div>
+        <!--<i class="bi bi-list menu-icon me-3" role="button" (click)="irMenu()"></i>-->
+
+        <ul class="navbar-nav mx-auto gap-4 fw-semibold nav-categorias">
+            <li class="nav-item" *ngFor="let c of categorias">
+                <a class="nav-link" (click)="irCategoria(c.nombre)">
+                  {{ c.nombre.toUpperCase() }}
+                </a>
+            </li>
+        </ul>
+
+        <div class="icons">
+        <i class="bi bi-person-fill"role="button" (click)="irPerfil()"></i>
+            <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i>
+            <i class="bi bi-cart" role="button" (click)="irCarrito()"></i>
+          <i class="bi bi-box-arrow-in-right" (click)="CerrarSesion()"></i>Cerrar Sesion
+        </div>
+
+    </div>
+  </nav>
+
+<div class="container py-5">
+  <h3 class="mb-4 text-center fw-bold text-secondary">Mis Favoritos</h3>
+
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col" *ngFor="let p of favoritos">
+      <div class="card h-100 shadow-sm border-0 position-relative favorite-card">
+        <img [src]="p.imagenUrl" class="card-img-top img-fluid favorite-img" alt="{{p.nombre}}">
+
+        <button class="fav-btn" 
+                [ngClass]="{'favorito': p.favorito}" 
+                (click)="quitar(p)">
+          <i class="bi" [ngClass]="{'bi-heart-fill': p.favorito, 'bi-heart': !p.favorito}"></i>
+        </button>
+
+        <div class="card-body">
+          <h6 class="card-title">{{ p.nombre }}</h6>
+          <p>S/ {{ p.precio }}</p>
+
+          <div class="acciones">
+            <button class="btn btn-ver"
+                    (click)="verDetalle(p)">
+              Ver
+            </button>
+
+            <button class="btn btn-quitar"
+                    (click)="quitar(p)">
+              Quitar
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,122 @@
+:root {
+  --accent: #ff4d6d;
+  --gradient: linear-gradient(135deg, #ff4d6d, #845ec2);
+}
+
+.add-card {
+  max-width: 460px;
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+  padding: 32px;
+}
+
+.add-card-header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  color: #535252;
+  font-size: 1.6rem;
+  box-shadow: 0 12px 25px rgba(77, 139, 255, 0.4);
+}
+
+.add-card-header h4 {
+  font-weight: 800;
+}
+
+.add-card-header p {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.input-premium {
+  border-radius: 14px;
+  padding: 14px;
+  border: 2px solid #f1f1f1;
+  transition: all 0.3s ease;
+}
+
+.input-premium:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(77, 95, 255, 0.25);
+}
+
+.btn-guardar {
+  background: var(--gradient);
+  color: #555050;
+  border-radius: 16px;
+  padding: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-guardar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(132, 94, 194, 0.4);
+}
+
+.btn-guardar:disabled {
+  background: #bbb;
+}
+
+.add-card-footer {
+  margin-top: 22px;
+  font-size: 0.85rem;
+  color: #6c757d;
+  text-align: center;
+}
+
+.add-card-footer i {
+  color: var(--accent);
+  margin-right: 4px;
+}
+
+.alert {
+  border-radius: 14px;
+}
+
+
+.btn-volver {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid #d6d6e0;
+  color: #2f2f4f;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-volver:hover {
+  background: #f5f6fa;
+  border-color: #2f2f4f;
+  color: #2f2f4f;
+}
+
+.btn-volver i {
+  font-size: 1rem;
+}
+
+.btn-volver:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

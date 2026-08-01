@@ -1,0 +1,82 @@
+# ============================================================
+#  AltaPinta - Tienda deportiva
+#  Backend: Spring Boot 3 (BackendTienda/)  |  Frontend: Angular 20 (Practica/)
+# ============================================================
+
+# ------------------------------------------------------------
+# SECRETOS  -- nunca subir credenciales al repositorio
+# ------------------------------------------------------------
+# La configuracion real (password de Gmail, secreto JWT, credenciales
+# de MySQL) queda solo en tu maquina. Para clonar el proyecto se copia
+# application.properties.example -> application.properties y se rellena.
+BackendTienda/src/main/resources/application.properties
+*.env
+.env
+.env.local
+
+# ------------------------------------------------------------
+# BACKEND - Java / Maven / Spring Boot
+# ------------------------------------------------------------
+target/
+bin/
+!.mvn/wrapper/maven-wrapper.jar
+HELP.md
+
+# Volcados de crash de la JVM
+hs_err_pid*.log
+replay_pid*.log
+
+# Datos generados en tiempo de ejecucion.
+# OJO: no se versionan, pero NO los borres de tu disco: la base de datos
+# guarda las rutas en producto_imagen.url y factura.url_pdf.
+BackendTienda/facturas/
+BackendTienda/productos-imagenes/
+
+# ------------------------------------------------------------
+# FRONTEND - Angular / Node
+# ------------------------------------------------------------
+node_modules/
+dist/
+tmp/
+out-tsc/
+bazel-out/
+.angular/
+npm-debug.log*
+yarn-error.log*
+coverage/
+testem.log
+/typings
+
+# ------------------------------------------------------------
+# IDEs y editores
+# ------------------------------------------------------------
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.classpath
+.project
+.settings/
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+*.sublime-workspace
+.history/
+
+# ------------------------------------------------------------
+# Documentos exportados / material que no es codigo
+# ------------------------------------------------------------
+# Export HTML de Word (~20 MB de bundles de Office Online). No es codigo
+# y no deberia vivir dentro de src/. Ver nota en el README.
+Practica/src/img/
+
+# ------------------------------------------------------------
+# Sistema operativo
+# ------------------------------------------------------------
+Thumbs.db
+desktop.ini
+.DS_Store

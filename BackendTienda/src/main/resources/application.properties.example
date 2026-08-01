@@ -1,0 +1,35 @@
+# ============================================================
+#  AltaPinta - Plantilla de configuracion
+#  Copia este archivo como "application.properties" y rellena los valores.
+#  El archivo real esta en .gitignore: NUNCA se sube al repositorio.
+#
+#  Windows (PowerShell):
+#    Copy-Item application.properties.example application.properties
+# ============================================================
+
+# ---------- Base de datos MySQL ----------
+spring.datasource.url=jdbc:mysql://localhost:3306/alta_pinta?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=TU_PASSWORD_MYSQL
+spring.jpa.hibernate.ddl-auto=update
+
+# ---------- Correo (Gmail) ----------
+# La password NO es la de tu cuenta: es una "App Password" de 16 caracteres
+# generada en https://myaccount.google.com/apppasswords
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=TU_CORREO@gmail.com
+spring.mail.password=TU_APP_PASSWORD_DE_GMAIL
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# ---------- JWT ----------
+# Cadena larga y aleatoria (minimo 64 caracteres). Generala con:
+#   openssl rand -base64 64
+jwt.secret=GENERA_UN_SECRETO_LARGO_Y_ALEATORIO
+jwt.expiration=86400000
+
+# ---------- Varios ----------
+spring.jackson.serialization.fail-on-empty-beans=false
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=5MB

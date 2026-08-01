@@ -1,0 +1,129 @@
+<head> 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> 
+</head> 
+
+<nav class="navbar navbar-expand-lg menu-top shadow-sm"> 
+  <div class="container-fluid d-flex align-items-center"> 
+      <div class="d-flex align-items-center logo-box " role="button" (click)="irMenu()"></div> 
+      <!--<i class="bi bi-list menu-icon " role="button" (click)="irMenu()"></i>--> 
+      <ul class="navbar-nav gap-4 fw-semibold nav-categorias"> 
+          <li class="nav-item" *ngFor="let c of categorias"> 
+              <a class="nav-link" (click)="irCategoria(c.nombre)"> 
+                {{ c.nombre.toUpperCase() }} 
+              </a> 
+          </li> 
+      </ul> 
+
+      <div class="icons"> 
+        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i> 
+ 
+        <div class="cart-icon" role="button" (click)="irCarrito()"> 
+          <i class="bi bi-cart"></i> 
+          <span class="badge" *ngIf="contadorCarrito > 0"> 
+            {{ contadorCarrito }} 
+          </span> 
+        </div> 
+
+        <div class="logout" role="button" (click)="cerrarSesion()"> 
+          <i class="bi bi-box-arrow-in-right"></i> 
+          <span>Cerrar Sesión</span> 
+        </div> 
+      </div> 
+  </div> 
+</nav> 
+
+<div class="container-fluid py-4 perfil-container" *ngIf="cliente">
+  <div class="row">
+    <!-- SIDEBAR -->
+    <div class="col-md-3">
+      <div class="perfil-sidebar text-center">
+
+        <div class="avatar mb-2">
+          <i class="bi bi-person-circle"></i>
+        </div>
+
+        <p class="fw-bold">¡HOLA!</p>
+
+        <button class="btn btn-menu active">MI PERFIL</button>
+        <button class="btn btn-menu"role="button" (click)="irPedidos()">PEDIDOS</button>
+        <button class="btn btn-menu"role="button" (click)="irTarjetas()">TARJETAS DE CRÉDITO</button>
+        <button class="btn btn-menu"role="button" (click)="irDirecciones()">MIS DIRECCIONES</button>
+        <button class="btn btn-menu"role="button" (click)="irFavoritos()">MIS FAVORITOS</button>
+        <button class="btn btn-menu salir"role="button" (click)="irMenu()">SALIR</button>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="perfil-card">
+
+        <div class="perfil-header">Mis datos</div>
+
+        <div class="perfil-body">
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label>Nombre</label>
+              <input class="form-control"
+                     [(ngModel)]="cliente.nombre"
+                     [disabled]="!editando">
+            </div>
+
+            <div class="col-md-6">
+              <label>Correo</label>
+              <input class="form-control"
+                     [value]="cliente.correo"
+                     disabled>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label>DNI</label>
+              <input class="form-control"
+                     [(ngModel)]="cliente.dni"
+                     [disabled]="!editando">
+            </div>
+
+            <div class="col-md-6">
+              <label>Dirección</label>
+              <input class="form-control"
+                     [(ngModel)]="cliente.direccion"
+                     [disabled]="!editando">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label>RUC (opcional, para factura a empresa)</label>
+              <input class="form-control"
+                     [(ngModel)]="cliente.ruc"
+                     [disabled]="!editando">
+            </div>
+
+            <div class="col-md-6">
+              <label>Razón social (opcional)</label>
+              <input class="form-control"
+                     [(ngModel)]="cliente.razonSocial"
+                     [disabled]="!editando">
+            </div>
+          </div>
+
+          <button class="btn btn-warning px-4"
+                  *ngIf="!editando"
+                  (click)="editar()">
+            EDITAR
+          </button>
+
+          <button class="btn btn-success px-4"
+                  *ngIf="editando"
+                  (click)="guardar()"
+                  [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : 'GUARDAR' }}
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
