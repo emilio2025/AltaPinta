@@ -8,6 +8,7 @@ import com.backend.AltaPinta.dto.RegisterRequest;
 import com.backend.AltaPinta.Config.JwtUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +43,10 @@ public class AuthController {
         return String.valueOf(number);
     }
 
-    private static final String ADMIN_EMAIL = "altapintaunamba@gmail.com";
+    // Correo que recibe ROLE_ADMIN al registrarse. Se configura fuera del
+    // codigo (secrets.properties o variable de entorno ADMIN_EMAIL).
+    @Value("${app.admin.correo}")
+    private String adminEmail;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
@@ -79,7 +83,7 @@ public class AuthController {
         c.setTokenVerificacion(codigo);
         c.setTokenExpira(LocalDateTime.now().plusMinutes(15));
 
-        if (correo.equalsIgnoreCase(ADMIN_EMAIL)) {
+        if (correo.equalsIgnoreCase(adminEmail)) {
             c.setRol(Rol.ADMIN);
         } else {
             c.setRol(Rol.USER);

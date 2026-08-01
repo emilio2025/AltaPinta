@@ -6,10 +6,14 @@
 # ------------------------------------------------------------
 # SECRETOS  -- nunca subir credenciales al repositorio
 # ------------------------------------------------------------
-# La configuracion real (password de Gmail, secreto JWT, credenciales
-# de MySQL) queda solo en tu maquina. Para clonar el proyecto se copia
-# application.properties.example -> application.properties y se rellena.
-BackendTienda/src/main/resources/application.properties
+# application.properties SI se versiona: solo tiene referencias
+# ${VARIABLE}, ningun valor sensible.
+# Los secretos reales (password de Gmail, secreto JWT, credenciales de
+# MySQL) viven solo en tu maquina, en secrets.properties. Para clonar el
+# proyecto se copia secrets.properties.example -> secrets.properties.
+BackendTienda/secrets.properties
+secrets.properties
+!secrets.properties.example
 *.env
 .env
 .env.local
