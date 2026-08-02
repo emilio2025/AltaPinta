@@ -23,10 +23,18 @@ public class Tarjeta {
         private String numero;
         private String titular;
         private String fechaVencimiento;
-        private String cvv;
+
+        // El CVV NO se guarda, a proposito.
+        //
+        // PCI DSS prohibe almacenar el codigo de verificacion despues de
+        // autorizar el pago, y no admite excepciones: tampoco vale cifrarlo
+        // ni guardar su hash. Su unica funcion es viajar hasta la pasarela
+        // en el momento del cobro y desaparecer.
+        //
+        // Si en el futuro se integra una pasarela real, el CVV debe llegar
+        // como campo de la peticion y usarse en memoria, nunca persistirse.
 
         @Column(precision = 12, scale = 2)
-
         private BigDecimal saldo;
         private Boolean activa = true;
 
@@ -60,14 +68,6 @@ public class Tarjeta {
 
     public void setFechaVencimiento(String fechaVencimiento) {
         this.fechaVencimiento = fechaVencimiento;
-    }
-
-    public String getCvv() {
-        return cvv;
-    }
-
-    public void setCvv(String cvv) {
-        this.cvv = cvv;
     }
 
     public BigDecimal getSaldo() {

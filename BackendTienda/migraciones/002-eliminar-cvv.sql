@@ -1,0 +1,48 @@
+-- ============================================================
+--  002 · Eliminar el CVV almacenado
+-- ============================================================
+--
+--  POR QUÉ
+--
+--  PCI DSS prohíbe almacenar el código de verificación de la tarjeta
+--  (CVV/CVC) una vez autorizado el pago. La prohibición es absoluta: no
+--  vale cifrarlo ni guardar su hash. Su única función es viajar hasta la
+--  pasarela en el momento del cobro y desaparecer.
+--
+--  La entidad Tarjeta ya no tiene el campo, pero Hibernate arranca con
+--  ddl-auto=update y ese modo nunca elimina columnas: la columna cvv
+--  seguiría en la tabla con todos los códigos que ya se guardaron.
+--  Este script la borra junto con su contenido.
+--
+--  CÓMO EJECUTARLO
+--
+--    mysql -u root -p alta_pinta < migraciones/002-eliminar-cvv.sql
+--
+--  ANTES: haz una copia de seguridad.
+--
+--    mysqldump -u root -p alta_pinta > respaldo-alta_pinta.sql
+--
+--  OJO: esto borra datos y no se puede deshacer sin el respaldo. Es
+--  justamente lo que se busca.
+-- ============================================================
+
+ALTER TABLE tarjeta DROP COLUMN cvv;
+
+-- ============================================================
+--  COMPROBACIÓN
+--  Tras ejecutarlo, esta consulta no debe devolver ninguna fila:
+--
+--    SELECT column_name
+--    FROM information_schema.columns
+--    WHERE table_schema = 'alta_pinta'
+--      AND table_name = 'tarjeta'
+--      AND column_name = 'cvv';
+--
+--  PENDIENTE APARTE
+--  La columna 'numero' guarda el número completo de la tarjeta en claro.
+--  PCI DSS sí permite almacenarlo, pero solo protegido (cifrado o
+--  truncado). Para esta tienda con tarjetas simuladas no es urgente, pero
+--  si algún día se manejan tarjetas reales hay que cifrarlo y dejar
+--  visibles solo los cuatro últimos dígitos, que es lo único que la API
+--  devuelve ya hoy.
+-- ============================================================

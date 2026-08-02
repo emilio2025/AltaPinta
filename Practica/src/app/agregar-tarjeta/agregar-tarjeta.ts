@@ -63,11 +63,15 @@ export class AgregarTarjetaComponent {
 
     this.loading = true;
 
+    // El CVV se pide y se valida aqui porque es lo que espera el usuario al
+    // dar de alta una tarjeta, pero NO se envia: el backend no lo guarda
+    // (PCI DSS lo prohibe) y mandarlo solo lo expondria en la red y en los
+    // registros del servidor. Cuando haya una pasarela real, el CVV viajara
+    // hasta ella en el momento del cobro, no al registrar la tarjeta.
     this.tarjetaService.registrar({
       numero: this.numero,
       titular: this.titular,
-      fechaVencimiento: this.fechaVencimiento,
-      cvv: this.cvv
+      fechaVencimiento: this.fechaVencimiento
     }).subscribe({
       next: () => {
         this.loading = false;
