@@ -7,10 +7,6 @@ import { RegisterComponent } from './register/register.component';
 import { DetalleProductoComponent } from './detalle-producto/detalle-producto';
 import { FavoritosComponent } from './favoritos/favoritos';
 import { PrincipalComponent } from './principal/principal';
-import { VaronComponent } from './categoria/varon/varon';
-import { MujerComponent } from './categoria/mujer/mujer';
-import { NinosComponent } from './categoria/ninos/ninos';
-import { BebesComponent } from './categoria/bebes/bebes';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password';
 import { ResetPasswordComponent } from './reset-password/reset-password';
 import { CarritoComponent } from './carrito/carrito';
@@ -37,10 +33,16 @@ export const routes: Routes = [
   { path: 'menu', component: MenuComponent, canActivate: [AuthGuard] },
   { path: 'detalle/:id', component: DetalleProductoComponent, canActivate: [AuthGuard] },
   { path: 'favoritos', component: FavoritosComponent, canActivate: [AuthGuard] },
-  { path: 'varon', component: VaronComponent, canActivate: [AuthGuard] },
-  { path: 'mujer', component: MujerComponent, canActivate: [AuthGuard] },
-  { path: 'nino', component: NinosComponent, canActivate: [AuthGuard] },
-  { path: 'bebe', component: BebesComponent, canActivate: [AuthGuard] },
+  // Las páginas de categoría son el mismo catálogo con un filtro puesto.
+  // Antes cada una era un componente propio que repetía toda la pantalla
+  // (unas 2.400 líneas entre las cuatro) y solo cambiaba el título y el
+  // banner. Ahora reutilizan MenuComponent, que lee la categoría de la
+  // ruta. Las URL no cambian, así que los enlaces existentes siguen
+  // funcionando.
+  { path: 'varon', component: MenuComponent, canActivate: [AuthGuard], data: { categoria: 'Varon' } },
+  { path: 'mujer', component: MenuComponent, canActivate: [AuthGuard], data: { categoria: 'Mujer' } },
+  { path: 'nino',  component: MenuComponent, canActivate: [AuthGuard], data: { categoria: 'Niños' } },
+  { path: 'bebe',  component: MenuComponent, canActivate: [AuthGuard], data: { categoria: 'Bebé' } },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'carrito', component: CarritoComponent, canActivate: [AuthGuard] },

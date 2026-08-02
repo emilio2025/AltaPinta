@@ -60,6 +60,8 @@ export interface FiltrosProducto {
   talla?: string;
   page?: number;
   size?: number;
+  /** Orden de Spring Data: "precio,asc" | "precio,desc". Vacio deja el orden natural. */
+  orden?: string;
 }
 
 @Injectable({
@@ -88,6 +90,10 @@ export class ProductoService {
     if (filtros.tipo?.trim())      params = params.set('tipo', filtros.tipo.trim());
     if (filtros.deporte?.trim())   params = params.set('deporte', filtros.deporte.trim());
     if (filtros.talla?.trim())     params = params.set('talla', filtros.talla.trim());
+
+    // El orden lo resuelve el backend: ordenar en el navegador solo
+    // reordenaria la pagina visible, no el catalogo entero.
+    if (filtros.orden?.trim())     params = params.set('sort', filtros.orden.trim());
 
     return this.http.get<Pagina<Producto>>(`${this.URL}/productos`, { params });
   }

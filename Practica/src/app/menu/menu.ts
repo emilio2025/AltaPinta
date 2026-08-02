@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -41,6 +41,15 @@ export class MenuComponent implements OnInit {
   tallas: any[] = [];
   tallaSeleccionada: any = null;
 
+  // Orden del catalogo. Lo aplica el backend sobre el catalogo entero.
+  ordenSeleccionado = '';
+  readonly opcionesOrden = [
+    { etiqueta: 'Relevancia',            valor: '' },
+    { etiqueta: 'Precio: de menor a mayor', valor: 'precio,asc' },
+    { etiqueta: 'Precio: de mayor a menor', valor: 'precio,desc' },
+    { etiqueta: 'Nombre: A-Z',           valor: 'nombre,asc' }
+  ];
+
   // Panel de filtros plegable en movil
   filtrosAbiertos = false;
 
@@ -58,10 +67,19 @@ export class MenuComponent implements OnInit {
     private favService: FavoritoService,
     private carritoService: CarritoService,
     private router: Router ,
-        private authService: AuthService
+        private authService: AuthService,
+    private route: ActivatedRoute
   ){}
 
   ngOnInit(): void {
+    // Las rutas /varon, /mujer, /nino y /bebe apuntan a esta misma pantalla
+    // con la categoria preseleccionada. Antes cada una era un componente
+    // propio que duplicaba el catalogo entero.
+    const categoriaDeLaRuta = this.route.snapshot.data['categoria'];
+    if (categoriaDeLaRuta) {
+      this.categoriaSeleccionada = categoriaDeLaRuta;
+    }
+
     this.cargarProductos();
     this.cargarCategorias();
     this.cargarTipos();
@@ -91,6 +109,7 @@ export class MenuComponent implements OnInit {
       tipo: this.tipoSeleccionado,
       deporte: this.deporteSeleccionado,
       talla: this.tallaSeleccionada?.nombre,
+      orden: this.ordenSeleccionado,
       page: this.pagina,
       size: this.tamanoPagina
     }).subscribe(res => {
@@ -170,6 +189,10 @@ export class MenuComponent implements OnInit {
    * hay que recargar: alternar el valor lo dejaria siempre en null.
    */
   cambiarTalla(){
+    this.reiniciarYFiltrar();
+  }
+
+  cambiarOrden(){
     this.reiniciarYFiltrar();
   }
 

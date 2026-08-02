@@ -151,3 +151,22 @@
 :host ::ng-deep .ap-paginador .p-paginator-last {
   border-radius: 0;
 }
+
+/* Selector de orden, en la barra de resultados */
+.ap-orden {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.ap-orden select {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--ap-gris-300, #d6d6d6);
+  background: var(--ap-blanco);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.ap-orden select:focus {
+  outline: 0;
+  border-color: var(--ap-negro);
+}

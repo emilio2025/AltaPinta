@@ -135,6 +135,15 @@
       <span class="ap-etiqueta">
         {{ totalResultados }} {{ totalResultados === 1 ? 'producto' : 'productos' }}
       </span>
+
+      <!-- Ordena el backend, asi que afecta al catalogo entero y no solo
+           a los productos de esta pagina. -->
+      <label class="ap-orden">
+        <span class="ap-etiqueta">Ordenar por</span>
+        <select [(ngModel)]="ordenSeleccionado" (change)="cambiarOrden()">
+          <option *ngFor="let o of opcionesOrden" [value]="o.valor">{{ o.etiqueta }}</option>
+        </select>
+      </label>
     </div>
 
     <div class="ap-fichas" *ngIf="filtrosActivos.length">
