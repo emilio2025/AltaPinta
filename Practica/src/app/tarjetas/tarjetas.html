@@ -1,99 +1,99 @@
-<head> 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> 
-</head> 
+<header class="ap-cabecera">
+  <div class="ap-cabecera__barra">
+    <a class="ap-logo" (click)="irMenu()">ALTA<span>PINTA</span></a>
 
-<nav class="navbar navbar-expand-lg menu-top shadow-sm"> 
-  <div class="container-fluid d-flex align-items-center"> 
-      <div class="d-flex align-items-center logo-box " role="button" (click)="irMenu()"></div> 
-      <!--<i class="bi bi-list menu-icon " role="button" (click)="irMenu()"></i>--> 
-      <ul class="navbar-nav gap-4 fw-semibold nav-categorias"> 
-          <li class="nav-item" *ngFor="let c of categorias"> 
-              <a class="nav-link" (click)="irCategoria(c.nombre)"> 
-                {{ c.nombre.toUpperCase() }} 
-              </a> 
-          </li> 
-      </ul> 
+    <nav class="ap-nav">
+      <button type="button" *ngFor="let c of categorias"
+              class="ap-nav__enlace" (click)="irCategoria(c.nombre)">
+        {{ c.nombre }}
+      </button>
+    </nav>
 
-      <div class="icons"> 
-        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i> 
- 
-        <div class="cart-icon" role="button" (click)="irCarrito()"> 
-          <i class="bi bi-cart"></i> 
-          <span class="badge" *ngIf="contadorCarrito > 0"> 
-            {{ contadorCarrito }} 
-          </span> 
-        </div> 
+    <div class="ap-cabecera__acciones">
+      <button type="button" class="ap-icono" (click)="irFavoritos()" aria-label="Favoritos">
+        <i class="pi pi-heart"></i>
+      </button>
+      <button type="button" class="ap-icono" (click)="irCarrito()" aria-label="Carrito">
+        <i class="pi pi-shopping-bag"></i>
+        <span class="ap-contador" *ngIf="contadorCarrito > 0">{{ contadorCarrito }}</span>
+      </button>
+      <button type="button" class="ap-icono" (click)="irPerfil()" aria-label="Mi perfil">
+        <i class="pi pi-user"></i>
+      </button>
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno" (click)="cerrarSesion()">
+        Salir
+      </button>
+    </div>
+  </div>
+</header>
 
-        <div class="logout" role="button" (click)="cerrarSesion()"> 
-          <i class="bi bi-box-arrow-in-right"></i> 
-          <span>Cerrar Sesión</span> 
-        </div> 
-      </div> 
-  </div> 
-</nav> 
+<div class="ap-cuenta">
 
-<div class="container-fluid py-4 perfil-container">
-  <div class="row">
-    <div class="col-md-3">
-      <div class="perfil-sidebar text-center">
+  <nav class="ap-cuenta__nav">
+    <button type="button" class="ap-cuenta__enlace" (click)="irPerfil()">
+      <i class="pi pi-user"></i> Mi perfil
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irPedidos()">
+      <i class="pi pi-box"></i> Mis pedidos
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irDirecciones()">
+      <i class="pi pi-map-marker"></i> Direcciones
+    </button>
+    <button type="button" class="ap-cuenta__enlace ap-cuenta__enlace--activo">
+      <i class="pi pi-credit-card"></i> Tarjetas
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irFavoritos()">
+      <i class="pi pi-heart"></i> Favoritos
+    </button>
+  </nav>
 
-        <div class="avatar mb-2">
-          <i class="bi bi-person-circle"></i>
-        </div>
-
-        <p class="fw-bold">¡HOLA!</p>
-
-        <button class="btn btn-menu active"(click)="irPerfil()">MI PERFIL</button>
-        <button class="btn btn-menu" (click)="irPedidos()">PEDIDOS</button>
-        <button class="btn btn-menu" (click)="irTarjetas()">TARJETAS DE CRÉDITO</button>
-        <button class="btn btn-menu" (click)="irFavoritos()">MIS FAVORITOS</button>
-        <button class="btn btn-menu salir" (click)="irMenu()">SALIR</button>
-
+  <main class="ap-cuenta__panel">
+    <div class="ap-cuenta__cabecera">
+      <div>
+        <span class="ap-etiqueta">Tu cuenta</span>
+        <h1 class="ap-titulo-seccion">Tarjetas</h1>
       </div>
+      <button type="button" class="ap-boton ap-boton--pequeno" (click)="registrarNueva()">
+        <i class="pi pi-plus"></i> Añadir tarjeta
+      </button>
     </div>
 
-   <div class="col-md-9">
-    <div class="perfil-card">
-
-      <div class="perfil-header">Mis pedidos</div>
-
-      <div class="perfil-body">
-
-        <div *ngIf="cargando" class="estado-vacio">
-          Cargando tarjetas...
-        </div>
-
-        <table class="table table-hover align-middle" *ngIf="tarjetas.length > 0">
-          <thead>
-            <tr>
-              <th>Número</th>
-              <th>Titular</th>
-              <th>Saldo</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr *ngFor="let t of tarjetas">
-              <td class="fw-semibold">
-                **** **** **** {{ t.numero.slice(-4) }}
-              </td>
-              <td>{{ t.titular }}</td>
-              <td class="fw-bold text-success">
-                S/ {{ t.saldo }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div *ngIf="!cargando && tarjetas.length === 0" class="estado-vacio">
-          No tienes tarjetas registradas.
-        </div>
-
-      </div>
+    <div class="ap-cargando" *ngIf="cargando">
+      <i class="pi pi-spinner pi-spin"></i> Cargando tarjetas...
     </div>
-    <button class="btn btn-add-card" (click)="registrarNueva()">
-          <i class="bi bi-plus-circle"></i> Agregar tarjeta
-        </button>
-  </div>
-  </div>
+
+    <!-- Sin tarjetas -->
+    <div class="ap-cuenta__vacio" *ngIf="!cargando && tarjetas.length === 0">
+      <i class="pi pi-credit-card"></i>
+      <h2>No tienes tarjetas registradas</h2>
+      <p>Añade una para poder completar tus compras.</p>
+      <button type="button" class="ap-boton ap-boton--acento" (click)="registrarNueva()">
+        Añadir tarjeta
+      </button>
+    </div>
+
+    <!-- Listado -->
+    <div class="ap-tarjetas" *ngIf="tarjetas.length > 0">
+      <article class="ap-tarjeta" *ngFor="let t of tarjetas">
+        <div class="ap-tarjeta__marca">
+          <i class="pi pi-credit-card"></i>
+          <span>AltaPinta</span>
+        </div>
+
+        <!-- Solo los cuatro últimos dígitos: el backend nunca envía el número completo -->
+        <div class="ap-tarjeta__numero">···· ···· ···· {{ t.numero.slice(-4) }}</div>
+
+        <div class="ap-tarjeta__pie">
+          <div>
+            <span class="ap-tarjeta__etiqueta">Titular</span>
+            <strong>{{ t.titular }}</strong>
+          </div>
+          <div class="ap-tarjeta__saldo">
+            <span class="ap-tarjeta__etiqueta">Saldo</span>
+            <strong>S/ {{ t.saldo | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
 </div>

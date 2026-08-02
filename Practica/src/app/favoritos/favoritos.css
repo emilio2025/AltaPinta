@@ -184,3 +184,11 @@
   background: #dc3546a6;
   color: #fff;
 }
+
+/* ============================================================
+   Favoritos — el resto del diseño vive en styles.css
+   ============================================================ */
+:host {
+  display: block;
+  font-family: "Inter", system-ui, sans-serif;
+}

@@ -83,8 +83,12 @@ export class TarjetasComponent implements OnInit {
     this.productoService.getCategorias().subscribe(res => this.categorias = res); 
   } 
 
-  irPerfil() { 
-    this.router.navigate(['/perfil']); 
+  irPerfil() {
+    this.router.navigate(['/perfil']);
+  }
+
+  irDirecciones() {
+    this.router.navigate(['/direcciones']);
   }
 
 }

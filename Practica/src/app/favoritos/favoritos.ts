@@ -72,8 +72,20 @@ export class FavoritosComponent implements OnInit {
     this.productoService.getCategorias().subscribe(res => this.categorias = res);
   }
 
-  irPerfil(){ 
-    this.router.navigate(['/perfil']); 
-  } 
+  irPerfil(){
+    this.router.navigate(['/perfil']);
+  }
+
+  irDirecciones(){
+    this.router.navigate(['/direcciones']);
+  }
+
+  irTarjetas(){
+    this.router.navigate(['/tarjetas']);
+  }
+
+  irPedidos(){
+    this.router.navigate(['/pedido']);
+  }
 }
 

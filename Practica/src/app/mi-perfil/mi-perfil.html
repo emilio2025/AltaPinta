@@ -1,129 +1,122 @@
-<head> 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> 
-</head> 
+<header class="ap-cabecera">
+  <div class="ap-cabecera__barra">
+    <a class="ap-logo" (click)="irMenu()">ALTA<span>PINTA</span></a>
 
-<nav class="navbar navbar-expand-lg menu-top shadow-sm"> 
-  <div class="container-fluid d-flex align-items-center"> 
-      <div class="d-flex align-items-center logo-box " role="button" (click)="irMenu()"></div> 
-      <!--<i class="bi bi-list menu-icon " role="button" (click)="irMenu()"></i>--> 
-      <ul class="navbar-nav gap-4 fw-semibold nav-categorias"> 
-          <li class="nav-item" *ngFor="let c of categorias"> 
-              <a class="nav-link" (click)="irCategoria(c.nombre)"> 
-                {{ c.nombre.toUpperCase() }} 
-              </a> 
-          </li> 
-      </ul> 
+    <nav class="ap-nav">
+      <button type="button" *ngFor="let c of categorias"
+              class="ap-nav__enlace" (click)="irCategoria(c.nombre)">
+        {{ c.nombre }}
+      </button>
+    </nav>
 
-      <div class="icons"> 
-        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i> 
- 
-        <div class="cart-icon" role="button" (click)="irCarrito()"> 
-          <i class="bi bi-cart"></i> 
-          <span class="badge" *ngIf="contadorCarrito > 0"> 
-            {{ contadorCarrito }} 
-          </span> 
-        </div> 
-
-        <div class="logout" role="button" (click)="cerrarSesion()"> 
-          <i class="bi bi-box-arrow-in-right"></i> 
-          <span>Cerrar Sesión</span> 
-        </div> 
-      </div> 
-  </div> 
-</nav> 
-
-<div class="container-fluid py-4 perfil-container" *ngIf="cliente">
-  <div class="row">
-    <!-- SIDEBAR -->
-    <div class="col-md-3">
-      <div class="perfil-sidebar text-center">
-
-        <div class="avatar mb-2">
-          <i class="bi bi-person-circle"></i>
-        </div>
-
-        <p class="fw-bold">¡HOLA!</p>
-
-        <button class="btn btn-menu active">MI PERFIL</button>
-        <button class="btn btn-menu"role="button" (click)="irPedidos()">PEDIDOS</button>
-        <button class="btn btn-menu"role="button" (click)="irTarjetas()">TARJETAS DE CRÉDITO</button>
-        <button class="btn btn-menu"role="button" (click)="irDirecciones()">MIS DIRECCIONES</button>
-        <button class="btn btn-menu"role="button" (click)="irFavoritos()">MIS FAVORITOS</button>
-        <button class="btn btn-menu salir"role="button" (click)="irMenu()">SALIR</button>
-      </div>
+    <div class="ap-cabecera__acciones">
+      <button type="button" class="ap-icono" (click)="irFavoritos()" aria-label="Favoritos">
+        <i class="pi pi-heart"></i>
+      </button>
+      <button type="button" class="ap-icono" (click)="irCarrito()" aria-label="Carrito">
+        <i class="pi pi-shopping-bag"></i>
+      </button>
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno" (click)="cerrarSesion()">
+        Salir
+      </button>
     </div>
-
-    <div class="col-md-9">
-      <div class="perfil-card">
-
-        <div class="perfil-header">Mis datos</div>
-
-        <div class="perfil-body">
-
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label>Nombre</label>
-              <input class="form-control"
-                     [(ngModel)]="cliente.nombre"
-                     [disabled]="!editando">
-            </div>
-
-            <div class="col-md-6">
-              <label>Correo</label>
-              <input class="form-control"
-                     [value]="cliente.correo"
-                     disabled>
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label>DNI</label>
-              <input class="form-control"
-                     [(ngModel)]="cliente.dni"
-                     [disabled]="!editando">
-            </div>
-
-            <div class="col-md-6">
-              <label>Dirección</label>
-              <input class="form-control"
-                     [(ngModel)]="cliente.direccion"
-                     [disabled]="!editando">
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label>RUC (opcional, para factura a empresa)</label>
-              <input class="form-control"
-                     [(ngModel)]="cliente.ruc"
-                     [disabled]="!editando">
-            </div>
-
-            <div class="col-md-6">
-              <label>Razón social (opcional)</label>
-              <input class="form-control"
-                     [(ngModel)]="cliente.razonSocial"
-                     [disabled]="!editando">
-            </div>
-          </div>
-
-          <button class="btn btn-warning px-4"
-                  *ngIf="!editando"
-                  (click)="editar()">
-            EDITAR
-          </button>
-
-          <button class="btn btn-success px-4"
-                  *ngIf="editando"
-                  (click)="guardar()"
-                  [disabled]="cargando">
-            {{ cargando ? 'Guardando...' : 'GUARDAR' }}
-          </button>
-
-        </div>
-      </div>
-    </div>
-
   </div>
+</header>
+
+<div class="ap-cuenta">
+
+  <nav class="ap-cuenta__nav">
+    <button type="button" class="ap-cuenta__enlace ap-cuenta__enlace--activo">
+      <i class="pi pi-user"></i> Mi perfil
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irPedidos()">
+      <i class="pi pi-box"></i> Mis pedidos
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irDirecciones()">
+      <i class="pi pi-map-marker"></i> Direcciones
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irTarjetas()">
+      <i class="pi pi-credit-card"></i> Tarjetas
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irFavoritos()">
+      <i class="pi pi-heart"></i> Favoritos
+    </button>
+  </nav>
+
+  <main class="ap-cuenta__panel">
+    <div class="ap-cuenta__cabecera">
+      <div>
+        <span class="ap-etiqueta">Tu cuenta</span>
+        <h1 class="ap-titulo-seccion">Mi perfil</h1>
+      </div>
+      <button type="button" class="ap-boton ap-boton--pequeno"
+              *ngIf="cliente && !editando"
+              (click)="editar()">
+        <i class="pi pi-pencil"></i> Editar
+      </button>
+    </div>
+
+    <div class="ap-cargando" *ngIf="!cliente && !errorCarga">
+      <i class="pi pi-spinner pi-spin"></i> Cargando tu perfil...
+    </div>
+
+    <div class="ap-cuenta__vacio" *ngIf="errorCarga">
+      <i class="pi pi-exclamation-triangle"></i>
+      <h2>No se pudo cargar tu perfil</h2>
+      <p>{{ errorCarga }}</p>
+      <button type="button" class="ap-boton ap-boton--acento" (click)="cerrarSesion()">
+        Iniciar sesión
+      </button>
+    </div>
+
+    <div class="ap-panel" *ngIf="cliente">
+
+      <!-- El correo no se edita: identifica la cuenta -->
+      <div class="ap-perfil__correo">
+        <span class="ap-etiqueta">Correo de la cuenta</span>
+        <strong>{{ cliente.correo }}</strong>
+      </div>
+
+      <div class="ap-rejilla-campos">
+        <div class="ap-campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" [(ngModel)]="cliente.nombre"
+                 name="nombre" [disabled]="!editando">
+        </div>
+
+        <div class="ap-campo">
+          <label for="dni">DNI</label>
+          <input id="dni" type="text" [(ngModel)]="cliente.dni"
+                 name="dni" [disabled]="!editando">
+        </div>
+
+        <div class="ap-campo ap-campo--ancho">
+          <label for="direccion">Dirección</label>
+          <input id="direccion" type="text" [(ngModel)]="cliente.direccion"
+                 name="direccion" [disabled]="!editando">
+        </div>
+
+        <div class="ap-campo">
+          <label for="ruc">RUC <span class="ap-campo__opcional">opcional</span></label>
+          <input id="ruc" type="text" [(ngModel)]="cliente.ruc"
+                 name="ruc" [disabled]="!editando">
+        </div>
+
+        <div class="ap-campo">
+          <label for="razonSocial">Razón social <span class="ap-campo__opcional">opcional</span></label>
+          <input id="razonSocial" type="text" [(ngModel)]="cliente.razonSocial"
+                 name="razonSocial" [disabled]="!editando">
+        </div>
+      </div>
+
+      <div class="ap-perfil__acciones" *ngIf="editando">
+        <button type="button" class="ap-boton ap-boton--acento"
+                [disabled]="cargando" (click)="guardar()">
+          <i class="pi" [ngClass]="cargando ? 'pi-spinner pi-spin' : 'pi-check'"></i>
+          {{ cargando ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+
+    </div>
+  </main>
 </div>

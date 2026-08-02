@@ -19,6 +19,7 @@ export class MiPerfil implements OnInit {
   cliente: any = null;
   editando = false;
   cargando = false;
+  errorCarga = '';
   favoritosIds: number[] = [];    
   busqueda: string = ""; 
   contadorCarrito = 0; 
@@ -36,8 +37,14 @@ export class MiPerfil implements OnInit {
   ngOnInit() {
     this.cargarCategorias(); 
     this.cargarFavoritos(); 
-    this.clienteService.obtenerPerfil().subscribe(res => {
-      this.cliente = res;
+    // Sin rama de error la pantalla se quedaba en "Cargando..." para
+    // siempre cuando la peticion fallaba (sesion caducada, backend caido).
+    this.clienteService.obtenerPerfil().subscribe({
+      next: res => {
+        this.cliente = res;
+        this.errorCarga = '';
+      },
+      error: () => this.errorCarga = 'No pudimos cargar tu perfil. Vuelve a iniciar sesión e inténtalo de nuevo.'
     });
   }
 

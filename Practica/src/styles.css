@@ -321,6 +321,136 @@ h1, h2, h3, h4 {
   font-size: 0.9rem;
 }
 
+/* ============================================================
+   Zona de cuenta
+
+   Diseño compartido por perfil, direcciones, tarjetas, pedidos y
+   favoritos: navegación lateral fija y panel de contenido.
+   ============================================================ */
+.ap-cuenta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+@media (min-width: 900px) {
+  .ap-cuenta { grid-template-columns: 220px minmax(0, 1fr); gap: 3rem; }
+}
+
+.ap-cuenta__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  align-self: start;
+}
+@media (min-width: 900px) {
+  .ap-cuenta__nav { position: sticky; top: 6rem; }
+}
+
+.ap-cuenta__enlace {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.8rem;
+  border: 0;
+  background: none;
+  text-align: left;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ap-negro);
+  transition: background var(--ap-transicion), color var(--ap-transicion);
+}
+.ap-cuenta__enlace:hover { background: var(--ap-gris-100); }
+.ap-cuenta__enlace--activo {
+  background: var(--ap-negro);
+  color: var(--ap-blanco);
+  font-weight: 700;
+}
+.ap-cuenta__enlace--activo i { color: var(--ap-acento); }
+.ap-cuenta__enlace i { width: 1rem; font-size: 0.9rem; }
+
+.ap-cuenta__panel { min-width: 0; }
+
+/* Estado vacío dentro de un panel de cuenta */
+.ap-cuenta__vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 4rem 1.5rem;
+  text-align: center;
+  border: var(--ap-borde);
+}
+.ap-cuenta__vacio i { font-size: 2.25rem; color: var(--ap-gris-400); }
+.ap-cuenta__vacio h2 { font-size: 1.05rem; }
+.ap-cuenta__vacio p {
+  margin: 0 0 1rem;
+  color: var(--ap-gris-600);
+  font-size: 0.88rem;
+}
+
+.ap-cuenta__cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--ap-negro);
+  margin-bottom: 1.75rem;
+}
+.ap-cuenta__cabecera .ap-titulo-seccion { margin: 0.3rem 0 0; }
+
+/* Panel con borde, para formularios y fichas de datos */
+.ap-panel {
+  border: var(--ap-borde);
+  padding: 1.5rem;
+}
+
+/* Campo de formulario reutilizable */
+.ap-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.ap-campo label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.ap-campo input,
+.ap-campo select,
+.ap-campo textarea {
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--ap-gris-300, #d6d6d6);
+  background: var(--ap-blanco);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.ap-campo input:focus,
+.ap-campo select:focus,
+.ap-campo textarea:focus {
+  outline: 0;
+  border-color: var(--ap-negro);
+}
+.ap-campo input:disabled {
+  background: var(--ap-gris-100);
+  color: var(--ap-gris-600);
+}
+
+.ap-rejilla-campos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .ap-rejilla-campos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* ---------- Tarjeta de producto ---------- */
 .ap-producto {
   position: relative;
