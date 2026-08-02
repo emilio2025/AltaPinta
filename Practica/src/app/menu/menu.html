@@ -185,7 +185,7 @@
         <div class="ap-producto__info">
           <span class="ap-producto__meta" *ngIf="p.tipoPrenda">{{ p.tipoPrenda.nombre }}</span>
           <h3 class="ap-producto__nombre">{{ p.nombre }}</h3>
-          <div class="ap-producto__precio">S/ {{ p.precio }}</div>
+          <div class="ap-producto__precio">S/ {{ p.precio | number:'1.2-2' }}</div>
         </div>
       </article>
     </div>

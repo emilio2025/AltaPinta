@@ -107,7 +107,7 @@
 
       <div class="ap-producto__info">
         <h3 class="ap-producto__nombre">{{ p.nombre }}</h3>
-        <div class="ap-producto__precio">S/ {{ p.precio }}</div>
+        <div class="ap-producto__precio">S/ {{ p.precio | number:'1.2-2' }}</div>
       </div>
     </article>
   </div>
@@ -202,7 +202,7 @@
         </div>
         <div class="ap-producto__info">
           <h3 class="ap-producto__nombre">{{ h.nombre }}</h3>
-          <div class="ap-producto__precio">S/ {{ h.precio }}</div>
+          <div class="ap-producto__precio">S/ {{ h.precio | number:'1.2-2' }}</div>
         </div>
       </article>
     </div>
@@ -227,7 +227,7 @@
         </div>
         <div class="ap-producto__info">
           <h3 class="ap-producto__nombre">{{ p.nombre }}</h3>
-          <div class="ap-producto__precio">S/ {{ p.precio }}</div>
+          <div class="ap-producto__precio">S/ {{ p.precio | number:'1.2-2' }}</div>
         </div>
       </article>
     </div>
