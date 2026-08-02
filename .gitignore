@@ -30,6 +30,11 @@ HELP.md
 hs_err_pid*.log
 replay_pid*.log
 
+# Respaldos de base de datos: llevan datos de clientes y pedidos, y pesan.
+# Guardalos fuera del repositorio.
+respaldo-*.sql
+*.dump.sql
+
 # Datos generados en tiempo de ejecucion.
 # OJO: no se versionan, pero NO los borres de tu disco: la base de datos
 # guarda las rutas en producto_imagen.url y factura.url_pdf.
