@@ -41,6 +41,11 @@ respaldo-*.sql
 BackendTienda/facturas/
 BackendTienda/productos-imagenes/
 
+# Excepción: las ilustraciones de prenda SÍ se versionan. No son datos
+# subidos por nadie, son parte del aspecto de la tienda: las genera
+# migraciones/generar_imagenes.py y pesan 28 KB entre las 54.
+!BackendTienda/productos-imagenes/prenda-*.svg
+
 # ------------------------------------------------------------
 # FRONTEND - Angular / Node
 # ------------------------------------------------------------
