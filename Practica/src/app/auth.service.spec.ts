@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import { AuthService } from './auth.service';
 
+import { environment } from '../environments/environment';
 /**
  * Pruebas del servicio de autenticacion.
  *
@@ -18,7 +19,8 @@ describe('AuthService', () => {
   let httpMock: HttpTestingController;
   let router: jasmine.SpyObj<Router>;
 
-  const API = 'http://localhost:8080/api/auth';
+  // Se lee del entorno para que la prueba no se rompa si cambia la direccion
+  const API = `${environment.apiUrl}/api/auth`;
   const ADMIN = 'altapintaunamba@gmail.com';
 
   beforeEach(() => {

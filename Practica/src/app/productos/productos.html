@@ -103,7 +103,7 @@
         <div class="ap-imagenes-form">
           <div class="ap-imagen-slot" *ngFor="let slot of imagenesForm; let i = index">
             <div class="ap-imagen-slot__vista" *ngIf="slot.preview || slot.url">
-              <img [src]="slot.preview || slot.url" [alt]="'Vista previa ' + (i + 1)">
+              <img [src]="slot.preview || slot.url | imagen" [alt]="'Vista previa ' + (i + 1)">
               <button type="button" class="ap-imagen-slot__quitar" (click)="quitarImagen(i)">
                 <i class="pi pi-times"></i>
               </button>
@@ -154,7 +154,7 @@
         <tbody>
           <tr *ngFor="let p of productos">
             <td>
-              <img [src]="p.imagenUrl" class="ap-tabla__miniatura" [alt]="p.nombre"
+              <img [src]="p.imagenUrl | imagen" class="ap-tabla__miniatura" [alt]="p.nombre"
                    onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
             </td>
             <td>{{ p.nombre }}</td>

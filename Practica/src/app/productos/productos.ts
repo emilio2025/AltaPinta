@@ -6,10 +6,11 @@ import { forkJoin } from 'rxjs';
 import { ProductoService } from '../../services/producto.service';
 import { Router } from '@angular/router';
 
+import { ImagenPipe } from '../pipes/imagen.pipe';
 @Component({
   selector: 'app-producto',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [ImagenPipe, CommonModule, FormsModule, HttpClientModule],
   templateUrl: './productos.html',
   styleUrls: ['./productos.css']
 })

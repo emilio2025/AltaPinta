@@ -9,10 +9,11 @@ import { RouterModule } from '@angular/router';
 import { forkJoin, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
+import { ImagenPipe } from '../pipes/imagen.pipe';
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, RouterModule, HttpClientModule, FormsModule],
+  imports: [ImagenPipe, CommonModule, RouterModule, HttpClientModule, FormsModule],
   templateUrl: './principal.html',
   styleUrls: ['./principal.css']
 })

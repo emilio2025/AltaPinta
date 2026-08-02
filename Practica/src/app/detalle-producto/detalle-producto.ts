@@ -8,9 +8,10 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { EnvioService } from '../../services/envio.service'; 
 import { Router } from '@angular/router'; 
 
+import { ImagenPipe } from '../pipes/imagen.pipe';
 @Component({
   selector: 'app-detalle-producto',
-  imports: [CommonModule, DecimalPipe],
+  imports: [ImagenPipe, CommonModule, DecimalPipe],
   templateUrl: './detalle-producto.html',
   styleUrls: ['./detalle-producto.css']
 })

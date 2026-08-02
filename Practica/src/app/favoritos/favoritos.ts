@@ -5,9 +5,10 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common'; 
 import { AuthService } from '../auth.service';
 
+import { ImagenPipe } from '../pipes/imagen.pipe';
 @Component({
   selector: 'app-favoritos',
-  imports: [CommonModule, RouterModule], 
+  imports: [ImagenPipe, CommonModule, RouterModule], 
   templateUrl: './favoritos.html',
   styleUrls: ['./favoritos.css']
 })

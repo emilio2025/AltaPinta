@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 
+import { environment } from '../environments/environment';
 export interface Talla {
   id: number;
   nombre: string;
@@ -69,7 +70,7 @@ export interface FiltrosProducto {
 })
 export class ProductoService {
 
-  private URL = "http://localhost:8080";
+  private URL = `${environment.apiUrl}`;
 
   constructor(private http: HttpClient) {}
 

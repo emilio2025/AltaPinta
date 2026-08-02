@@ -94,7 +94,7 @@
           <i class="pi" [ngClass]="esFavorito(p.id) ? 'pi-heart-fill' : 'pi-heart'"></i>
         </button>
 
-        <img [src]="p.imagenUrl" [alt]="p.nombre"
+        <img [src]="p.imagenUrl | imagen" [alt]="p.nombre"
              onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
 
         <div class="ap-producto__acciones">
@@ -191,7 +191,7 @@
       <article class="ap-producto" *ngFor="let h of productosHero" (click)="verDetalles(h)">
         <div class="ap-producto__imagen">
           <span class="ap-insignia ap-insignia--acento" *ngIf="h.deporte">{{ h.deporte.nombre }}</span>
-          <img [src]="h.imagenUrl" [alt]="h.nombre"
+          <img [src]="h.imagenUrl | imagen" [alt]="h.nombre"
                onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
           <div class="ap-producto__acciones">
             <button type="button" class="ap-producto__accion"
@@ -216,7 +216,7 @@
     <div class="ap-cuadricula">
       <article class="ap-producto" *ngFor="let p of productosBebes" (click)="verDetalles(p)">
         <div class="ap-producto__imagen">
-          <img [src]="p.imagenUrl" [alt]="p.nombre"
+          <img [src]="p.imagenUrl | imagen" [alt]="p.nombre"
                onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
           <div class="ap-producto__acciones">
             <button type="button" class="ap-producto__accion"

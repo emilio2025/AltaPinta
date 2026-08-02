@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { Deporte } from './producto.service';
 
+import { environment } from '../environments/environment';
 /**
  * Catalogo de deportes.
  *
@@ -13,7 +14,7 @@ import { Deporte } from './producto.service';
 @Injectable({ providedIn: 'root' })
 export class DeporteService {
 
-  private URL = 'http://localhost:8080/deportes';
+  private URL = `${environment.apiUrl}/deportes`;
 
   constructor(private http: HttpClient) {}
 

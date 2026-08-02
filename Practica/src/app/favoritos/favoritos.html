@@ -80,7 +80,7 @@
             <i class="pi pi-heart-fill"></i>
           </button>
 
-          <img [src]="p.imagenUrl" [alt]="p.nombre"
+          <img [src]="p.imagenUrl | imagen" [alt]="p.nombre"
                onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
 
           <div class="ap-producto__acciones">

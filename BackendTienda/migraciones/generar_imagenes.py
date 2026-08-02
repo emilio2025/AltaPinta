@@ -30,7 +30,7 @@ import io, os
 AQUI = os.path.dirname(os.path.abspath(__file__))
 DIR_IMAGENES = os.path.join(AQUI, "..", "productos-imagenes")
 SALIDA_SQL = os.path.join(AQUI, "004-imagenes-y-precios.sql")
-BASE_URL = "http://localhost:8080/imagenes"
+BASE_URL = "/imagenes"  # ruta relativa: el frontend antepone la direccion de su entorno
 
 # ---------------------------------------------------------------
 # Paleta: el fondo cambia con el deporte, la silueta siempre en negro

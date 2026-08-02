@@ -56,7 +56,7 @@
       <article class="ap-linea" *ngFor="let i of items">
 
         <div class="ap-linea__imagen">
-          <img [src]="i.imagenUrl" [alt]="i.nombre"
+          <img [src]="i.imagenUrl | imagen" [alt]="i.nombre"
                onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
         </div>
 

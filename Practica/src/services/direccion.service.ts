@@ -1,10 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { environment } from '../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class DireccionService {
 
-  private API = 'http://localhost:8080/direcciones';
+  private API = `${environment.apiUrl}/direcciones`;
 
   constructor(private http: HttpClient) {}
 

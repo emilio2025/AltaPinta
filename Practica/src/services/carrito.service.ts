@@ -2,10 +2,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, tap } from 'rxjs';
 
+import { environment } from '../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class CarritoService {
 
-  private API = 'http://localhost:8080/carrito';
+  private API = `${environment.apiUrl}/carrito`;
 
   private contador$ = new BehaviorSubject<number>(0);
   contadorObservable$ = this.contador$.asObservable();

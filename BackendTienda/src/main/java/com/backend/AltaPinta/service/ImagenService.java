@@ -42,7 +42,14 @@ public class ImagenService {
             Path destino = Path.of(IMAGENES_DIR, nombreArchivo);
             Files.copy(file.getInputStream(), destino);
 
-            return "http://localhost:8080/imagenes/" + nombreArchivo;
+            // Se devuelve la ruta RELATIVA, no la URL completa.
+            //
+            // Antes se guardaba "http://localhost:8080/imagenes/..." en la
+            // base de datos, lo que ata los datos a la máquina de desarrollo:
+            // al desplegar en otro sitio, todas las imágenes del catálogo
+            // apuntarían a un servidor que no existe. Ahora el frontend
+            // compone la URL con la dirección de su entorno.
+            return "/imagenes/" + nombreArchivo;
         } catch (IOException e) {
             throw new RuntimeException("Error guardando la imagen", e);
         }

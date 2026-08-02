@@ -8,10 +8,11 @@ import { ProductoService } from '../../services/producto.service';
 import { Router } from '@angular/router'; 
 import { AuthService } from '../auth.service';
 
+import { ImagenPipe } from '../pipes/imagen.pipe';
 @Component({ 
   selector: 'app-carrito', 
   standalone: true, 
-  imports: [CommonModule, FormsModule], 
+  imports: [ImagenPipe, CommonModule, FormsModule], 
   templateUrl: './carrito.html',
   styleUrl:'./carrito.css',
 

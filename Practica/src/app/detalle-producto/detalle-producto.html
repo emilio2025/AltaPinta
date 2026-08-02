@@ -53,7 +53,7 @@
                 *ngFor="let img of galeria()"
                 [class.ap-miniatura--activa]="img === imagenActiva"
                 (click)="verImagen(img)">
-          <img [src]="img" [alt]="producto.nombre"
+          <img [src]="img | imagen" [alt]="producto.nombre"
                onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
         </button>
       </div>
@@ -62,7 +62,7 @@
         <span class="ap-insignia ap-insignia--acento" *ngIf="producto.deporte">
           {{ producto.deporte.nombre }}
         </span>
-        <img [src]="imagenActiva" [alt]="producto.nombre"
+        <img [src]="imagenActiva | imagen" [alt]="producto.nombre"
              onerror="this.src='assets/altaPinta.jpg'; this.onerror=null;">
       </div>
     </section>

@@ -13,10 +13,11 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 
+import { ImagenPipe } from '../pipes/imagen.pipe';
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [
+  imports: [ImagenPipe, 
     CommonModule, RouterModule, HttpClientModule, FormsModule,
     SelectModule, PaginatorModule
   ],

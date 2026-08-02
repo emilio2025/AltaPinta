@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { environment } from '../environments/environment';
 export interface TarjetaResponse {
   id: number;
   numero: string;
@@ -12,7 +13,7 @@ export interface TarjetaResponse {
 @Injectable({ providedIn: 'root' })
 export class TarjetaService {
 
-  private API = 'http://localhost:8080/tarjetas';
+  private API = `${environment.apiUrl}/tarjetas`;
 
   constructor(private http: HttpClient) {}
 
