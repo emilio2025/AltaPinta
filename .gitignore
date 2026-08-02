@@ -39,7 +39,11 @@ respaldo-*.sql
 # OJO: no se versionan, pero NO los borres de tu disco: la base de datos
 # guarda las rutas en producto_imagen.url y factura.url_pdf.
 BackendTienda/facturas/
-BackendTienda/productos-imagenes/
+
+# Se ignora el CONTENIDO de productos-imagenes, no la carpeta: git no
+# puede volver a incluir un archivo si su directorio esta excluido, y
+# abajo hay una excepción.
+BackendTienda/productos-imagenes/*
 
 # Excepción: las ilustraciones de prenda SÍ se versionan. No son datos
 # subidos por nadie, son parte del aspecto de la tienda: las genera
