@@ -1,74 +1,73 @@
-<div class="login-wrapper d-flex justify-content-center align-items-center">
+<!-- ============================================================
+     Inicio de sesión
+     Dos paneles: marca a la izquierda, formulario a la derecha.
+     ============================================================ -->
 
-  <div class="login-container d-flex shadow">
+<div class="ap-acceso">
 
-    <!-- ===== FORMULARIO ===== -->
-    <div class="login-box">
+  <!-- Panel de marca -->
+  <aside class="ap-acceso__marca">
+    <a class="ap-logo ap-logo--claro" routerLink="/principal">ALTA<span>PINTA</span></a>
+    <h1 class="ap-acceso__lema">Entrena<br>sin excusas</h1>
+    <p class="ap-acceso__texto">
+      Accede a tu cuenta para ver tus pedidos, tus favoritos y completar
+      tus compras.
+    </p>
+  </aside>
 
-      <!-- LOGO -->
-      <div class="logo-container"></div>
+  <!-- Formulario -->
+  <main class="ap-acceso__panel">
+    <div class="ap-acceso__caja">
 
-      <h2 class="titulo-login">Inicia sesión</h2>
+      <span class="ap-etiqueta">Bienvenido de vuelta</span>
+      <h2 class="ap-acceso__titulo">Iniciar sesión</h2>
 
-      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <form (ngSubmit)="onLoginSubmit()" #loginForm="ngForm" novalidate>
 
-      <form (ngSubmit)="onLoginSubmit()" class="form-small">
-
-        <div class="form-group mb-2">
-          <label>Email</label>
-          <input type="email" class="form-control input-custom" [(ngModel)]="loginData.correo" name="correo" required>
+        <div class="ap-campo">
+          <label for="correo">Correo</label>
+          <input id="correo" type="email"
+                 [(ngModel)]="loginData.correo"
+                 name="correo"
+                 required
+                 autocomplete="email"
+                 placeholder="tucorreo@ejemplo.com">
         </div>
 
-        <div class="form-group mb-1">
-          <label>Contraseña</label>
-          <input type="password" class="form-control input-custom" [(ngModel)]="loginData.password" name="password" required>
+        <div class="ap-campo">
+          <label for="password">Contraseña</label>
+          <input id="password" type="password"
+                 [(ngModel)]="loginData.password"
+                 name="password"
+                 required
+                 autocomplete="current-password"
+                 placeholder="Tu contraseña">
         </div>
 
-        <a class="forgot" routerLink="/forgot-password">
-          ¿Has olvidado tu contraseña?
+        <a class="ap-acceso__olvido" routerLink="/forgot-password">
+          ¿Olvidaste tu contraseña?
         </a>
 
+        <p class="ap-acceso__error" *ngIf="errorMessage">
+          <i class="pi pi-exclamation-circle"></i> {{ errorMessage }}
+        </p>
 
-        <button type="submit" class="btn btn-dark w-100 btn-small mt-2">INICIAR SESIÓN</button>
-
-        <!-- ENVÍA A REGISTER -->
-        <button routerLink="/register" class="btn btn-outline-secondary w-100 btn-small mt-2">
-          REGISTRARME
+        <button type="submit" class="ap-boton ap-boton--acento ap-boton--bloque">
+          <i class="pi pi-sign-in"></i> Entrar
         </button>
-
-        <div class="text-muted tiny-text mt-2">
-          Al continuar acepto la Política de Privacidad
-        </div>
-
-        <div class="separator my-2"><span></span></div>
-
-        <button class="btn btn-light w-100 d-flex justify-content-center gap-2 btn-small mb-1">
-          <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" width="16">
-          CONTINUAR CON GOOGLE
-        </button>
-
-        <button class="btn btn-light w-100 d-flex justify-content-center gap-2 btn-small">
-          <img src="https://cdn-icons-png.flaticon.com/512/179/179309.png" width="16">
-          CONTINUAR CON APPLE
-        </button>
-
       </form>
 
-      <!-- ===== FOOTER MINI ===== -->
-      <div class="footer-login text-center mt-3">
-        <span class="brand-mini">Alta Pinta</span>
+      <div class="ap-acceso__separador"><span>o</span></div>
 
-        <span class="social-line">
-          <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="15">
-          <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="15">
-          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" width="15">
-          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384015.png" width="15">
-        </span>
-      </div>
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--bloque"
+              routerLink="/register">
+        Crear una cuenta
+      </button>
+
+      <a class="ap-acceso__volver" routerLink="/principal">
+        <i class="pi pi-arrow-left"></i> Volver a la tienda
+      </a>
+
     </div>
-
-    <!-- BANNER -->
-    <div class="login-banner"></div>
-
-  </div>
+  </main>
 </div>

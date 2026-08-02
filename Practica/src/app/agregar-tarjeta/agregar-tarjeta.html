@@ -1,139 +1,100 @@
-<head>
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-</head>
+<!-- ============================================================
+     Alta de tarjeta
+     Columna única centrada, igual que el checkout: aquí la única
+     acción útil es completar el formulario.
+     ============================================================ -->
 
-<div class="container my-5">
-  <div class="add-card mx-auto">
+<div class="ap-alta">
+  <div class="ap-alta__caja">
 
-    <div class="add-card-header">
-      <div class="card-icon">
-        <i class="bi bi-credit-card-2-front-fill"></i>
-      </div>
-      <h4>Agregar tarjeta</h4>
-      <p>Guarda tu tarjeta para compras más rápidas</p>
-    </div>
+    <header class="ap-alta__cabecera">
+      <span class="ap-etiqueta">Métodos de pago</span>
+      <h1 class="ap-alta__titulo">Nueva tarjeta</h1>
+    </header>
 
     <form #formTarjeta="ngForm" (ngSubmit)="guardar(formTarjeta)" novalidate>
 
-      <!-- NÚMERO DE TARJETA -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">
-          <i class="bi bi-123 me-1 text-accent"></i>
-          Número de tarjeta
-        </label>
-
-        <input class="form-control input-premium"
-               placeholder="•••• •••• •••• ••••"
+      <div class="ap-campo">
+        <label for="numero">Número de tarjeta</label>
+        <input id="numero" type="text" inputmode="numeric"
                [(ngModel)]="numero"
                name="numero"
                required
                pattern="^[0-9]{16}$"
-               minlength="16"
                maxlength="16"
-               inputmode="numeric"
-               autocomplete="off"
+               placeholder="16 dígitos"
                #numeroCtrl="ngModel">
-
-        <div *ngIf="numeroCtrl.invalid && numeroCtrl.touched"
-             class="text-danger small">
-          Debe contener exactamente 16 dígitos numéricos
-        </div>
+        <span class="ap-campo__error"
+              *ngIf="numeroCtrl.invalid && numeroCtrl.touched">
+          Debe tener exactamente 16 dígitos.
+        </span>
       </div>
 
-      <!-- TITULAR -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">
-          <i class="bi bi-person-fill me-1 text-accent"></i>
-          Titular
-        </label>
-
-        <input class="form-control input-premium"
-               placeholder="Nombre del titular"
+      <div class="ap-campo">
+        <label for="titular">Titular</label>
+        <input id="titular" type="text"
                [(ngModel)]="titular"
                name="titular"
-               required>
+               required
+               placeholder="Como aparece en la tarjeta">
       </div>
 
-      <div class="row">
-
-        <!-- FECHA -->
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">
-            <i class="bi bi-calendar-event me-1 text-accent"></i>
-            Vencimiento
-          </label>
-
-          <input class="form-control input-premium"
-                 placeholder="MM/AAAA"
+      <div class="ap-rejilla-campos">
+        <div class="ap-campo">
+          <label for="fecha">Vencimiento</label>
+          <input id="fecha" type="text"
                  [(ngModel)]="fechaVencimiento"
-                 name="fecha"
+                 name="fechaVencimiento"
                  required
                  pattern="^(0[1-9]|1[0-2])\/[0-9]{4}$"
+                 placeholder="MM/AAAA"
                  #fechaCtrl="ngModel">
-
-          <div *ngIf="fechaCtrl.invalid && fechaCtrl.touched"
-               class="text-danger small">
-            Formato válido: MM/AAAA
-          </div>
-
-          <div *ngIf="!fechaCtrl.invalid && tarjetaVencida(fechaVencimiento)"
-               class="text-danger small">
-            La tarjeta ya está vencida
-          </div>
+          <span class="ap-campo__error"
+                *ngIf="fechaCtrl.invalid && fechaCtrl.touched">
+            Usa el formato MM/AAAA.
+          </span>
         </div>
 
-        <!-- CVV -->
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">
-            <i class="bi bi-shield-lock-fill me-1 text-accent"></i>
-            CVV
-          </label>
-
-          <input class="form-control input-premium"
-                 type="password"
-                 placeholder="***"
+        <div class="ap-campo">
+          <label for="cvv">CVV</label>
+          <input id="cvv" type="text" inputmode="numeric"
                  [(ngModel)]="cvv"
                  name="cvv"
                  required
                  pattern="^[0-9]{3}$"
-                 minlength="3"
                  maxlength="3"
-                 inputmode="numeric"
-                 autocomplete="off"
+                 placeholder="3 dígitos"
                  #cvvCtrl="ngModel">
-
-          <div *ngIf="cvvCtrl.invalid && cvvCtrl.touched"
-               class="text-danger small">
-            El CVV debe tener 3 dígitos
-          </div>
+          <span class="ap-campo__error"
+                *ngIf="cvvCtrl.invalid && cvvCtrl.touched">
+            Deben ser 3 dígitos.
+          </span>
         </div>
       </div>
 
-      <!-- BOTÓN -->
-      <button class="btn btn-guardar w-100 mt-3"
-              type="submit"
-              [disabled]="loading || formTarjeta.invalid">
-        <i class="bi bi-check-circle-fill me-2"></i>
+      <!-- El CVV se valida pero no se envía ni se guarda: PCI DSS lo
+           prohíbe. Se avisa para que no parezca un olvido. -->
+      <p class="ap-alta__aviso">
+        <i class="pi pi-shield"></i>
+        El CVV solo se usa para validar el formato. No se envía ni se
+        almacena en ningún momento.
+      </p>
+
+      <p class="ap-campo__error ap-campo__error--bloque" *ngIf="error">
+        <i class="pi pi-exclamation-circle"></i> {{ error }}
+      </p>
+
+      <button type="submit" class="ap-boton ap-boton--acento ap-boton--bloque"
+              [disabled]="loading">
+        <i class="pi" [ngClass]="loading ? 'pi-spinner pi-spin' : 'pi-check'"></i>
         {{ loading ? 'Guardando...' : 'Guardar tarjeta' }}
       </button>
 
-      <!-- ERROR BACKEND -->
-      <div *ngIf="error" class="alert alert-danger mt-3">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {{ error }}
-      </div>
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--bloque"
+              (click)="volver()">
+        <i class="pi pi-arrow-left"></i> Volver
+      </button>
 
     </form>
-
-    <button class="btn btn-volver" type="button" (click)="volver()">
-      <i class="bi bi-arrow-left"></i> Volver
-    </button>
-
-    <div class="add-card-footer">
-      <i class="bi bi-lock-fill"></i>
-      Tu información está protegida
-    </div>
-
   </div>
 </div>

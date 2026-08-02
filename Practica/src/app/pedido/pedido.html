@@ -1,112 +1,110 @@
-<head> 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> 
-</head> 
+<header class="ap-cabecera">
+  <div class="ap-cabecera__barra">
+    <a class="ap-logo" (click)="irMenu()">ALTA<span>PINTA</span></a>
 
-<nav class="navbar navbar-expand-lg menu-top shadow-sm"> 
-  <div class="container-fluid d-flex align-items-center"> 
-      <div class="d-flex align-items-center logo-box " role="button" (click)="irMenu()"></div> 
-      <!--<i class="bi bi-list menu-icon " role="button" (click)="irMenu()"></i>--> 
-      <ul class="navbar-nav gap-4 fw-semibold nav-categorias"> 
-          <li class="nav-item" *ngFor="let c of categorias"> 
-              <a class="nav-link" (click)="irCategoria(c.nombre)"> 
-                {{ c.nombre.toUpperCase() }} 
-              </a> 
-          </li> 
-      </ul> 
+    <nav class="ap-nav">
+      <button type="button" *ngFor="let c of categorias"
+              class="ap-nav__enlace" (click)="irCategoria(c.nombre)">
+        {{ c.nombre }}
+      </button>
+    </nav>
 
-      <div class="icons"> 
-        <i class="bi bi-heart" role="button" (click)="irFavoritos()"></i> 
- 
-        <div class="cart-icon" role="button" (click)="irCarrito()"> 
-          <i class="bi bi-cart"></i> 
-          <span class="badge" *ngIf="contadorCarrito > 0"> 
-            {{ contadorCarrito }} 
-          </span> 
-        </div> 
+    <div class="ap-cabecera__acciones">
+      <button type="button" class="ap-icono" (click)="irFavoritos()" aria-label="Favoritos">
+        <i class="pi pi-heart"></i>
+      </button>
+      <button type="button" class="ap-icono" (click)="irCarrito()" aria-label="Carrito">
+        <i class="pi pi-shopping-bag"></i>
+        <span class="ap-contador" *ngIf="contadorCarrito > 0">{{ contadorCarrito }}</span>
+      </button>
+      <button type="button" class="ap-icono" (click)="irPerfil()" aria-label="Mi perfil">
+        <i class="pi pi-user"></i>
+      </button>
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno" (click)="cerrarSesion()">
+        Salir
+      </button>
+    </div>
+  </div>
+</header>
 
-        <div class="logout" role="button" (click)="cerrarSesion()"> 
-          <i class="bi bi-box-arrow-in-right"></i> 
-          <span>Cerrar Sesión</span> 
-        </div> 
-      </div> 
-  </div> 
-</nav> 
+<div class="ap-cuenta">
 
-<div class="container-fluid py-4 perfil-container">
+  <nav class="ap-cuenta__nav">
+    <button type="button" class="ap-cuenta__enlace" (click)="irPerfil()">
+      <i class="pi pi-user"></i> Mi perfil
+    </button>
+    <button type="button" class="ap-cuenta__enlace ap-cuenta__enlace--activo">
+      <i class="pi pi-box"></i> Mis pedidos
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irDirecciones()">
+      <i class="pi pi-map-marker"></i> Direcciones
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irTarjetas()">
+      <i class="pi pi-credit-card"></i> Tarjetas
+    </button>
+    <button type="button" class="ap-cuenta__enlace" (click)="irFavoritos()">
+      <i class="pi pi-heart"></i> Favoritos
+    </button>
+  </nav>
 
-  <div class="row">
-    <div class="col-md-3">
-      <div class="perfil-sidebar text-center">
-
-        <div class="avatar mb-2">
-          <i class="bi bi-person-circle"></i>
-        </div>
-
-        <p class="fw-bold">¡HOLA!</p>
-
-        <button class="btn btn-menu active"(click)="irPerfil()">MI PERFIL</button>
-        <button class="btn btn-menu" (click)="irPedidos()">PEDIDOS</button>
-        <button class="btn btn-menu" (click)="irTarjetas()">TARJETAS DE CRÉDITO</button>
-        <button class="btn btn-menu" (click)="irFavoritos()">MIS FAVORITOS</button>
-        <button class="btn btn-menu salir" (click)="irMenu()">SALIR</button>
-
+  <main class="ap-cuenta__panel">
+    <div class="ap-cuenta__cabecera">
+      <div>
+        <span class="ap-etiqueta">Tu cuenta</span>
+        <h1 class="ap-titulo-seccion">Mis pedidos</h1>
       </div>
+      <span class="ap-etiqueta" *ngIf="pedidos.length">
+        {{ pedidos.length }} {{ pedidos.length === 1 ? 'pedido' : 'pedidos' }}
+      </span>
     </div>
 
-    <div class="col-md-9">
-      <div class="perfil-card">
+    <div class="ap-cargando" *ngIf="cargando">
+      <i class="pi pi-spinner pi-spin"></i> Cargando tus pedidos...
+    </div>
 
-        <div class="perfil-header">Mis pedidos</div>
+    <!-- Sin pedidos -->
+    <div class="ap-cuenta__vacio" *ngIf="!cargando && pedidos.length === 0">
+      <i class="pi pi-box"></i>
+      <h2>Todavía no has hecho ningún pedido</h2>
+      <p>Cuando compres algo, aparecerá aquí con su factura.</p>
+      <button type="button" class="ap-boton ap-boton--acento" (click)="irMenu()">
+        Ver catálogo
+      </button>
+    </div>
 
-        <div class="perfil-body">
+    <!-- Listado -->
+    <div class="ap-pedidos" *ngIf="pedidos.length > 0">
+      <article class="ap-pedido" *ngFor="let p of pedidos">
 
-          <div *ngIf="cargando">Cargando pedidos...</div>
+        <div class="ap-pedido__cabecera">
+          <div>
+            <span class="ap-etiqueta">Pedido n.º {{ p.id }}</span>
+            <div class="ap-pedido__fecha">{{ p.fecha | date:'d MMM y, HH:mm' }}</div>
+          </div>
+          <span [class]="estadoBadge(p.estado)">{{ p.estado }}</span>
+        </div>
 
-          <table class="table table-bordered" *ngIf="pedidos.length > 0">
-            <thead>
-              <tr>
-                <th>Pedido ID</th>
-                <th>Fecha</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Factura</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let p of pedidos">
-                <td>{{ p.id }}</td>
-                <td>{{ p.fecha | date:'short' }}</td>
-                <td>S/ {{ p.total }}</td>
-                <td>
-                  <span [class]="estadoBadge(p.estado)">
-                    {{ p.estado }}
-                  </span>
-                </td>
-                <td>
-                  <button class="btn btn-sm btn-info"
-                          (click)="descargarFactura(p.id)">
-                    <i class="bi bi-download"></i> Descargar
-                  </button>
-                </td>
-                <td>
-                  <button class="btn btn-sm btn-outline-danger"
-                          *ngIf="esCancelable(p.estado)"
-                          (click)="cancelarPedido(p.id)">
-                    <i class="bi bi-x-circle"></i> Cancelar
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div *ngIf="!cargando && pedidos.length === 0">
-            No has realizado pedidos aún.
+        <div class="ap-pedido__cuerpo">
+          <div class="ap-pedido__total">
+            <span class="ap-etiqueta">Total</span>
+            <strong>S/ {{ p.total | number:'1.2-2' }}</strong>
           </div>
 
-        </div>
-      </div>
-    </div>
+          <div class="ap-pedido__acciones">
+            <button type="button" class="ap-boton ap-boton--fantasma ap-boton--pequeno"
+                    (click)="descargarFactura(p.id)">
+              <i class="pi pi-download"></i> Factura
+            </button>
 
-  </div>
+            <button type="button" class="ap-boton ap-boton--pequeno ap-boton--peligro"
+                    *ngIf="esCancelable(p.estado)"
+                    (click)="cancelarPedido(p.id)">
+              <i class="pi pi-times"></i> Cancelar
+            </button>
+          </div>
+        </div>
+
+      </article>
+    </div>
+  </main>
 </div>

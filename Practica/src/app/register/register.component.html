@@ -1,92 +1,135 @@
-<div class="register-wrapper d-flex justify-content-center align-items-center">
+<!-- ============================================================
+     Registro
+     Dos pasos en la misma pantalla: alta de datos y, tras enviarse el
+     correo, verificación con el código recibido.
+     ============================================================ -->
 
-  <div class="register-container d-flex shadow">
+<div class="ap-acceso">
 
-    <div class="register-box">
+  <aside class="ap-acceso__marca">
+    <a class="ap-logo ap-logo--claro" routerLink="/principal">ALTA<span>PINTA</span></a>
+    <h1 class="ap-acceso__lema">Únete al<br>equipo</h1>
+    <p class="ap-acceso__texto">
+      Crea tu cuenta para guardar favoritos, seguir tus pedidos y comprar
+      más rápido la próxima vez.
+    </p>
+  </aside>
 
-      <div class="logo-container"></div>
+  <main class="ap-acceso__panel">
+    <div class="ap-acceso__caja">
 
-      <h2 class="fw-bold mb-4 text-center title-reg">
-        {{ isRegistered ? ': Verifica tu Correo' : ': Registro de Cliente' }}
+      <span class="ap-etiqueta">{{ isRegistered ? 'Paso 2 de 2' : 'Paso 1 de 2' }}</span>
+      <h2 class="ap-acceso__titulo">
+        {{ isRegistered ? 'Verifica tu correo' : 'Crear cuenta' }}
       </h2>
 
-      <div *ngIf="message" class="alert-success-reg">{{ message }}</div>
-      <div *ngIf="errorMessage" class="alert-error-reg">{{ errorMessage }}</div>
+      <!-- ---------- Paso 1: datos ---------- -->
+      <form (ngSubmit)="onRegisterSubmit()" *ngIf="!isRegistered" #registerForm="ngForm" novalidate>
 
-      <form (ngSubmit)="onRegisterSubmit()" *ngIf="!isRegistered" #registerForm="ngForm">
-
-        <div class="reg-field">
-          <label>Nombre</label>
-          <input type="text" class="form-control input-reg" [(ngModel)]="registerData.nombre" name="nombre" required>
+        <div class="ap-campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text"
+                 [(ngModel)]="registerData.nombre" name="nombre" required
+                 autocomplete="name">
         </div>
 
-        <div class="reg-field">
-          <label>Correo Electrónico</label>
-          <input type="email" class="form-control input-reg" [(ngModel)]="registerData.correo" name="correo" required>
+        <div class="ap-campo">
+          <label for="correo">Correo electrónico</label>
+          <input id="correo" type="email"
+                 [(ngModel)]="registerData.correo" name="correo" required
+                 autocomplete="email"
+                 placeholder="tucorreo@ejemplo.com">
         </div>
 
-        <div class="reg-field">
-          <label>Contraseña</label>
-          <input type="password"
-                class="form-control input-reg"
-                [(ngModel)]="registerData.password"
-                name="password"
-                required
-                minlength="8"
-                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}"
-                #passwordField="ngModel">
-          <small class="text-muted" *ngIf="passwordField.invalid && passwordField.touched">
+        <div class="ap-campo">
+          <label for="password">Contraseña</label>
+          <input id="password" type="password"
+                 [(ngModel)]="registerData.password"
+                 name="password"
+                 required
+                 minlength="8"
+                 pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}"
+                 autocomplete="new-password"
+                 #passwordField="ngModel">
+          <!-- Mismo criterio que valida el backend en PasswordValidator -->
+          <span class="ap-campo__ayuda"
+                [class.ap-campo__ayuda--error]="passwordField.invalid && passwordField.touched">
             Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
-          </small>
+          </span>
         </div>
 
-        <div class="reg-field">
-          <label>Dirección (Opcional)</label>
-          <input type="text" class="form-control input-reg" [(ngModel)]="registerData.direccion" name="direccion">
+        <div class="ap-campo">
+          <label for="dni">DNI</label>
+          <input id="dni" type="text" inputmode="numeric"
+                 [(ngModel)]="registerData.dni"
+                 name="dni"
+                 maxlength="8"
+                 required
+                 pattern="[0-9]*"
+                 placeholder="8 dígitos"
+                 oninput="this.value = this.value.replace(/[^0-9]/g,'')">
         </div>
 
-        <div class="reg-field">
-          <label>DNI</label>
-          <input type="text"
-                class="form-control input-reg"
-                [(ngModel)]="registerData.dni"
-                name="dni"
-                maxlength="8"
-                required
-                pattern="[0-9]*"
-                oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+        <div class="ap-campo">
+          <label for="direccion">Dirección <span class="ap-campo__opcional">opcional</span></label>
+          <input id="direccion" type="text"
+                 [(ngModel)]="registerData.direccion" name="direccion">
         </div>
 
-        <button type="submit" class="btn btn-dark w-100 mt-2" [disabled]="registerForm.invalid">Registrarse y Enviar Código</button>
-      </form>
-
-      <form (ngSubmit)="onVerifySubmit()" *ngIf="isRegistered">
-
-        <p class="text-muted mb-2 text-center">
-          Se ha enviado un código a <b>{{ verificationData.correo }}</b>
+        <p class="ap-acceso__error" *ngIf="errorMessage">
+          <i class="pi pi-exclamation-circle"></i> {{ errorMessage }}
         </p>
 
-        <div class="reg-field">
-          <label>Código de Verificación</label>
-          <input type="text" class="form-control input-reg" [(ngModel)]="verificationData.codigo" name="codigo" maxlength="6" pattern="\d{6}" required>
-        </div>
-
-        <button class="btn btn-dark w-100">Verificar Cuenta</button>
+        <button type="submit" class="ap-boton ap-boton--acento ap-boton--bloque"
+                [disabled]="registerForm.invalid">
+          <i class="pi pi-user-plus"></i> Crear cuenta
+        </button>
       </form>
 
-      <p class="text-center mt-3">¿Ya tienes cuenta?
-        <a routerLink="/login" class="link-reg">Inicia Sesión</a>
-      </p>
+      <!-- ---------- Paso 2: verificación ---------- -->
+      <form (ngSubmit)="onVerifySubmit()" *ngIf="isRegistered" novalidate>
 
-      <div class="store-footer">
-        <span class="store-name">Alta Pinta</span>
-        <i class="fab fa-facebook"></i>
-        <i class="fab fa-instagram"></i>
-        <i class="fab fa-tiktok"></i>
-      </div>
+        <p class="ap-acceso__aviso">
+          <i class="pi pi-envelope"></i>
+          Enviamos un código a <strong>{{ verificationData.correo }}</strong>
+        </p>
+
+        <div class="ap-campo">
+          <label for="codigo">Código de verificación</label>
+          <input id="codigo" type="text" inputmode="numeric"
+                 [(ngModel)]="verificationData.codigo"
+                 name="codigo"
+                 maxlength="6"
+                 pattern="\d{6}"
+                 required
+                 placeholder="6 dígitos"
+                 autocomplete="one-time-code">
+        </div>
+
+        <p class="ap-acceso__error" *ngIf="errorMessage">
+          <i class="pi pi-exclamation-circle"></i> {{ errorMessage }}
+        </p>
+
+        <p class="ap-acceso__aviso" *ngIf="message">
+          <i class="pi pi-check-circle"></i> {{ message }}
+        </p>
+
+        <button type="submit" class="ap-boton ap-boton--acento ap-boton--bloque">
+          <i class="pi pi-check"></i> Verificar cuenta
+        </button>
+      </form>
+
+      <div class="ap-acceso__separador"><span>o</span></div>
+
+      <button type="button" class="ap-boton ap-boton--fantasma ap-boton--bloque"
+              routerLink="/login">
+        Ya tengo cuenta
+      </button>
+
+      <a class="ap-acceso__volver" routerLink="/principal">
+        <i class="pi pi-arrow-left"></i> Volver a la tienda
+      </a>
 
     </div>
-
-    <div class="register-banner"></div>
-  </div>
+  </main>
 </div>

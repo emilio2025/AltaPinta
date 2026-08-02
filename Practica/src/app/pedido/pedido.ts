@@ -67,15 +67,20 @@ export class PedidosComponent implements OnInit {
     });
   }
 
+  /** Clase de la etiqueta de estado, en la paleta de la tienda. */
   estadoBadge(estado: string): string {
     switch (estado) {
-      case 'PAGADO': return 'badge bg-primary';
-      case 'EN CAMINO': return 'badge bg-warning';
-      case 'EN DESTINO': return 'badge bg-info';
-      case 'RECOGIDO': return 'badge bg-success';
-      case 'CANCELADO': return 'badge bg-danger';
-      default: return 'badge bg-secondary';
+      case 'PAGADO':     return 'ap-estado ap-estado--pagado';
+      case 'EN CAMINO':  return 'ap-estado ap-estado--camino';
+      case 'EN DESTINO': return 'ap-estado ap-estado--destino';
+      case 'RECOGIDO':   return 'ap-estado ap-estado--recogido';
+      case 'CANCELADO':  return 'ap-estado ap-estado--cancelado';
+      default:           return 'ap-estado';
     }
+  }
+
+  irDirecciones(){
+    this.router.navigate(['/direcciones']);
   }
 
   irTarjetas(){ 
