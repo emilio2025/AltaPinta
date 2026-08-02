@@ -1,255 +1,243 @@
-<head> 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> 
-</head> 
+<!-- ============================================================
+     Panel de administración
+     Cabecera propia (fondo oscuro, para distinguirlo de la tienda) y
+     secciones en tarjetas.
+     ============================================================ -->
 
-<!-- MENU SUPERIOR -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="#">
-      <i class="bi bi-speedometer2 me-1"></i> TrendyShop Admin
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-            data-bs-target="#navbarNav" aria-controls="navbarNav" 
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link active" role="button" (click)="irAdmin()">
-            <i class="bi bi-house-door me-1"></i> Panel Admin
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" role="button" (click)="irProductos()">
-            <i class="bi bi-box-seam me-1"></i> Productos
-          </a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link text-danger" role="button" (click)="logout()">
-          <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
-          </a>
-        </li>
-      </ul>
+<header class="ap-admin__cabecera">
+  <div class="ap-admin__barra">
+    <div class="ap-admin__marca">
+      <span class="ap-logo ap-logo--claro">ALTA<span>PINTA</span></span>
+      <span class="ap-admin__insignia">Administración</span>
     </div>
+
+    <nav class="ap-admin__nav">
+      <button type="button" class="ap-admin__enlace ap-admin__enlace--activo" (click)="irAdmin()">
+        <i class="pi pi-chart-bar"></i> Resumen
+      </button>
+      <button type="button" class="ap-admin__enlace" (click)="irProductos()">
+        <i class="pi pi-box"></i> Productos
+      </button>
+      <button type="button" class="ap-boton ap-boton--claro ap-boton--pequeno" (click)="logout()">
+        Salir
+      </button>
+    </nav>
   </div>
-</nav>
+</header>
 
-<div class="container py-4">
+<div class="ap-admin">
 
-  <h3 class="fw-bold mb-4">
-    <i class="bi bi-bar-chart me-2"></i> Panel de Administración
-  </h3>
+  <!-- ---------- Indicadores ---------- -->
+  <section class="ap-indicadores">
+    <article class="ap-indicador">
+      <span class="ap-etiqueta">Total vendido</span>
+      <strong>S/ {{ totalVendido | number:'1.2-2' }}</strong>
+    </article>
+    <article class="ap-indicador">
+      <span class="ap-etiqueta">Pedidos pagados</span>
+      <strong>{{ totalPedidos }}</strong>
+    </article>
+    <article class="ap-indicador">
+      <span class="ap-etiqueta">Productos en catálogo</span>
+      <strong>{{ totalProductos }}</strong>
+    </article>
+  </section>
 
-  <div class="card card-tarjeta mb-4">
-    <div class="card-body">
-      <h6 class="fw-bold mb-3"><i class="bi bi-credit-card-2-front me-2"></i>Recargar Saldo de Tarjeta</h6>
-      <div class="row g-3 align-items-end">
-        <div class="col-md-6">
-          <input type="text" class="form-control" placeholder="Número de tarjeta" [(ngModel)]="recargarNumero">
+  <!-- ---------- Ventas por periodo ---------- -->
+  <section class="ap-bloque">
+    <h2 class="ap-bloque__titulo"><i class="pi pi-calendar"></i> Ventas por periodo</h2>
+
+    <div class="ap-bloque__cuerpo">
+      <div class="ap-periodo">
+        <div class="ap-campo">
+          <label for="fecha">Por día</label>
+          <input id="fecha" type="date" [(ngModel)]="fecha" name="fecha">
         </div>
-        <div class="col-md-4">
-          <input type="number" class="form-control" placeholder="Monto" [(ngModel)]="recargarMonto">
-        </div>
-        <div class="col-md-2">
-          <button class="btn btn-outline-secondary w-100" (click)="recargarTarjeta()">Recargar</button>
-        </div>
+        <button type="button" class="ap-boton ap-boton--pequeno" (click)="buscarDia()">
+          Consultar
+        </button>
       </div>
-      <div class="mt-2" *ngIf="recargarMensaje" class="alert alert-info">{{ recargarMensaje }}</div>
+
+      <div class="ap-periodo">
+        <div class="ap-campo">
+          <label for="mes">Por mes</label>
+          <input id="mes" type="number" min="1" max="12" [(ngModel)]="mes" name="mes">
+        </div>
+        <div class="ap-campo">
+          <label for="anioMes">Año</label>
+          <input id="anioMes" type="number" [(ngModel)]="anio" name="anioMes">
+        </div>
+        <button type="button" class="ap-boton ap-boton--pequeno" (click)="buscarMes()">
+          Consultar
+        </button>
+      </div>
+
+      <div class="ap-periodo">
+        <div class="ap-campo">
+          <label for="anio">Por año</label>
+          <input id="anio" type="number" [(ngModel)]="anio" name="anio">
+        </div>
+        <button type="button" class="ap-boton ap-boton--pequeno" (click)="buscarAnio()">
+          Consultar
+        </button>
+      </div>
+
+      <p class="ap-resultado" *ngIf="resultadoFiltro !== null">
+        <span class="ap-etiqueta">Total del periodo</span>
+        <strong>S/ {{ resultadoFiltro | number:'1.2-2' }}</strong>
+      </p>
     </div>
-  </div>
+  </section>
 
-  <!-- TOTAL VENDIDO / PEDIDOS -->
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="card card-total text-center">
-        <div class="card-body">
-          <h6>Total Vendido</h6>
-          <h3>S/ {{ totalVendido }}</h3>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card card-pedidos text-center">
-        <div class="card-body">
-          <h6>Pedidos Pagados</h6>
-          <h3>{{ totalPedidos }}</h3>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- ---------- Deportes ---------- -->
+  <section class="ap-bloque">
+    <h2 class="ap-bloque__titulo"><i class="pi pi-bolt"></i> Deportes</h2>
 
-  <!-- FILTROS POR PERIODO -->
-  <div class="card card-ventas mb-4">
-    <div class="card-body">
-      <h6 class="fw-bold mb-3"><i class="bi bi-calendar3 me-2"></i>Ventas por periodo</h6>
-      <div class="row g-3 align-items-end">
-        <div class="col-md-3">
-          <label>Día</label>
-          <input type="date" [(ngModel)]="fecha" class="form-control">
-          <button class="btn btn-outline-primary mt-2 w-100" (click)="buscarDia()">Buscar</button>
-        </div>
-        <div class="col-md-3">
-          <label>Mes</label>
-          <input type="number" [(ngModel)]="mes" class="form-control">
-        </div>
-        <div class="col-md-3">
-          <label>Año</label>
-          <input type="number" [(ngModel)]="anio" class="form-control">
-        </div>
-        <div class="col-md-3 d-grid gap-2">
-          <button class="btn btn-outline-success w-100" (click)="buscarMes()">Mes</button>
-          <button class="btn btn-outline-dark w-100" (click)="buscarAnio()">Año</button>
-        </div>
-      </div>
-      <div class="alert alert-info mt-3" *ngIf="resultadoFiltro !== null">
-        Total vendido: <b>S/ {{ resultadoFiltro }}</b>
-      </div>
-    </div>
-  </div>
-
-  <!-- DEPORTES -->
-  <div class="card card-deportes mb-4">
-    <div class="card-body">
-      <h6 class="fw-bold mb-3">
-        <i class="bi bi-lightning-charge me-2"></i> Deportes
-      </h6>
-
-      <p class="text-muted small mb-3">
+    <div class="ap-bloque__cuerpo">
+      <p class="ap-bloque__nota">
         Cada producto se asigna a un deporte desde la pantalla de productos.
         Al eliminar un deporte, los productos que lo usen quedan sin asignar.
       </p>
 
-      <!-- Alta -->
-      <div class="row g-2 align-items-end mb-3">
-        <div class="col-md-5">
-          <label class="form-label small fw-semibold">Nombre</label>
-          <input type="text" class="form-control"
+      <div class="ap-deporte-alta">
+        <div class="ap-campo">
+          <label for="nuevoDeporte">Nombre</label>
+          <input id="nuevoDeporte" type="text"
                  [(ngModel)]="nuevoDeporte.nombre"
                  name="nuevoDeporteNombre"
                  placeholder="Ej. Natación"
                  (keyup.enter)="crearDeporte()">
         </div>
-        <div class="col-md-4">
-          <label class="form-label small fw-semibold">Icono</label>
-          <select class="form-select" [(ngModel)]="nuevoDeporte.icono" name="nuevoDeporteIcono">
+        <div class="ap-campo">
+          <label for="iconoDeporte">Icono</label>
+          <select id="iconoDeporte" [(ngModel)]="nuevoDeporte.icono" name="nuevoDeporteIcono">
             <option *ngFor="let ic of iconosDisponibles" [value]="ic">{{ ic }}</option>
           </select>
         </div>
-        <div class="col-md-3">
-          <button type="button" class="btn btn-dark w-100"
-                  [disabled]="!nuevoDeporte.nombre.trim()"
-                  (click)="crearDeporte()">
-            <i class="bi bi-plus-lg"></i> Añadir
-          </button>
-        </div>
+        <button type="button" class="ap-boton ap-boton--acento ap-boton--pequeno"
+                [disabled]="!nuevoDeporte.nombre.trim()"
+                (click)="crearDeporte()">
+          <i class="pi pi-plus"></i> Añadir
+        </button>
       </div>
 
-      <div class="alert alert-info py-2 small" *ngIf="deporteMensaje">{{ deporteMensaje }}</div>
+      <p class="ap-aviso" *ngIf="deporteMensaje">
+        <i class="pi pi-info-circle"></i> {{ deporteMensaje }}
+      </p>
 
-      <!-- Listado -->
-      <div class="d-flex flex-wrap gap-2">
-        <span class="chip-deporte" *ngFor="let d of deportes">
+      <div class="ap-fichas">
+        <span class="ap-ficha" *ngFor="let d of deportes">
           <i class="pi" [ngClass]="d.icono || 'pi-bolt'"></i>
           {{ d.nombre }}
-          <button type="button" class="chip-deporte__quitar"
+          <button type="button" class="ap-ficha__quitar"
                   (click)="eliminarDeporte(d)"
                   [attr.aria-label]="'Eliminar ' + d.nombre">
-            <i class="bi bi-x"></i>
+            <i class="pi pi-times"></i>
           </button>
         </span>
-        <span class="text-muted small" *ngIf="deportes.length === 0">
+        <span class="ap-bloque__nota" *ngIf="deportes.length === 0">
           Todavía no hay deportes registrados.
         </span>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- PEDIDOS / CAMBIO DE ESTADO -->
-<div class="card card-pedidos-estado mb-4">
-  <div class="card-body">
-    <h6 class="fw-bold mb-3">
-      <i class="bi bi-list-check me-2"></i> Pedidos
-    </h6>
-    <div class="table-responsive">
-      <table class="table table-hover table-pedidos align-middle">
+  <!-- ---------- Recargar tarjeta ---------- -->
+  <section class="ap-bloque">
+    <h2 class="ap-bloque__titulo"><i class="pi pi-credit-card"></i> Recargar saldo de tarjeta</h2>
+
+    <div class="ap-bloque__cuerpo">
+      <div class="ap-deporte-alta">
+        <div class="ap-campo">
+          <label for="recargarNumero">Número de tarjeta</label>
+          <input id="recargarNumero" type="text"
+                 [(ngModel)]="recargarNumero" name="recargarNumero"
+                 placeholder="16 dígitos">
+        </div>
+        <div class="ap-campo">
+          <label for="recargarMonto">Monto</label>
+          <input id="recargarMonto" type="number" step="0.01"
+                 [(ngModel)]="recargarMonto" name="recargarMonto">
+        </div>
+        <button type="button" class="ap-boton ap-boton--pequeno" (click)="recargarTarjeta()">
+          <i class="pi pi-plus"></i> Recargar
+        </button>
+      </div>
+
+      <p class="ap-aviso" *ngIf="recargarMensaje">
+        <i class="pi pi-info-circle"></i> {{ recargarMensaje }}
+      </p>
+    </div>
+  </section>
+
+  <!-- ---------- Pedidos ---------- -->
+  <section class="ap-bloque">
+    <h2 class="ap-bloque__titulo"><i class="pi pi-list"></i> Pedidos</h2>
+
+    <div class="ap-tabla-scroll">
+      <table class="ap-tabla">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>N.º</th>
             <th>Cliente</th>
             <th>Total</th>
             <th>Estado</th>
-            <th>Actualizar Estado</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let pedido of pedidos">
             <td>{{ pedido.id }}</td>
             <td>{{ pedido.clienteCorreo }}</td>
-            <td>S/ {{ pedido.total }}</td>
+            <td class="ap-tabla__importe">S/ {{ pedido.total | number:'1.2-2' }}</td>
             <td>
-              <span class="badge estado-badge"
-                    [ngClass]="{
-                      'pagado': pedido.estado==='PAGADO',
-                      'enviado': pedido.estado==='ENVIADO',
-                      'en-transito': pedido.estado==='EN TRANSITO',
-                      'en-destino': pedido.estado==='EN DESTINO',
-                      'entregado': pedido.estado==='ENTREGADO'
-                    }">
-                {{ pedido.estado }}
-              </span>
-            </td>
-            <td>
-              <select class="form-select mb-1" [(ngModel)]="pedido.estado">
-                <option value="PAGADO">PAGADO</option>
-                <option value="ENVIADO">ENVIADO</option>
-                <option value="EN TRANSITO">EN TRANSITO</option>
-                <option value="EN DESTINO">EN DESTINO</option>
-                <option value="ENTREGADO">ENTREGADO</option>
+              <select [(ngModel)]="pedido.estado"
+                      [name]="'estado-' + pedido.id"
+                      (change)="actualizarEstado(pedido)">
+                <option value="PAGADO">Pagado</option>
+                <option value="ENVIADO">Enviado</option>
+                <option value="EN TRANSITO">En tránsito</option>
+                <option value="EN DESTINO">En destino</option>
+                <option value="ENTREGADO">Entregado</option>
               </select>
-              <button class="btn btn-sm btn-success w-100" (click)="actualizarEstado(pedido)">
-                <i class="bi bi-arrow-repeat me-1"></i> Actualizar
-              </button>
             </td>
+          </tr>
+          <tr *ngIf="pedidos.length === 0">
+            <td colspan="4" class="ap-tabla__vacio">Todavía no hay pedidos.</td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
-</div>
+  </section>
 
-  <!-- RF054: AUDITORÍA -->
-  <div class="card card-pedidos-estado mb-4">
-    <div class="card-body">
-      <h6 class="fw-bold mb-3">
-        <i class="bi bi-clock-history me-2"></i> Auditoría de operaciones críticas
-      </h6>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Usuario</th>
-              <th>Entidad</th>
-              <th>Acción</th>
-              <th>Detalle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let a of auditoria">
-              <td>{{ a.fecha | date:'short' }}</td>
-              <td>{{ a.usuarioCorreo }}</td>
-              <td>{{ a.entidad }} #{{ a.entidadId }}</td>
-              <td>{{ a.accion }}</td>
-              <td>{{ a.detalle }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div *ngIf="auditoria.length === 0" class="text-muted text-center py-2">
-          Sin registros de auditoría todavía.
-        </div>
-      </div>
+  <!-- ---------- Auditoría ---------- -->
+  <section class="ap-bloque">
+    <h2 class="ap-bloque__titulo"><i class="pi pi-history"></i> Auditoría</h2>
+
+    <div class="ap-tabla-scroll">
+      <table class="ap-tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Entidad</th>
+            <th>Acción</th>
+            <th>Detalle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of auditoria">
+            <td>{{ a.fecha | date:'d MMM y, HH:mm' }}</td>
+            <td>{{ a.usuarioCorreo }}</td>
+            <td>{{ a.entidad }} #{{ a.entidadId }}</td>
+            <td><span class="ap-accion">{{ a.accion }}</span></td>
+            <td>{{ a.detalle }}</td>
+          </tr>
+          <tr *ngIf="auditoria.length === 0">
+            <td colspan="5" class="ap-tabla__vacio">Sin actividad registrada.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </div>
+  </section>
 
 </div>
