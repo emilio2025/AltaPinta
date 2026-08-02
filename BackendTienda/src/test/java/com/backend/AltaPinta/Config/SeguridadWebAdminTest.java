@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.backend.AltaPinta.Config.PermisosAssert.denegado;
@@ -114,7 +115,7 @@ class SeguridadWebAdminTest {
         @WithMockUser(authorities = "ROLE_ADMIN")
         @DisplayName("Un administrador si puede ver el total vendido")
         void adminVeVentas() throws Exception {
-            when(pedidoRepo.totalVendido()).thenReturn(0.0);
+            when(pedidoRepo.totalVendido()).thenReturn(BigDecimal.ZERO);
 
             permitido(mockMvc.perform(get("/reportes/total")));
         }

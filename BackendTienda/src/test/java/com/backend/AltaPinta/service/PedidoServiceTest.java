@@ -17,9 +17,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static com.backend.AltaPinta.Importes.assertImporte;
+import static com.backend.AltaPinta.Importes.imp;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -68,7 +71,7 @@ class PedidoServiceTest {
         producto = new Producto();
         producto.setId(10L);
         producto.setNombre("Polo deportivo");
-        producto.setPrecio(100.0);
+        producto.setPrecio(imp("100.0"));
 
         talla = new Talla();
         talla.setId(5L);
@@ -86,16 +89,16 @@ class PedidoServiceTest {
 
         tarjeta = new Tarjeta();
         tarjeta.setId(7L);
-        tarjeta.setSaldo(500.0);
+        tarjeta.setSaldo(imp("500.0"));
 
         envio = new Envio();
         envio.setId(3L);
         envio.setLugar("Lima");
-        envio.setCosto(15.0);                // total = 200 + 15 = 215
+        envio.setCosto(imp("15.0"));                // total = 200 + 15 = 215
 
         cuenta = new CuentaTienda();
         cuenta.setId(1L);
-        cuenta.setSaldo(1000.0);
+        cuenta.setSaldo(imp("1000.0"));
     }
 
     private ConfirmarPedidoDTO dtoConEnvio() {
@@ -121,6 +124,41 @@ class PedidoServiceTest {
     class ConfirmarPedido {
 
         @Test
+        @DisplayName("Los importes con centimos salen exactos, sin arrastre de coma flotante")
+        void importesExactosConCentimos() {
+            // Con double este escenario daba 59.970000000000006 y el saldo
+            // quedaba en 440.02999999999997. Son los valores que acababan
+            // impresos en la factura y guardados en la tarjeta.
+            producto.setPrecio(imp("19.99"));
+            itemCarrito.setCantidad(3);          // 19.99 x 3 = 59.97
+            envio.setCosto(imp("10.01"));        // total = 69.98
+
+            escenarioCompraCorrecta();
+
+            PedidoResponse respuesta = pedidoService.confirmarPedido(CORREO, dtoConEnvio());
+
+            assertImporte("69.98", respuesta.getTotal());
+            assertImporte("430.02", tarjeta.getSaldo(), "500 - 69.98");
+            assertImporte("1069.98", cuenta.getSaldo(), "1000 + 69.98");
+        }
+
+        @Test
+        @DisplayName("Un precio con muchos decimales no se redondea por el camino")
+        void sumaDeTercios() {
+            // 0.10 no tiene representacion exacta en binario: sumarlo diez
+            // veces con double da 0.9999999999999999, no 1.
+            producto.setPrecio(imp("0.10"));
+            itemCarrito.setCantidad(10);
+            envio.setCosto(BigDecimal.ZERO);
+
+            escenarioCompraCorrecta();
+
+            PedidoResponse respuesta = pedidoService.confirmarPedido(CORREO, dtoConEnvio());
+
+            assertImporte("1.00", respuesta.getTotal());
+        }
+
+        @Test
         @DisplayName("Compra correcta: cobra, descuenta stock, abona a la tienda y vacia el carrito")
         void compraCorrecta() {
             escenarioCompraCorrecta();
@@ -128,14 +166,14 @@ class PedidoServiceTest {
             PedidoResponse respuesta = pedidoService.confirmarPedido(CORREO, dtoConEnvio());
 
             // Total = subtotal (200) + envio (15)
-            assertEquals(215.0, respuesta.getTotal(), 0.001);
+            assertImporte("215.0", respuesta.getTotal());
             assertEquals("PAGADO", respuesta.getEstado());
             assertEquals("24 a 48 horas", respuesta.getTiempoEntrega());
 
             // Efectos sobre el estado del sistema
-            assertEquals(285.0, tarjeta.getSaldo(), 0.001, "500 - 215");
+            assertImporte("285.0", tarjeta.getSaldo(), "500 - 215");
             assertEquals(8, stockTalla.getStock(), "10 - 2 unidades");
-            assertEquals(1215.0, cuenta.getSaldo(), 0.001, "1000 + 215");
+            assertImporte("1215.0", cuenta.getSaldo(), "1000 + 215");
 
             verify(carritoItemRepo).deleteByCarritoClienteId(1L);
             verify(pedidoRepo).save(any(Pedido.class));
@@ -157,7 +195,7 @@ class PedidoServiceTest {
 
             PedidoResponse respuesta = pedidoService.confirmarPedido(CORREO, dto);
 
-            assertEquals(200.0, respuesta.getTotal(), 0.001, "solo el subtotal");
+            assertImporte("200.0", respuesta.getTotal(), "solo el subtotal");
             assertEquals("Recojo en tienda", respuesta.getTiempoEntrega());
             verifyNoInteractions(envioRepo);
         }
@@ -199,7 +237,7 @@ class PedidoServiceTest {
                     () -> pedidoService.confirmarPedido(CORREO, dtoConEnvio()));
 
             assertTrue(ex.getMessage().contains("Stock insuficiente"), ex.getMessage());
-            assertEquals(500.0, tarjeta.getSaldo(), 0.001, "la tarjeta no debe tocarse");
+            assertImporte("500.0", tarjeta.getSaldo(), "la tarjeta no debe tocarse");
             assertEquals(10, stockTalla.getStock(), "el stock no debe tocarse");
             verify(pedidoRepo, never()).save(any());
             verify(carritoItemRepo, never()).deleteByCarritoClienteId(any());
@@ -222,7 +260,7 @@ class PedidoServiceTest {
         @Test
         @DisplayName("Saldo insuficiente: no descuenta stock ni vacia el carrito")
         void saldoInsuficiente() {
-            tarjeta.setSaldo(10.0);           // hacen falta 215
+            tarjeta.setSaldo(imp("10.0"));           // hacen falta 215
             // No se usa el escenario completo a proposito: la ejecucion falla
             // en la comprobacion de saldo y nunca llega a la cuenta de la tienda.
             when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
@@ -236,7 +274,7 @@ class PedidoServiceTest {
 
             assertEquals("Saldo insuficiente en la tarjeta", ex.getMessage());
             assertEquals(10, stockTalla.getStock(), "el stock no debe descontarse");
-            assertEquals(1000.0, cuenta.getSaldo(), 0.001, "la tienda no debe cobrar");
+            assertImporte("1000.0", cuenta.getSaldo(), "la tienda no debe cobrar");
             verify(carritoItemRepo, never()).deleteByCarritoClienteId(any());
             verify(pedidoRepo, never()).save(any());
         }
@@ -268,7 +306,7 @@ class PedidoServiceTest {
 
             // El pedido se confirma igual: el PDF y el correo son secundarios.
             assertEquals("PAGADO", respuesta.getEstado());
-            assertEquals(285.0, tarjeta.getSaldo(), 0.001);
+            assertImporte("285.0", tarjeta.getSaldo());
             assertEquals(8, stockTalla.getStock());
             verify(carritoItemRepo).deleteByCarritoClienteId(1L);
         }
@@ -279,7 +317,7 @@ class PedidoServiceTest {
             Producto zapatilla = new Producto();
             zapatilla.setId(11L);
             zapatilla.setNombre("Zapatilla running");
-            zapatilla.setPrecio(250.0);
+            zapatilla.setPrecio(imp("250.0"));
 
             Talla talla42 = new Talla();
             talla42.setId(6L);
@@ -306,7 +344,7 @@ class PedidoServiceTest {
             PedidoResponse respuesta = pedidoService.confirmarPedido(CORREO, dtoConEnvio());
 
             // (2 x 100) + (1 x 250) + 15 de envio
-            assertEquals(465.0, respuesta.getTotal(), 0.001);
+            assertImporte("465.0", respuesta.getTotal());
             assertEquals(8, stockTalla.getStock());
             assertEquals(3, stockZapatilla.getStock());
             verify(detalleRepo, times(2)).save(any(PedidoDetalle.class));
@@ -327,7 +365,7 @@ class PedidoServiceTest {
             pedidoPagado.setId(50L);
             pedidoPagado.setCliente(cliente);
             pedidoPagado.setEnvio(envio);
-            pedidoPagado.setTotal(215.0);
+            pedidoPagado.setTotal(imp("215.0"));
             pedidoPagado.setEstado("PAGADO");
 
             detalle = new PedidoDetalle();
@@ -335,7 +373,7 @@ class PedidoServiceTest {
             detalle.setProducto(producto);
             detalle.setTalla(talla);
             detalle.setCantidad(2);
-            detalle.setPrecioUnitario(100.0);
+            detalle.setPrecioUnitario(imp("100.0"));
         }
 
         @Test
@@ -350,7 +388,7 @@ class PedidoServiceTest {
 
             assertEquals("CANCELADO", respuesta.getEstado());
             assertEquals(12, stockTalla.getStock(), "10 + 2 devueltas");
-            assertEquals(785.0, cuenta.getSaldo(), 0.001, "1000 - 215");
+            assertImporte("785.0", cuenta.getSaldo(), "1000 - 215");
             verify(emailService).sendPedidoEstado(CORREO, pedidoPagado);
             verify(pedidoRepo).save(pedidoPagado);
         }
@@ -366,7 +404,7 @@ class PedidoServiceTest {
 
             assertEquals("El pedido ya no puede cancelarse", ex.getMessage());
             assertEquals(10, stockTalla.getStock(), "no debe devolver stock dos veces");
-            assertEquals(1000.0, cuenta.getSaldo(), 0.001);
+            assertImporte("1000.0", cuenta.getSaldo());
         }
 
         @Test

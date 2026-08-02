@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.service;
 
+import java.math.BigDecimal;
+
 import com.backend.AltaPinta.model.Pedido;
 import com.backend.AltaPinta.model.PedidoDetalle;
 import com.itextpdf.text.Document;
@@ -57,7 +59,7 @@ public class FacturaPdfService {
                 table.addCell(d.getProducto().getNombre());
                 table.addCell(String.valueOf(d.getCantidad()));
                 table.addCell(String.format("S/ %.2f", d.getPrecioUnitario()));
-                table.addCell(String.format("S/ %.2f", d.getCantidad() * d.getPrecioUnitario()));
+                table.addCell(String.format("S/ %.2f", d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad()))));
             }
 
             document.add(table);

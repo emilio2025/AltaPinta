@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.service;
 
+import java.math.BigDecimal;
+
 import com.backend.AltaPinta.model.Pedido;
 import com.backend.AltaPinta.model.PedidoDetalle;
 import jakarta.mail.MessagingException;
@@ -72,7 +74,7 @@ public class EmailService {
                 cuerpo.append("Cantidad: ").append(d.getCantidad()).append("\n");
                 cuerpo.append("Precio unitario: S/ ").append(d.getPrecioUnitario()).append("\n");
                 cuerpo.append("Subtotal: S/ ")
-                        .append(d.getCantidad() * d.getPrecioUnitario())
+                        .append(d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())))
                         .append("\n\n");
             }
 

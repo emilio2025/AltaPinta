@@ -1,16 +1,18 @@
 package com.backend.AltaPinta.dto;
 
+import java.math.BigDecimal;
+
 public class PedidoResponse {
 
     private Long pedidoId;
-    private Double total;
+    private BigDecimal total;
     private String estado;
     private String tiempoEntrega;
 
     public PedidoResponse() {
     }
 
-    public PedidoResponse(Long pedidoId, Double total, String estado, String tiempoEntrega) {
+    public PedidoResponse(Long pedidoId, BigDecimal total, String estado, String tiempoEntrega) {
         this.pedidoId = pedidoId;
         this.total = total;
         this.estado = estado;
@@ -25,11 +27,11 @@ public class PedidoResponse {
         this.pedidoId = pedidoId;
     }
 
-    public Double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(Double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 

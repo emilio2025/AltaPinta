@@ -13,8 +13,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.TestPropertySource;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import static com.backend.AltaPinta.Importes.assertImporte;
+import static com.backend.AltaPinta.Importes.imp;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -77,7 +80,7 @@ class ProductoRepositoryBusquedaTest {
     private Producto producto(String nombre, Categoria cat, TipoPrenda tip, Talla... tallas) {
         Producto p = new Producto();
         p.setNombre(nombre);
-        p.setPrecio(100.0);
+        p.setPrecio(imp("100.0"));
         p.setCategoria(cat);
         p.setTipoPrenda(tip);
         p = productoRepo.save(p);

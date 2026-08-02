@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,7 +28,8 @@ public class Producto {
 
     @NotNull(message = "El precio es requerido")
     @PositiveOrZero(message = "El precio no puede ser negativo")
-    private Double precio;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal precio;
 
     @Lob
     private String imagenUrl;
@@ -82,8 +85,8 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public Double getPrecio() { return precio; }
-    public void setPrecio(Double precio) { this.precio = precio; }
+    public BigDecimal getPrecio() { return precio; }
+    public void setPrecio(BigDecimal precio) { this.precio = precio; }
 
     public String getDescripcion() {
         return descripcion;

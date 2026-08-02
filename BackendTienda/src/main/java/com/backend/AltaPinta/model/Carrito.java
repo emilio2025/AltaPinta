@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,11 +56,12 @@ public class Carrito {
 
     // TOTAL CALCULADO
     @Transient
-    public Double getTotal() {
-        if (items == null) return 0.0;
+    public BigDecimal getTotal() {
+        if (items == null) return BigDecimal.ZERO;
 
         return items.stream()
-                .mapToDouble(i -> i.getProducto().getPrecio() * i.getCantidad())
-                .sum();
+                .map(i -> i.getProducto().getPrecio()
+                        .multiply(BigDecimal.valueOf(i.getCantidad())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

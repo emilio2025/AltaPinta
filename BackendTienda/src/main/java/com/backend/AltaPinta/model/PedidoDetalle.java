@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -21,7 +23,8 @@ public class PedidoDetalle {
     private Talla talla;
 
     private Integer cantidad;
-    private Double precioUnitario;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal precioUnitario;
 
     public Long getId() {
         return id;
@@ -63,11 +66,11 @@ public class PedidoDetalle {
         this.cantidad = cantidad;
     }
 
-    public Double getPrecioUnitario() {
+    public BigDecimal getPrecioUnitario() {
         return precioUnitario;
     }
 
-    public void setPrecioUnitario(Double precioUnitario) {
+    public void setPrecioUnitario(BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
     }
 }

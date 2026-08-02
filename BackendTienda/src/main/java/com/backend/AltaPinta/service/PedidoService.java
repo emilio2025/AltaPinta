@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +86,7 @@ public class PedidoService {
             throw new RuntimeException("El carrito está vacío");
         }
 
-        double subtotal = 0;
+        BigDecimal subtotal = BigDecimal.ZERO;
 
         // Validar stock (por talla) y calcular subtotal
         for (CarritoItem item : itemsCarrito) {
@@ -100,30 +101,32 @@ public class PedidoService {
                 throw new RuntimeException("Stock insuficiente: " + producto.getNombre() + " (talla " + item.getTalla().getNombre() + ")");
             }
 
-            subtotal += producto.getPrecio() * item.getCantidad();
+            subtotal = subtotal.add(
+                    producto.getPrecio().multiply(BigDecimal.valueOf(item.getCantidad())));
         }
 
         // Envío (opcional)
         Envio envio = null;
-        double costoEnvio = 0;
+        BigDecimal costoEnvio = BigDecimal.ZERO;
         if (dto.getEnvioId() != null) {
             envio = envioRepo.findById(dto.getEnvioId())
                     .orElseThrow(() -> new RuntimeException("Envío inválido"));
             costoEnvio = envio.getCosto();
         }
 
-        double total = subtotal + costoEnvio;
+        BigDecimal total = subtotal.add(costoEnvio);
 
         // Validar tarjeta y descontar saldo
         Tarjeta tarjeta = tarjetaRepo
                 .findByIdAndClienteId(dto.getTarjetaId(), cliente.getId())
                 .orElseThrow(() -> new RuntimeException("La tarjeta no pertenece al cliente"));
 
-        if (tarjeta.getSaldo() < total) {
+        // compareTo y no equals: equals distingue 10.0 de 10.00, compareTo no.
+        if (tarjeta.getSaldo().compareTo(total) < 0) {
             throw new RuntimeException("Saldo insuficiente en la tarjeta");
         }
 
-        tarjeta.setSaldo(tarjeta.getSaldo() - total);
+        tarjeta.setSaldo(tarjeta.getSaldo().subtract(total));
         tarjetaRepo.save(tarjeta);
 
         // Crear pedido
@@ -160,7 +163,7 @@ public class PedidoService {
         // Registrar ingreso en cuenta de la tienda
         CuentaTienda cuenta = cuentaTiendaRepo.findById(1L)
                 .orElseThrow(() -> new RuntimeException("Cuenta de la tienda no configurada"));
-        cuenta.setSaldo(cuenta.getSaldo() + total);
+        cuenta.setSaldo(cuenta.getSaldo().add(total));
         cuentaTiendaRepo.save(cuenta);
 
         // Vaciar carrito
@@ -221,7 +224,7 @@ public class PedidoService {
         // Revertir el ingreso registrado en la cuenta de la tienda
         CuentaTienda cuenta = cuentaTiendaRepo.findById(1L)
                 .orElseThrow(() -> new RuntimeException("Cuenta de la tienda no configurada"));
-        cuenta.setSaldo(cuenta.getSaldo() - pedido.getTotal());
+        cuenta.setSaldo(cuenta.getSaldo().subtract(pedido.getTotal()));
         cuentaTiendaRepo.save(cuenta);
 
         pedido.setEstado("CANCELADO");

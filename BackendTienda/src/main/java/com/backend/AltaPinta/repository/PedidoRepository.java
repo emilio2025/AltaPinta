@@ -4,6 +4,7 @@ import com.backend.AltaPinta.model.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
         FROM Pedido p
         WHERE p.estado = 'PAGADO'
     """)
-    Double totalVendido();
+    BigDecimal totalVendido();
 
     // Ventas por día
     // Se consulta por rango [inicio, fin) en vez de con DATE(p.fecha):
@@ -37,10 +38,10 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
         AND p.fecha >= :inicio
         AND p.fecha < :fin
     """)
-    Double ventasEntre(LocalDateTime inicio, LocalDateTime fin);
+    BigDecimal ventasEntre(LocalDateTime inicio, LocalDateTime fin);
 
     /** Ventas de un día completo, de las 00:00 inclusive a las 00:00 del día siguiente. */
-    default Double ventasPorDia(LocalDate fecha) {
+    default BigDecimal ventasPorDia(LocalDate fecha) {
         return ventasEntre(fecha.atStartOfDay(), fecha.plusDays(1).atStartOfDay());
     }
 
@@ -52,7 +53,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
         AND MONTH(p.fecha) = :mes
         AND YEAR(p.fecha) = :anio
     """)
-    Double ventasPorMes(int mes, int anio);
+    BigDecimal ventasPorMes(int mes, int anio);
 
     // Ventas por año
     @Query("""
@@ -61,7 +62,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
         WHERE p.estado = 'PAGADO'
         AND YEAR(p.fecha) = :anio
     """)
-    Double ventasPorAnio(int anio);
+    BigDecimal ventasPorAnio(int anio);
 
     // Cantidad de pedidos pagados
     @Query("""

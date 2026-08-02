@@ -12,9 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static com.backend.AltaPinta.Importes.assertImporte;
+import static com.backend.AltaPinta.Importes.imp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -54,10 +57,12 @@ class PedidoRepositoryReportesTest {
 
     /** Crea y guarda un pedido con la fecha, el total y el estado indicados. */
     private Pedido pedido(String estado, double total, LocalDateTime fecha) {
+        // El fixture sigue recibiendo double por comodidad; el importe se
+        // convierte aqui para no repetir la conversion en cada llamada.
         Pedido p = new Pedido();
         p.setCliente(cliente);
         p.setEstado(estado);
-        p.setTotal(total);
+        p.setTotal(BigDecimal.valueOf(total));
         p.setFecha(fecha);
         return pedidoRepo.save(p);
     }
@@ -74,7 +79,7 @@ class PedidoRepositoryReportesTest {
             pedido("PAGADO", 215.5, LocalDateTime.now());
             pedido("CANCELADO", 999.0, LocalDateTime.now());
 
-            assertEquals(315.5, pedidoRepo.totalVendido(), 0.001);
+            assertImporte("315.5", pedidoRepo.totalVendido());
         }
 
         @Test
@@ -82,7 +87,7 @@ class PedidoRepositoryReportesTest {
         void sinVentasDevuelveCero() {
             // El COALESCE de la consulta existe justamente para esto: si
             // devolviera null, el panel de administracion reventaria.
-            assertEquals(0.0, pedidoRepo.totalVendido(), 0.001);
+            assertImporte("0.0", pedidoRepo.totalVendido());
         }
 
         @Test
@@ -90,7 +95,7 @@ class PedidoRepositoryReportesTest {
         void soloCanceladosDevuelveCero() {
             pedido("CANCELADO", 500.0, LocalDateTime.now());
 
-            assertEquals(0.0, pedidoRepo.totalVendido(), 0.001);
+            assertImporte("0.0", pedidoRepo.totalVendido());
         }
     }
 
@@ -134,7 +139,7 @@ class PedidoRepositoryReportesTest {
             pedido("PAGADO", 777.0, hoy.minusDays(1).atTime(23, 59));
             pedido("PAGADO", 888.0, hoy.plusDays(1).atTime(0, 1));
 
-            assertEquals(150.0, pedidoRepo.ventasPorDia(hoy), 0.001);
+            assertImporte("150.0", pedidoRepo.ventasPorDia(hoy));
         }
 
         @Test
@@ -144,7 +149,7 @@ class PedidoRepositoryReportesTest {
             pedido("PAGADO", 100.0, hoy.atTime(12, 0));
             pedido("CANCELADO", 900.0, hoy.atTime(12, 0));
 
-            assertEquals(100.0, pedidoRepo.ventasPorDia(hoy), 0.001);
+            assertImporte("100.0", pedidoRepo.ventasPorDia(hoy));
         }
 
         @Test
@@ -152,7 +157,7 @@ class PedidoRepositoryReportesTest {
         void diaSinVentas() {
             pedido("PAGADO", 100.0, LocalDateTime.of(2026, 3, 15, 12, 0));
 
-            assertEquals(0.0, pedidoRepo.ventasPorDia(LocalDate.of(2026, 3, 16)), 0.001);
+            assertImporte("0.0", pedidoRepo.ventasPorDia(LocalDate.of(2026, 3, 16)));
         }
 
         @Test
@@ -165,8 +170,8 @@ class PedidoRepositoryReportesTest {
             pedido("PAGADO", 100.0, dia.atStartOfDay());
             pedido("PAGADO", 500.0, dia.plusDays(1).atStartOfDay());
 
-            assertEquals(100.0, pedidoRepo.ventasPorDia(dia), 0.001);
-            assertEquals(500.0, pedidoRepo.ventasPorDia(dia.plusDays(1)), 0.001);
+            assertImporte("100.0", pedidoRepo.ventasPorDia(dia));
+            assertImporte("500.0", pedidoRepo.ventasPorDia(dia.plusDays(1)));
         }
     }
 
@@ -186,7 +191,7 @@ class PedidoRepositoryReportesTest {
             // Mismo mes pero de otro año: el filtro de año debe excluirlo.
             pedido("PAGADO", 999.0, LocalDateTime.of(2025, 3, 15, 12, 0));
 
-            assertEquals(300.0, pedidoRepo.ventasPorMes(3, 2026), 0.001);
+            assertImporte("300.0", pedidoRepo.ventasPorMes(3, 2026));
         }
 
         @Test
@@ -195,13 +200,13 @@ class PedidoRepositoryReportesTest {
             pedido("PAGADO", 100.0, LocalDateTime.of(2026, 3, 10, 12, 0));
             pedido("CANCELADO", 900.0, LocalDateTime.of(2026, 3, 10, 12, 0));
 
-            assertEquals(100.0, pedidoRepo.ventasPorMes(3, 2026), 0.001);
+            assertImporte("100.0", pedidoRepo.ventasPorMes(3, 2026));
         }
 
         @Test
         @DisplayName("Un mes sin ventas devuelve 0")
         void mesSinVentas() {
-            assertEquals(0.0, pedidoRepo.ventasPorMes(7, 2026), 0.001);
+            assertImporte("0.0", pedidoRepo.ventasPorMes(7, 2026));
         }
     }
 
@@ -220,7 +225,7 @@ class PedidoRepositoryReportesTest {
             pedido("PAGADO", 777.0, LocalDateTime.of(2025, 12, 31, 23, 59));
             pedido("PAGADO", 888.0, LocalDateTime.of(2027, 1, 1, 0, 1));
 
-            assertEquals(600.0, pedidoRepo.ventasPorAnio(2026), 0.001);
+            assertImporte("600.0", pedidoRepo.ventasPorAnio(2026));
         }
 
         @Test
@@ -229,13 +234,13 @@ class PedidoRepositoryReportesTest {
             pedido("PAGADO", 100.0, LocalDateTime.of(2026, 5, 10, 12, 0));
             pedido("CANCELADO", 900.0, LocalDateTime.of(2026, 5, 10, 12, 0));
 
-            assertEquals(100.0, pedidoRepo.ventasPorAnio(2026), 0.001);
+            assertImporte("100.0", pedidoRepo.ventasPorAnio(2026));
         }
 
         @Test
         @DisplayName("Un año sin ventas devuelve 0")
         void anioSinVentas() {
-            assertEquals(0.0, pedidoRepo.ventasPorAnio(2020), 0.001);
+            assertImporte("0.0", pedidoRepo.ventasPorAnio(2020));
         }
     }
 }

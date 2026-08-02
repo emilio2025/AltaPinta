@@ -1,11 +1,13 @@
 package com.backend.AltaPinta.dto;
 
+import java.math.BigDecimal;
+
 import java.util.List;
 
 public class CarritoDTO {
 
     private Long id;
-    private Double total;
+    private BigDecimal total;
     private List<CarritoItemDTO> items;
 
     public Long getId() {
@@ -16,11 +18,11 @@ public class CarritoDTO {
         this.id = id;
     }
 
-    public Double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(Double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 

@@ -1,10 +1,12 @@
 package com.backend.AltaPinta.dto;
 
+import java.math.BigDecimal;
+
 public class CarritoItemDTO {
 
     private Long productoId;
     private String nombre;
-    private Double precio;
+    private BigDecimal precio;
     private Integer cantidad;
     private String imagenUrl;
     private Long tallaId;
@@ -50,11 +52,11 @@ public class CarritoItemDTO {
         this.cantidad = cantidad;
     }
 
-    public Double getPrecio() {
+    public BigDecimal getPrecio() {
         return precio;
     }
 
-    public void setPrecio(Double precio) {
+    public void setPrecio(BigDecimal precio) {
         this.precio = precio;
     }
 

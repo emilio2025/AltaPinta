@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -15,9 +17,13 @@ public class Factura {
 
     private LocalDateTime fecha;
 
-    private double subtotal;
-    private double envio;
-    private double total;
+    @Column(precision = 12, scale = 2)
+
+    private BigDecimal subtotal;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal envio;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal total;
 
     private String urlPdf;
 
@@ -49,27 +55,27 @@ public class Factura {
         this.fecha = fecha;
     }
 
-    public double getSubtotal() {
+    public BigDecimal getSubtotal() {
         return subtotal;
     }
 
-    public void setSubtotal(double subtotal) {
+    public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
     }
 
-    public double getEnvio() {
+    public BigDecimal getEnvio() {
         return envio;
     }
 
-    public void setEnvio(double envio) {
+    public void setEnvio(BigDecimal envio) {
         this.envio = envio;
     }
 
-    public double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 

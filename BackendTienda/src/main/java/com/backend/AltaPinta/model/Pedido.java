@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.model;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -20,7 +22,9 @@ public class Pedido {
     @ManyToOne
     private Envio envio;
 
-    private Double total;
+    @Column(precision = 12, scale = 2)
+
+    private BigDecimal total;
     private String estado;
 
     private String tipoEnvio;
@@ -43,11 +47,11 @@ public class Pedido {
         this.cliente = cliente;
     }
 
-    public Double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(Double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 

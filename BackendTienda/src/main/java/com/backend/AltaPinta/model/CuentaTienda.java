@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -10,7 +12,9 @@ public class CuentaTienda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private double saldo;
+    @Column(precision = 12, scale = 2)
+
+    private BigDecimal saldo;
 
     public Long getId() {
         return id;
@@ -20,11 +24,11 @@ public class CuentaTienda {
         this.id = id;
     }
 
-    public double getSaldo() {
+    public BigDecimal getSaldo() {
         return saldo;
     }
 
-    public void setSaldo(double saldo) {
+    public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
     }
 }

@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -17,7 +19,9 @@ public class Pago {
     @ManyToOne
     private Tarjeta tarjeta;
 
-    private Double monto;
+    @Column(precision = 12, scale = 2)
+
+    private BigDecimal monto;
 
     private String estado; // APROBADO / RECHAZADO
 
@@ -47,11 +51,11 @@ public class Pago {
         this.tarjeta = tarjeta;
     }
 
-    public Double getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(Double monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 

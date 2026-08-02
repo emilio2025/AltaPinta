@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.controller;
 
+import java.math.BigDecimal;
+
 import com.backend.AltaPinta.dto.TarjetaResponse;
 import com.backend.AltaPinta.model.Cliente;
 import com.backend.AltaPinta.model.Tarjeta;
@@ -36,7 +38,7 @@ public class TarjetaController {
         }
 
         tarjeta.setCliente(cliente);
-        tarjeta.setSaldo(500.0);
+        tarjeta.setSaldo(new BigDecimal("500.00"));
         tarjeta.setActiva(true);
 
         Tarjeta guardada = tarjetaRepo.save(tarjeta);
@@ -72,12 +74,12 @@ public class TarjetaController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public TarjetaResponse recargar(
             @RequestParam String numero,
-            @RequestParam Double monto
+            @RequestParam BigDecimal monto
     ) {
         Tarjeta t = tarjetaRepo.findByNumero(numero)
                 .orElseThrow(() -> new RuntimeException("Tarjeta no encontrada"));
 
-        t.setSaldo(t.getSaldo() + monto);
+        t.setSaldo(t.getSaldo().add(monto));
 
         Tarjeta actualizada = tarjetaRepo.save(t);
 

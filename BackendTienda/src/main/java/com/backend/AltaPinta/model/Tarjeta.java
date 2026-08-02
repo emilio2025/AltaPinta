@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.model;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -23,7 +25,9 @@ public class Tarjeta {
         private String fechaVencimiento;
         private String cvv;
 
-        private Double saldo;
+        @Column(precision = 12, scale = 2)
+
+        private BigDecimal saldo;
         private Boolean activa = true;
 
     public Long getId() {
@@ -66,11 +70,11 @@ public class Tarjeta {
         this.cvv = cvv;
     }
 
-    public Double getSaldo() {
+    public BigDecimal getSaldo() {
         return saldo;
     }
 
-    public void setSaldo(Double saldo) {
+    public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
     }
 
