@@ -18,6 +18,7 @@ ENTRADA = os.path.join(os.path.dirname(__file__), "catalogo-actual.tsv")
 # El TSV de entrada se genera con:
 #   mysql -u root -p -D alta_pinta --batch --raw -e "SELECT p.id, COALESCE(c.nombre,'') AS categoria, COALESCE(t.nombre,'') AS tipo, p.precio FROM producto p LEFT JOIN categoria c ON c.id=p.categoria_id LEFT JOIN tipo_prenda t ON t.id=p.tipo_prenda_id ORDER BY p.id" > migraciones/catalogo-actual.tsv
 SALIDA = os.path.join(os.path.dirname(__file__), "catalogo-deportivo.sql")
+SALIDA_BUSQUEDAS = os.path.join(os.path.dirname(__file__), "busqueda-imagenes.tsv")
 
 # Semilla fija: el mismo catalogo cada vez que se ejecute
 random.seed(20260802)
@@ -26,10 +27,24 @@ random.seed(20260802)
 # Vocabulario propio
 # ---------------------------------------------------------------
 
-# Nombres de linea inventados para AltaPinta
-LINEAS = ["Aero", "Pulse", "Vertex", "Ritmo", "Núcleo", "Trazo", "Ímpetu",
-          "Cima", "Zancada", "Circuito", "Fondo", "Ápice", "Cadencia",
-          "Umbral", "Relieve", "Sendero", "Kilómetro", "Racha"]
+# Los nombres son DESCRIPTIVOS a proposito, no de fantasia.
+#
+# Antes eran "Camiseta Aero" o "Legging Vertex": suenan a marca, pero si
+# los pegas en un buscador de imagenes no encuentras nada. Ahora cada
+# producto se llama por lo que es, de modo que su propio nombre sirve como
+# termino de busqueda para dar con una foto real.
+
+# Los rasgos van declarados prenda por prenda, no por zona del cuerpo.
+#
+# Aplicarlos en bloque producia disparates: "Casaca deportiva sin
+# mangas", "Cortavientos de cuello redondo", "Camiseta de manga corta de
+# manga larga" y "Falda deportiva ajustado" (sin concordancia). Cada
+# prenda lleva ahora solo los rasgos que le caben, ya concordados.
+
+# Colores habituales en ropa deportiva. Ayudan a afinar la busqueda de
+# imagenes y hacen el catalogo mas creible.
+COLORES_M = ["negro", "gris", "azul marino", "verde militar", "blanco", "granate"]
+COLORES_F = ["negra", "gris", "azul marino", "verde militar", "blanca", "granate"]
 
 TEJIDOS = [
     "tejido técnico de secado rápido",
@@ -91,29 +106,29 @@ DEPORTE_POR_TIPO = {
 # El genero decide "Confeccionado" o "Confeccionada"; la zona decide que
 # cortes y remates tienen sentido.
 PRENDA = {
-    "Short":    [("Short", "m", "inferior"),
-                 ("Short de entrenamiento", "m", "inferior"),
-                 ("Short deportivo", "m", "inferior")],
-    "Polo":     [("Camiseta técnica", "f", "superior"),
-                 ("Camiseta de manga corta", "f", "superior"),
-                 ("Camiseta", "f", "superior")],
-    "Polera":   [("Sudadera", "f", "superior"),
-                 ("Polerón técnico", "m", "superior"),
-                 ("Sudadera con capucha", "f", "superior")],
-    "Pantalón": [("Pantalón jogger", "m", "inferior"),
-                 ("Pantalón de entrenamiento", "m", "inferior"),
-                 ("Legging", "m", "inferior")],
-    "Casaca":   [("Cortavientos", "m", "superior"),
-                 ("Chaqueta técnica", "f", "superior"),
-                 ("Casaca deportiva", "f", "superior")],
-    "Chompa":   [("Chaqueta de media cremallera", "f", "superior"),
-                 ("Sudadera térmica", "f", "superior")],
-    "Vestido":  [("Vestido deportivo", "m", "superior"),
-                 ("Vestido de entrenamiento", "m", "superior")],
-    "Falda":    [("Falda-short", "f", "inferior"),
-                 ("Falda deportiva", "f", "inferior")],
-    "":         [("Conjunto deportivo", "m", "superior"),
-                 ("Body deportivo", "m", "superior")],
+    "Short":    [("Short", "m", "inferior", ["", "de tiro medio", "con malla interior"]),
+                 ("Short de entrenamiento", "m", "inferior", ["", "de secado rápido"]),
+                 ("Short deportivo", "m", "inferior", ["", "con bolsillos"])],
+    "Polo":     [("Camiseta técnica", "f", "superior", ["", "de cuello redondo", "sin mangas"]),
+                 ("Camiseta de manga corta", "f", "superior", ["", "de cuello redondo"]),
+                 ("Camiseta", "f", "superior", ["de manga corta", "de manga larga", "sin mangas"])],
+    "Polera":   [("Sudadera", "f", "superior", ["", "con capucha", "con cremallera"]),
+                 ("Polerón técnico", "m", "superior", ["", "con capucha"]),
+                 ("Sudadera con capucha", "f", "superior", ["", "de algodón"])],
+    "Pantalón": [("Pantalón jogger", "m", "inferior", ["", "con puños", "de tiro alto"]),
+                 ("Pantalón de entrenamiento", "m", "inferior", ["", "holgado"]),
+                 ("Legging", "m", "inferior", ["de tiro alto", "de compresión", "largo"])],
+    "Casaca":   [("Cortavientos", "m", "superior", ["", "impermeable", "con capucha"]),
+                 ("Chaqueta técnica", "f", "superior", ["", "impermeable", "con capucha"]),
+                 ("Casaca deportiva", "f", "superior", ["", "con cremallera"])],
+    "Chompa":   [("Chaqueta de media cremallera", "f", "superior", ["", "térmica"]),
+                 ("Sudadera térmica", "f", "superior", ["", "de cuello alto"])],
+    "Vestido":  [("Vestido deportivo", "m", "superior", ["", "con short interior"]),
+                 ("Vestido de entrenamiento", "m", "superior", ["", "sin mangas"])],
+    "Falda":    [("Falda-short", "f", "inferior", ["", "con malla interior"]),
+                 ("Falda deportiva", "f", "inferior", ["", "con short interior", "plisada"])],
+    "":         [("Conjunto deportivo", "m", "superior", ["", "de dos piezas"]),
+                 ("Body deportivo", "m", "superior", ["", "de manga corta"])],
 }
 
 USO_POR_DEPORTE = {
@@ -163,6 +178,7 @@ def generar():
 
     usados = set()
     resumen = {}
+    busquedas = []
 
     for fila in filas:
         pid = fila["id"]
@@ -170,16 +186,30 @@ def generar():
         tipo = fila["tipo"]
 
         deporte = random.choice(DEPORTE_POR_TIPO.get(tipo, ["Training"]))
-        prenda, genero, zona = random.choice(
-            PRENDA.get(tipo, [("Prenda deportiva", "f", "superior")]))
+        prenda, genero, zona, rasgos = random.choice(
+            PRENDA.get(tipo, [("Prenda deportiva", "f", "superior", [""])]))
 
-        # Nombre unico: prenda + linea, y si choca se añade el deporte
-        for _ in range(30):
-            nombre = "%s %s" % (prenda, random.choice(LINEAS))
+        # Nombre buscable: prenda + rasgo + deporte + color.
+        # Ej. "Camiseta técnica de manga corta running negra", que pegado
+        # en un buscador de imagenes devuelve fotos utiles.
+        colores = COLORES_M if genero == "m" else COLORES_F
+        publico_corto = PUBLICO.get(categoria, "").replace("de ", "")
+
+        def montar(rasgo, color, con_publico=False):
+            partes = [prenda, rasgo, deporte.lower(), color]
+            if con_publico:
+                partes.append(publico_corto)
+            return " ".join(p for p in partes if p)
+
+        for _ in range(60):
+            rasgo = random.choice(rasgos)
+            color = random.choice(colores)
+            nombre = montar(rasgo, color)
             if nombre not in usados:
                 break
         else:
-            nombre = "%s %s %s" % (prenda, random.choice(LINEAS), deporte)
+            # Si todas las combinaciones estan cogidas, el publico desempata
+            nombre = montar(rasgo, color, con_publico=True)
         usados.add(nombre)
 
         # "Camiseta de mujer para el gimnasio." — el publico va pegado a la
@@ -209,6 +239,12 @@ def generar():
                        "SELECT %s, id, %d, 0 FROM talla WHERE nombre='%s';"
                        % (pid, stock, escapar(talla)))
 
+        # Termino de busqueda: sin el rasgo, que estorba al buscar fotos
+        publico_corto = PUBLICO.get(categoria, '').replace('de ', '')
+        termino = ' '.join(x for x in [prenda.lower(), deporte.lower(),
+                                       color, publico_corto] if x)
+        busquedas.append((pid, nombre, termino))
+
         resumen[deporte] = resumen.get(deporte, 0) + 1
 
     sql.append("")
@@ -216,6 +252,15 @@ def generar():
 
     with io.open(SALIDA, "w", encoding="utf-8") as f:
         f.write("\n".join(sql) + "\n")
+
+    # Listado para buscar fotos: id, nombre y el termino que conviene
+    # pegar en un buscador de imagenes. Se ordena por termino para que
+    # los productos que comparten busqueda queden juntos y una misma foto
+    # sirva para varios.
+    with io.open(SALIDA_BUSQUEDAS, "w", encoding="utf-8") as f:
+        f.write("id\tnombre\tbuscar\n")
+        for pid, nombre, termino in sorted(busquedas, key=lambda x: x[2]):
+            f.write("%s\t%s\t%s\n" % (pid, nombre, termino))
 
     print("Productos procesados: %d" % len(filas))
     print("Sentencias generadas: %d" % len(sql))
