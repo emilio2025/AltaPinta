@@ -4,12 +4,7 @@
    La cabecera, los botones y los estados vacíos están en styles.css.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
-:host {
-  display: block;
-  font-family: "Inter", system-ui, sans-serif;
-}
 
 .ap-carrito {
   max-width: 1400px;

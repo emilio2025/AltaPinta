@@ -4,12 +4,7 @@
    El diseño de la zona de cuenta está en styles.css.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
-:host {
-  display: block;
-  font-family: "Inter", system-ui, sans-serif;
-}
 
 .ap-campo--ancho { grid-column: 1 / -1; }
 

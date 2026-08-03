@@ -4,14 +4,7 @@
    Los campos y botones vienen de styles.css.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
-:host {
-  display: block;
-  font-family: "Inter", system-ui, sans-serif;
-  background: var(--ap-gris-100);
-  min-height: 100vh;
-}
 
 .ap-alta {
   display: flex;

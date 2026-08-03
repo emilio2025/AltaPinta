@@ -1,0 +1,77 @@
+# ============================================================
+#  Ejecuta las dos suites de pruebas en cada push y pull request.
+#
+#  Backend y frontend van en trabajos separados y en paralelo: si falla
+#  uno, el otro sigue y ves los dos resultados de una vez en lugar de
+#  arreglar, empujar y descubrir el siguiente.
+# ============================================================
+name: Pruebas
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:      # permite lanzarlo a mano desde la pestaña Actions
+
+jobs:
+
+  backend:
+    name: Backend · 136 pruebas
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          # La misma versión que declara el pom. Spring Boot 3.3.5 es
+          # anterior a los JDK más nuevos y con ellos falla de formas
+          # difíciles de diagnosticar.
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Ejecutar las pruebas
+        working-directory: BackendTienda
+        # Las pruebas no necesitan MySQL: las de repositorio corren sobre
+        # H2 en memoria y el resto usa dobles.
+        run: ./mvnw --batch-mode test
+
+      - name: Publicar los informes si algo falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informes-backend
+          path: BackendTienda/target/surefire-reports/
+
+  frontend:
+    name: Frontend · 35 pruebas
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: Practica/package-lock.json
+
+      # npm ci instala exactamente lo que fija el lockfile, sin
+      # actualizar nada: es lo que garantiza que la integración pruebe la
+      # misma combinación de versiones que tienes en tu máquina.
+      - name: Instalar dependencias
+        working-directory: Practica
+        run: npm ci
+
+      - name: Ejecutar las pruebas
+        working-directory: Practica
+        run: npm run test:ci
+
+      - name: Comprobar que compila para producción
+        working-directory: Practica
+        # Compilar con la configuración de producción detecta errores que
+        # el modo desarrollo deja pasar, como un environment mal resuelto.
+        run: npm run build

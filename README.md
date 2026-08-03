@@ -6,11 +6,24 @@ Proyecto del curso **Ingeniería de Software II**.
 | Módulo | Tecnología | Carpeta |
 |---|---|---|
 | Backend | Spring Boot 3.3.5 · Java 17 · MySQL | `BackendTienda/` |
-| Frontend | Angular 20.3 · Bootstrap 5 | `Practica/` |
+| Frontend | Angular 20.3 · PrimeNG 20 · Tailwind 4 | `Practica/` |
 
 Funcionalidades: autenticación con JWT y verificación por correo, catálogo
-con tallas y control de stock, carrito, checkout con pago simulado,
-generación de facturas en PDF, favoritos, direcciones y auditoría.
+paginado con búsqueda y filtros por categoría, deporte, tipo de prenda y
+talla, control de stock por talla, carrito, checkout con pago simulado,
+generación de facturas en PDF, favoritos, direcciones, panel de
+administración con reportes de ventas y registro de auditoría.
+
+### Estado de las pruebas
+
+| Suite | Casos | Cómo se ejecuta |
+|---|---|---|
+| Backend | 136 | `cd BackendTienda && .\mvnw.cmd test` |
+| Frontend | 35 | `cd Practica && npm run test:ci` |
+
+Cubren el flujo de compra, la autenticación, las reglas de autorización de
+todos los controladores y las consultas de reportes. Las de repositorio
+corren sobre H2 en memoria, así que no tocan tu base de datos.
 
 ---
 
@@ -83,6 +96,81 @@ npm start
 ```
 
 Queda en http://localhost:4200
+
+### 5. Aplicar las migraciones
+
+Hibernate crea las tablas al arrancar, pero **nunca cambia el tipo de una
+columna que ya existe ni elimina ninguna**. Por eso hay cambios que se
+aplican a mano, una sola vez, en `BackendTienda/migraciones/`:
+
+| Script | Qué hace |
+|---|---|
+| `001-importes-a-decimal.sql` | Pasa los importes de `DOUBLE` a `DECIMAL(12,2)`. Sin esto el dinero se guarda en coma flotante binaria y 89,90 no es exactamente 89,90 |
+| `002-eliminar-cvv.sql` | Borra la columna `cvv` y su contenido. PCI DSS prohíbe almacenar el código de verificación de la tarjeta |
+| `003-catalogo-deportivo.sql` | Nombres, descripciones, deportes y tallas del catálogo |
+| `004-imagenes-y-precios.sql` | Ilustración y precio de cada producto |
+| `005-urls-de-imagen-relativas.sql` | Convierte las URLs de imagen absolutas en rutas relativas |
+
+Haz una copia de seguridad antes:
+
+```powershell
+cd BackendTienda
+mysqldump -u root -p alta_pinta > respaldo-alta_pinta.sql
+mysql -u root -p alta_pinta < migraciones\001-importes-a-decimal.sql
+```
+
+Los scripts 003 y 004 se regeneran con `generar_catalogo.py` y
+`generar_imagenes.py`, que llevan semilla fija: producen siempre el mismo
+resultado. Edita su vocabulario si quieres otro catálogo.
+
+---
+
+## Estructura del proyecto
+
+```
+BackendTienda/
+  src/main/java/com/backend/AltaPinta/
+    Config/       seguridad, JWT, manejo de errores
+    controller/   endpoints REST
+    model/        entidades JPA
+    repository/   acceso a datos
+    service/      lógica de negocio
+  migraciones/    scripts SQL y generadores del catálogo
+  productos-imagenes/  ilustraciones e imágenes subidas
+  run.ps1         arranque con el JDK correcto
+
+Practica/src/
+  app/            componentes (una carpeta por pantalla)
+    guards/       control de acceso por ruta
+    interceptors/ inserción del token JWT
+    pipes/        composición de URLs de imagen
+    theme/        tema de PrimeNG
+  services/       clientes HTTP del backend
+  environments/   dirección del backend por entorno
+  styles.css      tokens de marca y piezas compartidas
+```
+
+---
+
+## Dónde vive la dirección del backend
+
+En `Practica/src/environments/`. No está escrita en ningún servicio:
+
+| Archivo | Cuándo se usa | `apiUrl` |
+|---|---|---|
+| `environment.development.ts` | `npm start` | `http://localhost:8080` |
+| `environment.ts` | `npm run build` | vacío, es decir el mismo origen |
+
+Vacío en producción significa "el mismo servidor que sirve la aplicación",
+que es lo habitual detrás de un proxy inverso. Si tu backend queda en otro
+dominio, ponlo ahí y no toques nada más.
+
+> Si cambias `angular.json`, **reinicia `npm start`**: el servidor de
+> desarrollo lee ese archivo al arrancar y no vuelve a leerlo.
+
+Las imágenes se guardan en la base de datos como ruta relativa
+(`/imagenes/x.svg`) y el pipe `imagen` les antepone la dirección del
+entorno. Guardar la URL completa ataba los datos a una máquina concreta.
 
 ---
 

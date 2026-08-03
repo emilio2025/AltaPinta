@@ -5,12 +5,7 @@
    están en styles.css. Aquí solo la galería y la ficha.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
-:host {
-  display: block;
-  font-family: "Inter", system-ui, sans-serif;
-}
 
 .ap-detalle {
   max-width: 1400px;
