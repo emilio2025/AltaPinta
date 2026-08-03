@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { FavoritoService } from '../../services/favorito.service';
 import { ProductoService } from '../../services/producto.service';
+import { AuthService } from '../auth.service';
 import { RouterModule } from '@angular/router';
 import { forkJoin, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -44,7 +45,8 @@ export class PrincipalComponent implements OnInit {
   constructor(
     private productoService: ProductoService,
     private favService: FavoritoService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ){}
 
   ngOnInit(): void {
@@ -159,9 +161,23 @@ export class PrincipalComponent implements OnInit {
   paginaAnterior(){ this.irAPagina(this.pagina - 1); }
   paginaSiguiente(){ this.irAPagina(this.pagina + 1); }
 
+  /**
+   * Los favoritos son de cada cliente, asi que solo se piden si hay sesion.
+   *
+   * Esta es la portada publica: al pedirlos sin token el backend responde
+   * 403, y como la llamada no trataba el error, Angular lo dejaba en la
+   * consola. Cualquiera que abriera las herramientas del navegador veia dos
+   * errores rojos en la primera pantalla de la tienda.
+   */
   cargarFavoritos(){
-    this.favService.getFavoritos().subscribe((r:any[]) => {
-      this.favoritosIds = r.map(p=>p.id);
+    if (!this.authService.isLoggedIn()) {
+      this.favoritosIds = [];
+      return;
+    }
+
+    this.favService.getFavoritos().subscribe({
+      next: (r:any[]) => this.favoritosIds = r.map(p=>p.id),
+      error: () => this.favoritosIds = []
     });
   }
 
@@ -193,20 +209,10 @@ export class PrincipalComponent implements OnInit {
   agregarCarrito(producto:any){this.router.navigate(['/login']);  }
 
 
+  // Esta es la portada publica: aqui no hay sesion, asi que marcar un
+  // favorito lleva a iniciarla. El alta y baja real esta en el catalogo.
   agregarFavorito(p:any){
-    /*if (this.esFavorito(p.id)) {
-      this.favService.eliminar(p.id).subscribe(() => {
-        this.favoritosIds = this.favoritosIds.filter(f => f !== p.id);
-        console.log(" Eliminado de favoritos", p.nombre);
-      });
-    } else {
-      this.favService.agregar(p.id).subscribe(() => {
-        this.favoritosIds.push(p.id);
-        console.log(" Agregado a favoritos", p.nombre);
-      });
-    }*/
-   this.router.navigate(['/login']);
-    
+    this.router.navigate(['/login']);
   }
 
   irMenu(){
