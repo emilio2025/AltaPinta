@@ -1,0 +1,30 @@
+-- ============================================================
+--  V2 - Eliminar la tabla pago
+--
+--  Sobraba desde que se retiro el endpoint /pago/procesar, que tenia un
+--  fallo de control de acceso: buscaba el pedido solo por su id, sin
+--  comprobar de quien era, asi que cualquier cliente autenticado podia
+--  marcar como RECHAZADO el pedido de otro. Se elimino el endpoint y con
+--  el todo lo que lo acompanaba, pero la entidad Pago y su tabla se
+--  quedaron: Hibernate seguia creandola con ddl-auto=update y nadie
+--  escribia ni leia en ella.
+--
+--  Comprobado antes de borrar:
+--    - Ninguna referencia a Pago en el backend ni en el frontend.
+--    - 0 filas en la tabla.
+--    - Ninguna otra tabla apunta a pago; solo pago apuntaba a pedido y a
+--      tarjeta, y esas claves ajenas desaparecen con ella.
+--
+--  El pago real vive dentro de PedidoService: valida la tarjeta, descuenta
+--  el saldo y registra el ingreso en cuenta_tienda, todo en la misma
+--  transaccion que crea el pedido.
+--
+--  En una base nueva, V1 la crea y esta V2 la borra a continuacion. Podria
+--  parecer absurdo, pero V1 no se toca: Flyway guarda su suma de
+--  comprobacion y se negaria a arrancar si cambiara. Un esquema versionado
+--  es el historial de lo que paso, no un resumen de como quedo.
+--
+--  IF EXISTS por si alguien ya la borro a mano en su copia local.
+-- ============================================================
+
+DROP TABLE IF EXISTS pago;
