@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.controller;
 
+import jakarta.validation.Valid;
+
 import com.backend.AltaPinta.dto.ConfirmarPedidoDTO;
 import com.backend.AltaPinta.dto.PedidoResponse;
 import com.backend.AltaPinta.model.Pedido;
@@ -50,7 +52,7 @@ public class PedidoController {
     // RF014–RF016: Confirmar pedido
     @PostMapping("/confirmar")
     public ResponseEntity<PedidoResponse> confirmar(
-            @RequestBody ConfirmarPedidoDTO dto,
+            @Valid @RequestBody ConfirmarPedidoDTO dto,
             Authentication auth
     ) {
         if (auth == null) {

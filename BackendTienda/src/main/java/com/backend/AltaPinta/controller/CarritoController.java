@@ -9,12 +9,20 @@ import com.backend.AltaPinta.repository.ClienteRepository;
 import com.backend.AltaPinta.repository.ProductoRepository;
 import com.backend.AltaPinta.repository.ProductoTallaRepository;
 import com.backend.AltaPinta.repository.TallaRepository;
+import jakarta.validation.constraints.Min;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Aqui la entrada no viaja en el cuerpo sino como parametros, asi que
+ * @Valid no sirve: hace falta @Validated en la clase para que Spring
+ * compruebe las anotaciones de los argumentos.
+ */
 @RestController
 @RequestMapping("/carrito")
 @CrossOrigin("*")
+@Validated
 public class CarritoController {
 
     private final CarritoRepository carritoRepo;
@@ -91,7 +99,10 @@ public class CarritoController {
     // RF010 – AGREGAR PRODUCTO (con talla seleccionada por el cliente)
     @PostMapping("/agregar/{productoId}")
     public void agregar(@PathVariable Long productoId,
-                        @RequestParam int cantidad,
+                        // Sin este minimo, una cantidad de 0 creaba una linea
+                        // inutil y una negativa habria devuelto stock al
+                        // confirmar el pedido en lugar de descontarlo.
+                        @RequestParam @Min(value = 1, message = "La cantidad debe ser al menos 1") int cantidad,
                         @RequestParam Long tallaId,
                         Authentication auth) {
 
@@ -125,7 +136,7 @@ public class CarritoController {
     // RF011 – MODIFICAR CANTIDAD
     @PutMapping("/actualizar/{productoId}")
     public void actualizar(@PathVariable Long productoId,
-                           @RequestParam int cantidad,
+                           @RequestParam @Min(value = 1, message = "La cantidad debe ser al menos 1") int cantidad,
                            @RequestParam Long tallaId,
                            Authentication auth) {
 

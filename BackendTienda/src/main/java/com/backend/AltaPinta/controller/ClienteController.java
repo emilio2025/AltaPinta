@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.controller;
 
+import jakarta.validation.Valid;
+
 import com.backend.AltaPinta.dto.ActualizarPerfilRequest;
 import com.backend.AltaPinta.model.Cliente;
 import com.backend.AltaPinta.repository.ClienteRepository;
@@ -26,7 +28,7 @@ public class ClienteController {
 
     // ACTUALIZAR PERFIL (SIN CORREO NI PASSWORD)
     @PutMapping("/actualizar")
-    public Cliente actualizar(@RequestBody ActualizarPerfilRequest req, Authentication auth) {
+    public Cliente actualizar(@Valid @RequestBody ActualizarPerfilRequest req, Authentication auth) {
 
         Cliente db = clienteRepo.findByCorreo(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));

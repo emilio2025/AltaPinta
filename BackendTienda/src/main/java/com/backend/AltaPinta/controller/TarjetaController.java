@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.controller;
 
+import jakarta.validation.Valid;
+
 import java.math.BigDecimal;
 
 import com.backend.AltaPinta.dto.TarjetaResponse;
@@ -28,7 +30,7 @@ public class TarjetaController {
 
     // REGISTRAR TARJETA (CLIENTE)
     @PostMapping
-    public TarjetaResponse registrar(@RequestBody Tarjeta tarjeta, Authentication auth) {
+    public TarjetaResponse registrar(@Valid @RequestBody Tarjeta tarjeta, Authentication auth) {
 
         Cliente cliente = clienteRepo.findByCorreo(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));

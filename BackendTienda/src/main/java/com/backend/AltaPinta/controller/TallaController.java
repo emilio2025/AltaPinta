@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.controller;
 
+import jakarta.validation.Valid;
+
 import com.backend.AltaPinta.model.Producto;
 import com.backend.AltaPinta.model.Talla;
 import com.backend.AltaPinta.repository.ProductoRepository;
@@ -28,7 +30,7 @@ public class TallaController {
     }
 
     @PostMapping
-    public Talla crear(@RequestBody Talla t){
+    public Talla crear(@Valid @RequestBody Talla t){
         return tallaRepo.save(t);
     }
 

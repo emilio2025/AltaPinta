@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.controller;
 
+import jakarta.validation.Valid;
+
 import com.backend.AltaPinta.model.Deporte;
 import com.backend.AltaPinta.repository.DeporteRepository;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +30,12 @@ public class DeporteController {
     }
 
     @PostMapping
-    public Deporte crear(@RequestBody Deporte deporte) {
+    public Deporte crear(@Valid @RequestBody Deporte deporte) {
         return repo.save(deporte);
     }
 
     @PutMapping("/{id}")
-    public Deporte actualizar(@PathVariable Long id, @RequestBody Deporte deporte) {
+    public Deporte actualizar(@PathVariable Long id, @Valid @RequestBody Deporte deporte) {
         Deporte db = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Deporte no encontrado"));
         db.setNombre(deporte.getNombre());

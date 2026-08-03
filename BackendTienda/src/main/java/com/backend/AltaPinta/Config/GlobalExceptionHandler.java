@@ -1,7 +1,10 @@
 package com.backend.AltaPinta.Config;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,6 +23,34 @@ public class GlobalExceptionHandler {
                 .map(fe -> fe.getDefaultMessage())
                 .orElse("Datos inválidos");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", mensaje));
+    }
+
+    /**
+     * Validacion de parametros y variables de ruta (@Validated en la clase).
+     *
+     * Estos no pasan por MethodArgumentNotValidException, que solo cubre el
+     * cuerpo de la peticion: sin este manejador, una cantidad de 0 en el
+     * carrito salia como 500 y parecia una averia del servidor en lugar de
+     * un dato mal enviado.
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, String>> handleConstraintViolation(ConstraintViolationException ex) {
+        String mensaje = ex.getConstraintViolations().stream()
+                .findFirst()
+                .map(ConstraintViolation::getMessage)
+                .orElse("Datos inválidos");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", mensaje));
+    }
+
+    /**
+     * Cuerpo ilegible: JSON con la sintaxis rota, o un texto donde se espera
+     * un numero. Sin este manejador el cliente recibia la pagina de error por
+     * defecto de Spring, con la traza dentro.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleCuerpoIlegible(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", "El cuerpo de la petición no tiene un formato válido"));
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)

@@ -1,5 +1,7 @@
 package com.backend.AltaPinta.controller;
 
+import jakarta.validation.Valid;
+
 import com.backend.AltaPinta.model.TipoPrenda;
 import com.backend.AltaPinta.repository.ProductoRepository;
 import com.backend.AltaPinta.repository.TipoPrendaRepository;
@@ -22,7 +24,7 @@ public class TipoPrendaController {
     }
 
 
-    @PostMapping public TipoPrenda crear(@RequestBody TipoPrenda t){
+    @PostMapping public TipoPrenda crear(@Valid @RequestBody TipoPrenda t){
         return repo.save(t); }
 
     @GetMapping public List<TipoPrenda> listar(){
