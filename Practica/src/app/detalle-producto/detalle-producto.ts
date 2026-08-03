@@ -87,13 +87,23 @@ export class DetalleProductoComponent implements OnInit {
   }
 
   agregarCarrito() {
-    if (!this.tallaSeleccionada) return;
+    // loadingCarrito también deshabilita el botón, así que salir aquí evita
+    // añadir la prenda dos veces si se pulsa antes de que la vista se refresque.
+    if (!this.tallaSeleccionada || this.loadingCarrito) return;
 
     this.loadingCarrito = true;
 
-    this.carritoService.agregar(this.producto.id, 1, this.tallaSeleccionada.talla.id).subscribe(() => {
-      this.carritoState.incrementar();
-      this.loadingCarrito = false;
+    this.carritoService.agregar(this.producto.id, 1, this.tallaSeleccionada.talla.id).subscribe({
+      next: () => {
+        this.carritoState.incrementar();
+        this.loadingCarrito = false;
+      },
+      // Sin esta rama, un fallo de red dejaba el botón deshabilitado para
+      // siempre: el cliente no podía reintentar sin recargar la página.
+      error: err => {
+        console.error('No se pudo añadir al carrito', err);
+        this.loadingCarrito = false;
+      }
     });
   }
 

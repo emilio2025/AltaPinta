@@ -18,12 +18,18 @@ administración con reportes de ventas y registro de auditoría.
 
 | Suite | Casos | Cómo se ejecuta |
 |---|---|---|
-| Backend | 136 | `cd BackendTienda && .\mvnw.cmd test` |
-| Frontend | 35 | `cd Practica && npm run test:ci` |
+| Backend | 137 | `cd BackendTienda && .\mvnw.cmd test` |
+| Frontend | 107 | `cd Practica && npm run test:ci` |
 
-Cubren el flujo de compra, la autenticación, las reglas de autorización de
-todos los controladores y las consultas de reportes. Las de repositorio
-corren sobre H2 en memoria, así que no tocan tu base de datos.
+En el backend cubren el flujo de compra, la autenticación, las reglas de
+autorización de todos los controladores y las consultas de reportes. Las de
+repositorio corren sobre H2 en memoria, así que no tocan tu base de datos.
+
+En el frontend cubren los servicios, las guardias, el interceptor y las cuatro
+pantallas con lógica propia: el catálogo (filtros combinados, búsqueda con
+retardo, orden y paginación), el carrito (cálculo del total y del envío), la
+ficha de producto (elección de talla y stock) y el mantenimiento de productos
+del panel de administración.
 
 ---
 
@@ -36,8 +42,20 @@ corren sobre H2 en memoria, así que no tocan tu base de datos.
 > **Importante sobre el JDK.** Si en tu máquina el `java` del PATH es un JDK
 > más nuevo (24, 25…), no lo uses para este proyecto: Spring Boot 3.3.5 es
 > anterior a esos JDK y puede fallar de formas difíciles de diagnosticar.
-> El script `BackendTienda/run.ps1` selecciona el JDK 17 automáticamente,
-> solo para esa ventana de terminal, sin tocar la configuración del sistema.
+> Las pruebas son las primeras en caer, porque Mockito no sabe leer las clases
+> que generan esos JDK y devuelve decenas de `Failed to load ApplicationContext`
+> que parecen un fallo del código sin serlo.
+>
+> Para que eso no se confunda con un error real, el `pom.xml` comprueba la
+> versión antes de compilar y corta con un mensaje explicándolo. Si te sale,
+> apunta `JAVA_HOME` al JDK 17 solo en esa terminal:
+>
+> ```powershell
+> $env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
+> ```
+>
+> El script `BackendTienda/run.ps1` ya lo hace automáticamente al arrancar,
+> sin tocar la configuración del sistema.
 
 ---
 

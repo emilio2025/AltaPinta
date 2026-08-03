@@ -150,6 +150,41 @@
 				</configuration>
 			</plugin>
 
+			<!-- Aviso temprano si Maven corre sobre un JDK demasiado nuevo.
+
+			     Compilar funciona en cualquiera gracias a <release>, pero las
+			     pruebas no: Mockito necesita Byte Buddy para crear los dobles,
+			     y Byte Buddy solo entiende el formato de clases hasta Java 23.
+			     Con un JDK 24 o 25 salen 77 errores de "Failed to load
+			     ApplicationContext" que parecen un fallo del codigo y no lo son.
+
+			     Este plugin corta antes con un mensaje que dice que pasa. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.4.1</version>
+				<executions>
+					<execution>
+						<id>comprobar-jdk</id>
+						<goals><goal>enforce</goal></goals>
+						<configuration>
+							<rules>
+								<requireJavaVersion>
+									<version>[17,24)</version>
+									<message>
+Este proyecto necesita un JDK entre 17 y 23; el 24 y el 25 rompen las pruebas
+(Mockito/Byte Buddy). Apunta JAVA_HOME al JDK 17 antes de compilar, por ejemplo:
+
+  PowerShell:  $env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
+  Git Bash:    export JAVA_HOME="/c/Program Files/Java/jdk-17"
+									</message>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
