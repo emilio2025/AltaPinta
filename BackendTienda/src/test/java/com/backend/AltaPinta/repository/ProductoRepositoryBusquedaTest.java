@@ -30,7 +30,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @TestPropertySource(properties = {
         "spring.datasource.url=jdbc:h2:mem:catalogo;MODE=MySQL;DATABASE_TO_LOWER=TRUE",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        // Las migraciones estan escritas en SQL de MySQL y aqui la base es H2:
+        // el esquema de la prueba lo crea Hibernate a partir de las entidades.
+        "spring.flyway.enabled=false"
 })
 class ProductoRepositoryBusquedaTest {
 

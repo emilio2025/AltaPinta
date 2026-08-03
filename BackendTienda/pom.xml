@@ -74,6 +74,25 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Flyway: control de versiones del esquema.
+
+		     Antes el esquema lo creaba Hibernate con ddl-auto=update y los
+		     cambios que este no sabe hacer (cambiar el tipo de una columna,
+		     borrar otra) se aplicaban a mano con los .sql de migraciones/.
+		     Eso significaba que la unica copia fiel del esquema era la base
+		     de datos de esta maquina: nadie mas podia reconstruirla igual.
+
+		     flyway-mysql va aparte desde Flyway 10: el nucleo ya no trae los
+		     dialectos, y sin el no reconoce la conexion a MySQL. -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
+		</dependency>
+
 		<!-- Validación DTO / Request -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

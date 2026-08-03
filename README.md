@@ -93,7 +93,8 @@ Para generar un `JWT_SECRET`:
 CREATE DATABASE alta_pinta CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Las tablas se crean solas al arrancar (`spring.jpa.hibernate.ddl-auto=update`).
+Crea la base vacía y nada más: las tablas las crea Flyway al arrancar el
+backend, a partir de los scripts versionados del repositorio (ver el paso 5).
 
 ### 3. Arrancar el backend
 
@@ -115,31 +116,34 @@ npm start
 
 Queda en http://localhost:4200
 
-### 5. Aplicar las migraciones
+### 5. Las migraciones se aplican solas
 
-Hibernate crea las tablas al arrancar, pero **nunca cambia el tipo de una
-columna que ya existe ni elimina ninguna**. Por eso hay cambios que se
-aplican a mano, una sola vez, en `BackendTienda/migraciones/`:
+No hay que hacer nada: **Flyway las aplica al arrancar el backend**. Los
+scripts viven en el repositorio, en `BackendTienda/src/main/resources/db/migration/`,
+y se ejecutan en orden y una sola vez. Flyway lleva la cuenta en la tabla
+`flyway_schema_history` de la propia base de datos.
+
+Hibernate ya no toca el esquema: `ddl-auto` está en `validate`, así que solo
+comprueba al arrancar que las tablas coinciden con las entidades y falla si no.
+Antes estaba en `update`, que iba modificando la base por su cuenta pero nunca
+cambiaba el tipo de una columna ni borraba ninguna; por eso los importes se
+quedaron en `DOUBLE` meses después de pasarlos a `BigDecimal`.
 
 | Script | Qué hace |
 |---|---|
-| `001-importes-a-decimal.sql` | Pasa los importes de `DOUBLE` a `DECIMAL(12,2)`. Sin esto el dinero se guarda en coma flotante binaria y 89,90 no es exactamente 89,90 |
-| `002-eliminar-cvv.sql` | Borra la columna `cvv` y su contenido. PCI DSS prohíbe almacenar el código de verificación de la tarjeta |
-| `003-catalogo-deportivo.sql` | Nombres, descripciones, deportes y tallas del catálogo |
-| `004-imagenes-y-precios.sql` | Ilustración y precio de cada producto |
-| `005-urls-de-imagen-relativas.sql` | Convierte las URLs de imagen absolutas en rutas relativas |
+| `V1__esquema_inicial.sql` | Las 20 tablas. Es el volcado del esquema real ya corregido, generado con `mysqldump --no-data` |
 
-Haz una copia de seguridad antes:
+**En una base de datos que ya existe, V1 no se ejecuta.** Flyway la marca como
+"ya está en la versión 1" (`spring.flyway.baseline-on-migrate`) y sigue desde
+V2. Solo corre de verdad al crear una base vacía.
 
-```powershell
-cd BackendTienda
-mysqldump -u root -p alta_pinta > respaldo-alta_pinta.sql
-mysql -u root -p alta_pinta < migraciones\001-importes-a-decimal.sql
-```
+Para cambiar el esquema, crea un archivo nuevo numerado a continuación
+(`V2__lo_que_sea.sql`) y arranca. Nunca edites uno ya aplicado: Flyway guarda
+su suma de comprobación y se niega a arrancar si cambia.
 
-Los scripts 003 y 004 se regeneran con `generar_catalogo.py` y
-`generar_imagenes.py`, que llevan semilla fija: producen siempre el mismo
-resultado. Edita su vocabulario si quieres otro catálogo.
+> Los cinco `.sql` sueltos de `BackendTienda/migraciones/` son de antes de
+> Flyway y **ya no se ejecutan**: su contenido está dentro de V1. Se conservan
+> como registro; hay detalle de cada uno en `migraciones/LEEME.md`.
 
 ---
 
@@ -153,7 +157,8 @@ BackendTienda/
     model/        entidades JPA
     repository/   acceso a datos
     service/      lógica de negocio
-  migraciones/    scripts SQL y generadores del catálogo
+  src/main/resources/db/migration/   migraciones de Flyway (V1, V2...)
+  migraciones/    scripts SQL de antes de Flyway (histórico)
   productos-imagenes/  ilustraciones e imágenes subidas
   run.ps1         arranque con el JDK correcto
 
@@ -233,3 +238,18 @@ Get-NetTCPConnection -State Listen -LocalPort 3306 | Select-Object OwningProcess
 **La sesión se cierra sola tras cambiar `JWT_SECRET`**
 Es lo esperado: al cambiar la clave de firma, los tokens anteriores dejan de
 ser válidos. Vuelve a iniciar sesión.
+
+**`Schema-validation: missing table` o `wrong column type`**
+El esquema de la base no coincide con las entidades. Con `ddl-auto=validate`
+esto se ve al arrancar en lugar de dar errores raros meses después. La causa
+casi siempre es un cambio en una entidad sin su migración: crea el `V2__…sql`
+que haga el cambio en la base.
+
+**`Validate failed: Migration checksum mismatch for version 1`**
+Alguien editó un script que Flyway ya había aplicado. No se corrigen editando:
+devuelve el archivo a como estaba y haz el cambio en un `V2__` nuevo.
+
+**`Found non-empty schema without schema history table`**
+Solo puede salir si se desactiva `spring.flyway.baseline-on-migrate`. Esa
+opción existe precisamente porque la base de datos ya tenía las 20 tablas
+cuando se adoptó Flyway.
