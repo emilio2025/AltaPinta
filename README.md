@@ -78,8 +78,15 @@ Abre el archivo y rellena:
 | Clave | Qué poner |
 |---|---|
 | `DB_PASSWORD` | La contraseña de tu usuario de MySQL |
-| `MAIL_USERNAME` | El correo Gmail que envía las notificaciones |
+| `MAIL_USERNAME` | La cuenta de Google que envía las notificaciones. Sirve tanto una de Gmail como una institucional de Workspace; también se usa como remitente |
 | `MAIL_PASSWORD` | Una *App Password* de 16 caracteres, **no** la contraseña de la cuenta. Se genera en https://myaccount.google.com/apppasswords |
+
+> La página de *App Passwords* solo aparece si la cuenta tiene activada la
+> verificación en dos pasos. Si dice que la opción no está disponible, es eso.
+> Ojo también con la cuenta: si tienes varias sesiones de Google abiertas, esa
+> página muestra la del selector de arriba a la derecha, y la contraseña que
+> generes solo vale para **esa** cuenta. Tiene que ser la misma de
+> `MAIL_USERNAME`, o el envío falla con un error de autenticación poco claro.
 | `JWT_SECRET` | Una cadena larga y aleatoria (mínimo 64 caracteres) |
 | `ADMIN_EMAIL` | El correo que recibirá el rol de administrador al registrarse |
 
