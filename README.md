@@ -1,5 +1,7 @@
 # AltaPinta — Tienda deportiva
 
+[![Pruebas](https://github.com/emilio2025/AltaPinta/actions/workflows/pruebas.yml/badge.svg)](https://github.com/emilio2025/AltaPinta/actions/workflows/pruebas.yml)
+
 Sistema de comercio electrónico para una tienda deportiva.
 Proyecto del curso **Ingeniería de Software II**.
 

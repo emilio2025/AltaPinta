@@ -16,7 +16,9 @@ on:
 jobs:
 
   backend:
-    name: Backend · 136 pruebas
+    # Sin el numero de pruebas en el nombre: se queda obsoleto en cuanto se
+    # anade una, y un nombre que miente es peor que uno generico.
+    name: Backend
     runs-on: ubuntu-latest
 
     steps:
@@ -46,7 +48,7 @@ jobs:
           path: BackendTienda/target/surefire-reports/
 
   frontend:
-    name: Frontend · 35 pruebas
+    name: Frontend
     runs-on: ubuntu-latest
 
     steps:
