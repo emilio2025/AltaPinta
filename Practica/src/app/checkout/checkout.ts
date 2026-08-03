@@ -93,7 +93,17 @@ export class CheckoutComponent implements OnInit {
         }, 1500);
       },
       error: err => {
-        this.error = err?.error || 'Error procesando pedido, stock insuficiente';
+        // El backend responde {"message": "..."}. Guardar err.error entero
+        // dejaba un objeto en este campo, y la plantilla lo pintaba como
+        // "[object Object]" justo cuando falla una compra: el cliente veia
+        // eso en lugar de "Stock insuficiente" o "Saldo insuficiente".
+        //
+        // Se contempla tambien la cadena suelta porque no todos los
+        // endpoints pasan por el manejador global.
+        const cuerpo = err?.error;
+        this.error = cuerpo?.message
+                  || (typeof cuerpo === 'string' ? cuerpo : '')
+                  || 'No se pudo procesar el pedido, intenta de nuevo';
         this.loading = false;
       }
     });
