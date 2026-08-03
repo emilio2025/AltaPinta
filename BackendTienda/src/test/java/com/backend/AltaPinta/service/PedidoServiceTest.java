@@ -110,7 +110,7 @@ class PedidoServiceTest {
 
     /** Deja los dobles listos para que la compra llegue hasta el final. */
     private void escenarioCompraCorrecta() {
-        when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
+        when(clienteRepo.findByCorreoBloqueando(CORREO)).thenReturn(Optional.of(cliente));
         when(carritoItemRepo.findByCarritoClienteId(1L)).thenReturn(List.of(itemCarrito));
         when(productoTallaRepo.findByProductoIdAndTallaId(10L, 5L)).thenReturn(Optional.of(stockTalla));
         when(envioRepo.findById(3L)).thenReturn(Optional.of(envio));
@@ -159,6 +159,21 @@ class PedidoServiceTest {
         }
 
         @Test
+        @DisplayName("RF045: bloquea la fila del cliente antes de tocar nada")
+        void bloqueaAlCliente() {
+            escenarioCompraCorrecta();
+
+            pedidoService.confirmarPedido(CORREO, dtoConEnvio());
+
+            // Lo que impide el doble pago por doble clic es este bloqueo en
+            // la base de datos. Si alguien lo cambia por la busqueda normal,
+            // dos peticiones simultaneas del mismo cliente volverian a
+            // colarse: la proteccion se pierde sin que falle nada mas.
+            verify(clienteRepo).findByCorreoBloqueando(CORREO);
+            verify(clienteRepo, never()).findByCorreo(anyString());
+        }
+
+        @Test
         @DisplayName("Compra correcta: cobra, descuenta stock, abona a la tienda y vacia el carrito")
         void compraCorrecta() {
             escenarioCompraCorrecta();
@@ -183,7 +198,7 @@ class PedidoServiceTest {
         @Test
         @DisplayName("Sin envio: no cobra costo de envio y marca recojo en tienda")
         void sinEnvio() {
-            when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
+            when(clienteRepo.findByCorreoBloqueando(CORREO)).thenReturn(Optional.of(cliente));
             when(carritoItemRepo.findByCarritoClienteId(1L)).thenReturn(List.of(itemCarrito));
             when(productoTallaRepo.findByProductoIdAndTallaId(10L, 5L)).thenReturn(Optional.of(stockTalla));
             when(tarjetaRepo.findByIdAndClienteId(7L, 1L)).thenReturn(Optional.of(tarjeta));
@@ -203,7 +218,7 @@ class PedidoServiceTest {
         @Test
         @DisplayName("Carrito vacio: no se crea pedido")
         void carritoVacio() {
-            when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
+            when(clienteRepo.findByCorreoBloqueando(CORREO)).thenReturn(Optional.of(cliente));
             when(carritoItemRepo.findByCarritoClienteId(1L)).thenReturn(List.of());
 
             RuntimeException ex = assertThrows(RuntimeException.class,
@@ -216,7 +231,7 @@ class PedidoServiceTest {
         @Test
         @DisplayName("Cliente inexistente: falla antes de tocar nada")
         void clienteInexistente() {
-            when(clienteRepo.findByCorreo("fantasma@ejemplo.com")).thenReturn(Optional.empty());
+            when(clienteRepo.findByCorreoBloqueando("fantasma@ejemplo.com")).thenReturn(Optional.empty());
 
             assertThrows(RuntimeException.class,
                     () -> pedidoService.confirmarPedido("fantasma@ejemplo.com", dtoConEnvio()));
@@ -229,7 +244,7 @@ class PedidoServiceTest {
         @DisplayName("Stock insuficiente: no cobra la tarjeta ni descuenta stock")
         void stockInsuficiente() {
             itemCarrito.setCantidad(20);      // pide 20, solo hay 10
-            when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
+            when(clienteRepo.findByCorreoBloqueando(CORREO)).thenReturn(Optional.of(cliente));
             when(carritoItemRepo.findByCarritoClienteId(1L)).thenReturn(List.of(itemCarrito));
             when(productoTallaRepo.findByProductoIdAndTallaId(10L, 5L)).thenReturn(Optional.of(stockTalla));
 
@@ -246,7 +261,7 @@ class PedidoServiceTest {
         @Test
         @DisplayName("Talla ya no disponible: falla con mensaje claro")
         void tallaNoDisponible() {
-            when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
+            when(clienteRepo.findByCorreoBloqueando(CORREO)).thenReturn(Optional.of(cliente));
             when(carritoItemRepo.findByCarritoClienteId(1L)).thenReturn(List.of(itemCarrito));
             when(productoTallaRepo.findByProductoIdAndTallaId(10L, 5L)).thenReturn(Optional.empty());
 
@@ -263,7 +278,7 @@ class PedidoServiceTest {
             tarjeta.setSaldo(imp("10.0"));           // hacen falta 215
             // No se usa el escenario completo a proposito: la ejecucion falla
             // en la comprobacion de saldo y nunca llega a la cuenta de la tienda.
-            when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
+            when(clienteRepo.findByCorreoBloqueando(CORREO)).thenReturn(Optional.of(cliente));
             when(carritoItemRepo.findByCarritoClienteId(1L)).thenReturn(List.of(itemCarrito));
             when(productoTallaRepo.findByProductoIdAndTallaId(10L, 5L)).thenReturn(Optional.of(stockTalla));
             when(envioRepo.findById(3L)).thenReturn(Optional.of(envio));
@@ -282,7 +297,7 @@ class PedidoServiceTest {
         @Test
         @DisplayName("Tarjeta de otro cliente: se rechaza")
         void tarjetaAjena() {
-            when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
+            when(clienteRepo.findByCorreoBloqueando(CORREO)).thenReturn(Optional.of(cliente));
             when(carritoItemRepo.findByCarritoClienteId(1L)).thenReturn(List.of(itemCarrito));
             when(productoTallaRepo.findByProductoIdAndTallaId(10L, 5L)).thenReturn(Optional.of(stockTalla));
             when(envioRepo.findById(3L)).thenReturn(Optional.of(envio));
@@ -333,7 +348,7 @@ class PedidoServiceTest {
             item2.setTalla(talla42);
             item2.setCantidad(1);
 
-            when(clienteRepo.findByCorreo(CORREO)).thenReturn(Optional.of(cliente));
+            when(clienteRepo.findByCorreoBloqueando(CORREO)).thenReturn(Optional.of(cliente));
             when(carritoItemRepo.findByCarritoClienteId(1L)).thenReturn(List.of(itemCarrito, item2));
             when(productoTallaRepo.findByProductoIdAndTallaId(10L, 5L)).thenReturn(Optional.of(stockTalla));
             when(productoTallaRepo.findByProductoIdAndTallaId(11L, 6L)).thenReturn(Optional.of(stockZapatilla));

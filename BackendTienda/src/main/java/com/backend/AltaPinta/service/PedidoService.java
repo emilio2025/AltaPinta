@@ -14,20 +14,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
 public class PedidoService {
 
     private static final Logger log = LoggerFactory.getLogger(PedidoService.class);
-
-    // RF045: Evitar duplicación de pagos por doble clic/doble envío del mismo cliente
-    private final ConcurrentHashMap<Long, Object> locksPorCliente = new ConcurrentHashMap<>();
-
-    private Object lockDe(Long clienteId) {
-        return locksPorCliente.computeIfAbsent(clienteId, id -> new Object());
-    }
 
     private final PedidoRepository pedidoRepo;
     private final PedidoDetalleRepository detalleRepo;
@@ -69,13 +61,20 @@ public class PedidoService {
 
     public PedidoResponse confirmarPedido(String correoCliente, ConfirmarPedidoDTO dto) {
 
-        Cliente cliente = clienteRepo.findByCorreo(correoCliente)
+        // RF045: un mismo cliente no puede confirmar dos pedidos a la vez.
+        //
+        // La fila del cliente se bloquea en la base de datos hasta que
+        // termina la transacción, así que un segundo intento simultáneo
+        // —el doble clic en "pagar"— espera aquí y, cuando entra, ya ve el
+        // carrito vacío y no puede duplicar la compra.
+        //
+        // Esto sustituye a un synchronized sobre un mapa en memoria, que
+        // solo protegía dentro de una instancia y, al tomarse dentro de la
+        // transacción, dejaba al segundo hilo con su instantánea anterior.
+        Cliente cliente = clienteRepo.findByCorreoBloqueando(correoCliente)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        // RF045: un solo cliente no puede confirmar dos pedidos en simultáneo (doble clic)
-        synchronized (lockDe(cliente.getId())) {
-            return confirmarPedidoInterno(cliente, dto);
-        }
+        return confirmarPedidoInterno(cliente, dto);
     }
 
     private PedidoResponse confirmarPedidoInterno(Cliente cliente, ConfirmarPedidoDTO dto) {
