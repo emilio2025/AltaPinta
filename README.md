@@ -20,18 +20,27 @@ administración con reportes de ventas y registro de auditoría.
 
 | Suite | Casos | Cómo se ejecuta |
 |---|---|---|
-| Backend | 137 | `cd BackendTienda && .\mvnw.cmd test` |
-| Frontend | 107 | `cd Practica && npm run test:ci` |
+| Backend | 160 | `cd BackendTienda && .\mvnw.cmd test` |
+| Frontend | 125 | `cd Practica && npm run test:ci` |
 
 En el backend cubren el flujo de compra, la autenticación, las reglas de
-autorización de todos los controladores y las consultas de reportes. Las de
-repositorio corren sobre H2 en memoria, así que no tocan tu base de datos.
+autorización de todos los controladores, la validación de la entrada y las
+consultas de reportes. Las de repositorio corren sobre H2 en memoria, así que
+**no tocan tu base de datos**.
 
-En el frontend cubren los servicios, las guardias, el interceptor y las cuatro
+`CompraCompletaTest` es la de integración: levanta la aplicación entera y
+recorre registro → verificación → sesión → catálogo → carrito → pedido
+arrastrando el token JWT, y luego comprueba cómo quedó la base. Es la única
+que puede detectar que las piezas no encajan entre sí. El correo y la
+generación de PDF van con dobles: una prueba no manda correos de verdad ni
+deja archivos por el disco.
+
+En el frontend cubren los servicios, las guardias, el interceptor y las cinco
 pantallas con lógica propia: el catálogo (filtros combinados, búsqueda con
 retardo, orden y paginación), el carrito (cálculo del total y del envío), la
-ficha de producto (elección de talla y stock) y el mantenimiento de productos
-del panel de administración.
+ficha de producto (elección de talla y stock), el checkout (las guardas que
+impiden pagar y el envío de la petición) y el mantenimiento de productos del
+panel de administración.
 
 ---
 
