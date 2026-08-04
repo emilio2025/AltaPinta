@@ -151,6 +151,7 @@ quedaron en `DOUBLE` meses después de pasarlos a `BigDecimal`.
 |---|---|
 | `V1__esquema_inicial.sql` | Las 20 tablas. Es el volcado del esquema real ya corregido, generado con `mysqldump --no-data` |
 | `V2__eliminar_tabla_pago.sql` | Borra la tabla `pago`, que sobraba desde que se retiró el endpoint `/pago/procesar` |
+| `V3__ascender_administrador.sql` | Da rol `ADMIN` a la cuenta del responsable del proyecto. Es una migración de datos, no de esquema |
 
 **En una base de datos que ya existe, V1 no se ejecuta.** Flyway la marca como
 "ya está en la versión 1" (`spring.flyway.baseline-on-migrate`) y sigue desde
