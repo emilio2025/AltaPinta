@@ -90,9 +90,31 @@ jobs:
           echo "::error title=Fallo npm ci::$(grep -iE 'npm (error|warn EBADENGINE)' npm-salida.log | head -25 | tr '\n' '|' | cut -c1-1500)"
           exit 1
 
+      # Karma no trae navegador: lanza el que encuentre en el sistema. En
+      # local usa el Chrome instalado, pero en el runner hay que decirle
+      # cual es, y el nombre del ejecutable cambia entre imagenes. Sin esto
+      # el paso moria con codigo 127 (orden no encontrada) sin mas pista.
+      - name: Localizar el navegador para Karma
+        run: |
+          for b in google-chrome google-chrome-stable chromium chromium-browser; do
+            ruta=$(command -v "$b" || true)
+            if [ -n "$ruta" ]; then
+              echo "CHROME_BIN=$ruta" >> "$GITHUB_ENV"
+              echo "Karma usara: $ruta"
+              exit 0
+            fi
+          done
+          echo "::error title=Sin navegador::El runner no tiene Chrome ni Chromium; Karma no puede ejecutar las pruebas."
+          exit 1
+
       - name: Ejecutar las pruebas
         working-directory: Practica
-        run: npm run test:ci
+        run: |
+          if npm run test:ci 2>&1 | tee pruebas.log; then
+            exit 0
+          fi
+          echo "::error title=Fallo en las pruebas del frontend::$(grep -iE 'error|failed|cannot|no such' pruebas.log | head -20 | tr '\n' '|' | cut -c1-1500)"
+          exit 1
 
       - name: Comprobar que compila para producción
         working-directory: Practica
