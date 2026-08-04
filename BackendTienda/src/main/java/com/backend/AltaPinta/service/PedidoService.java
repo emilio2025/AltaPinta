@@ -32,6 +32,7 @@ public class PedidoService {
     private final EmailService emailService;
     private final FacturaRepository facturaRepository;
     private final FacturaPdfService facturaPdfService;
+    private final PagoService pagoService;
 
     public PedidoService(
             PedidoRepository pedidoRepo,
@@ -44,7 +45,8 @@ public class PedidoService {
             TarjetaRepository tarjetaRepo,
             EmailService emailService,
             FacturaRepository facturaRepository,
-            FacturaPdfService facturaPdfService
+            FacturaPdfService facturaPdfService,
+            PagoService pagoService
     ) {
         this.pedidoRepo = pedidoRepo;
         this.detalleRepo = detalleRepo;
@@ -57,6 +59,7 @@ public class PedidoService {
         this.emailService = emailService;
         this.facturaRepository = facturaRepository;
         this.facturaPdfService = facturaPdfService;
+        this.pagoService = pagoService;
     }
 
     public PedidoResponse confirmarPedido(String correoCliente, ConfirmarPedidoDTO dto) {
@@ -74,7 +77,39 @@ public class PedidoService {
         Cliente cliente = clienteRepo.findByCorreoBloqueando(correoCliente)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        return confirmarPedidoInterno(cliente, dto);
+        // RF020 / RNF018: todo intento de cobro deja constancia, prospere o no.
+        //
+        // El rechazo se registra desde aqui y no dentro de
+        // confirmarPedidoInterno porque ahi la transaccion ya esta marcada
+        // para revertirse: cualquier escritura que se hiciera dentro se
+        // perderia con ella. PagoService.registrarRechazado abre su propia
+        // transaccion justamente para sobrevivir a esta reversion.
+        try {
+            return confirmarPedidoInterno(cliente, dto);
+        } catch (RuntimeException ex) {
+            pagoService.registrarRechazado(cliente, dto.getTarjetaId(),
+                    totalEstimado(cliente), ex.getMessage());
+            throw ex;
+        }
+    }
+
+    /**
+     * Importe que el cliente intentaba pagar, para dejarlo en el registro del
+     * intento fallido.
+     *
+     * Se recalcula del carrito en lugar de arrastrarlo desde el punto del
+     * fallo: el cobro puede fallar antes de haberlo calculado —por ejemplo si
+     * falta stock— y un registro con importe cero no diria nada.
+     */
+    private BigDecimal totalEstimado(Cliente cliente) {
+        try {
+            return carritoItemRepo.findByCarritoClienteId(cliente.getId()).stream()
+                    .map(i -> i.getProducto().getPrecio()
+                            .multiply(BigDecimal.valueOf(i.getCantidad())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        } catch (Exception ex) {
+            return BigDecimal.ZERO;
+        }
     }
 
     private PedidoResponse confirmarPedidoInterno(Cliente cliente, ConfirmarPedidoDTO dto) {
@@ -158,6 +193,11 @@ public class PedidoService {
             detalleRepo.save(detalle);
             detalles.add(detalle);
         }
+
+        // RF020: el cobro prospero, queda registrado. Va dentro de esta
+        // misma transaccion a proposito: si algo la revirtiera, el registro
+        // debe irse con ella. Un pago aprobado sin su pedido seria falso.
+        pagoService.registrarAprobado(cliente, pedido, tarjeta.getId(), total);
 
         // Registrar ingreso en cuenta de la tienda
         CuentaTienda cuenta = cuentaTiendaRepo.findById(1L)

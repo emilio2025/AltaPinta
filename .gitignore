@@ -50,6 +50,15 @@ BackendTienda/productos-imagenes/*
 # migraciones/generar_imagenes.py y pesan 28 KB entre las 54.
 !BackendTienda/productos-imagenes/prenda-*.svg
 
+# Excepción: las fotografías del catálogo también se versionan, porque la
+# migración V5 apunta a ellas y sin los archivos un clon limpio mostraría
+# el catálogo roto.
+#
+# IMPORTANTE: son imágenes de referencia de terceros, no propias. Ver la
+# nota de atribución en el README antes de darles cualquier otro uso.
+!BackendTienda/productos-imagenes/foto-*.jpg
+!BackendTienda/productos-imagenes/foto-*.webp
+
 # ------------------------------------------------------------
 # FRONTEND - Angular / Node
 # ------------------------------------------------------------

@@ -78,6 +78,7 @@ class CompraCompletaTest {
     @Autowired private CarritoRepository carritoRepo;
     @Autowired private PedidoDetalleRepository detalleRepo;
     @Autowired private FacturaRepository facturaRepo;
+    @Autowired private PagoRepository pagoRepo;
 
     // Sin estos dobles la prueba mandaria correo de verdad y escribiria PDFs.
     @MockBean private EmailService emailService;
@@ -102,6 +103,7 @@ class CompraCompletaTest {
         // envolviendolo todo, el fallo la marcaria entera para revertir y no
         // se podria comprobar nada despues. A cambio, hay que limpiar a mano
         // y en el orden que permiten las claves ajenas.
+        pagoRepo.deleteAll();
         carritoItemRepo.deleteAll();
         carritoRepo.deleteAll();
         facturaRepo.deleteAll();
@@ -319,6 +321,14 @@ class CompraCompletaTest {
             assertThat(pedidoRepo.findAll())
                     .as("queda un pedido registrado")
                     .hasSize(1);
+
+            // RF020: el cobro que prospera deja constancia, ligado a su pedido
+            var pagos = pagoRepo.findAll();
+            assertThat(pagos).as("se registra el intento de cobro").hasSize(1);
+            assertThat(pagos.get(0).getEstado()).isEqualTo("APROBADO");
+            assertThat(pagos.get(0).getPedido()).as("el pago aprobado apunta a su pedido").isNotNull();
+            assertImporte("194.80", pagos.get(0).getMonto(),
+                    "el importe registrado es el cobrado");
         }
     }
 
@@ -434,6 +444,23 @@ class CompraCompletaTest {
             assertThat(carritoItemRepo.findByCarritoClienteId(cliente.getId()))
                     .as("el carrito sigue con lo que habia")
                     .isNotEmpty();
+
+            // RNF018: el intento fallido SI queda registrado.
+            //
+            // Es la comprobacion que da sentido a toda la transaccionalidad:
+            // el pedido se revirtio entero, pero este registro se escribio en
+            // una transaccion propia y sobrevivio al rollback. Si el registro
+            // se hiciera dentro de la transaccion del pedido, aqui no habria
+            // ninguna fila.
+            var pagos = pagoRepo.findAll();
+            assertThat(pagos).as("el cobro rechazado deja constancia").hasSize(1);
+            assertThat(pagos.get(0).getEstado()).isEqualTo("RECHAZADO");
+            assertThat(pagos.get(0).getPedido())
+                    .as("un cobro rechazado no tiene pedido: nunca llego a crearse")
+                    .isNull();
+            assertThat(pagos.get(0).getMotivo())
+                    .as("queda el motivo real del rechazo")
+                    .contains("Saldo insuficiente");
         }
     }
 }

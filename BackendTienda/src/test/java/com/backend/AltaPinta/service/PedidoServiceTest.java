@@ -48,6 +48,7 @@ class PedidoServiceTest {
     @Mock private EmailService emailService;
     @Mock private FacturaRepository facturaRepository;
     @Mock private FacturaPdfService facturaPdfService;
+    @Mock private PagoService pagoService;
 
     @InjectMocks private PedidoService pedidoService;
 

@@ -152,6 +152,8 @@ quedaron en `DOUBLE` meses después de pasarlos a `BigDecimal`.
 | `V1__esquema_inicial.sql` | Las 20 tablas. Es el volcado del esquema real ya corregido, generado con `mysqldump --no-data` |
 | `V2__eliminar_tabla_pago.sql` | Borra la tabla `pago`, que sobraba desde que se retiró el endpoint `/pago/procesar` |
 | `V3__ascender_administrador.sql` | Da rol `ADMIN` a la cuenta del responsable del proyecto. Es una migración de datos, no de esquema |
+| `V4__registro_de_pagos.sql` | Crea la tabla `pago` para registrar el resultado de cada intento de cobro (RF020, RNF018) |
+| `V5__fotografias_de_producto.sql` | Sustituye los bocetos por fotografía real en el catálogo de Mujer |
 
 **En una base de datos que ya existe, V1 no se ejecuta.** Flyway la marca como
 "ya está en la versión 1" (`spring.flyway.baseline-on-migrate`) y sigue desde
@@ -164,6 +166,25 @@ su suma de comprobación y se niega a arrancar si cambia.
 > Los cinco `.sql` sueltos de `BackendTienda/migraciones/` son de antes de
 > Flyway y **ya no se ejecutan**: su contenido está dentro de V1. Se conservan
 > como registro; hay detalle de cada uno en `migraciones/LEEME.md`.
+
+---
+
+## Atribución de las imágenes de producto
+
+Las fotografías del catálogo (`BackendTienda/productos-imagenes/foto-*`) son
+**imágenes de referencia de terceros**, incorporadas únicamente con fines
+académicos para que el catálogo pueda demostrarse con material realista. **No
+son propiedad de este proyecto ni de sus autores**, y algunas conservan la
+marca de agua de su titular.
+
+No se han modificado ni se les ha retirado ninguna marca: alterarlas para
+ocultar su procedencia sería peor que usarlas.
+
+**Antes de cualquier uso que no sea académico deben sustituirse** por
+fotografía propia o con licencia. Las ilustraciones `prenda-*.svg`, que sí son
+generadas por el proyecto (`migraciones/generar_imagenes.py`), siguen
+disponibles como alternativa y se usan en los productos que aún no tienen
+fotografía.
 
 ---
 
