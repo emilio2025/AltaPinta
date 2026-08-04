@@ -23,6 +23,15 @@
   --ap-gris-200: #e8e8e8;
   --ap-gris-400: #a3a3a3;
   --ap-gris-600: #525252;
+
+  /* Texto secundario sobre fondo claro.
+     #767676 es el gris mas claro que aun alcanza 4.5:1 sobre blanco, el
+     minimo que exige WCAG AA para texto normal. El --ap-gris-400 se venia
+     usando para esto y solo llega a 2.52:1: en textos de 0.72rem, como la
+     ayuda bajo los campos del formulario, costaba leerlo de verdad.
+     El gris-400 sigue valiendo sobre fondo oscuro, donde el contraste se
+     invierte. */
+  --ap-texto-tenue: #767676;
   --ap-acento: #d4ff3f;          /* lima: solo para CTA y estados activos */
   --ap-acento-oscuro: #b8e02c;
   --ap-alerta: #e11d48;
@@ -150,7 +159,10 @@ h1, h2, h3, h4 {
   user-select: none;
   white-space: nowrap;
 }
-.ap-logo span { color: var(--ap-gris-400); }
+/* Gris 600 y no 400: sobre blanco, el 400 (#a3a3a3) da un contraste de
+   2.52:1 y el minimo para texto grande es 3:1. Ademas de incumplirlo, se
+   veia deslavado, como si la marca estuviera a medio cargar. */
+.ap-logo span { color: var(--ap-gris-600); }
 .ap-logo--claro { color: var(--ap-blanco); }
 .ap-logo--claro span { color: var(--ap-acento); }
 
@@ -590,7 +602,7 @@ h1, h2, h3, h4 {
   align-items: center;
   gap: 0.85rem;
   margin: 1.5rem 0;
-  color: var(--ap-gris-400);
+  color: var(--ap-texto-tenue);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -606,7 +618,7 @@ h1, h2, h3, h4 {
 /* Texto de ayuda bajo un campo; se tiñe de rojo si el campo es inválido */
 .ap-campo__ayuda {
   font-size: 0.72rem;
-  color: var(--ap-gris-400);
+  color: var(--ap-texto-tenue);
   line-height: 1.4;
 }
 .ap-campo__ayuda--error { color: var(--ap-alerta); }
@@ -615,7 +627,7 @@ h1, h2, h3, h4 {
   font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
-  color: var(--ap-gris-400);
+  color: var(--ap-texto-tenue);
   font-size: 0.68rem;
 }
 
@@ -625,7 +637,7 @@ h1, h2, h3, h4 {
   gap: 0.4rem;
   margin-top: 1.75rem;
   font-size: 0.78rem;
-  color: var(--ap-gris-400);
+  color: var(--ap-texto-tenue);
   cursor: pointer;
 }
 .ap-acceso__volver:hover { color: var(--ap-negro); }
