@@ -166,10 +166,20 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(correo);
 
+        // El rol viaja en la respuesta para que el frontend sepa que menus
+        // mostrar. Antes no se enviaba, asi que saveAuthData guardaba
+        // undefined y la interfaz decidia quien era administrador comparando
+        // el correo con una constante suya: dos fuentes de verdad que se
+        // separaban en cuanto se ascendia a alguien en la base de datos.
+        //
+        // Esto NO es lo que autoriza nada: cada peticion vuelve a leer el rol
+        // de la base a traves de CustomUserDetailsService. Es solo para la
+        // interfaz.
         return ResponseEntity.ok(Map.of(
                 "token", token,
                 "nombre", c.getNombre(),
-                "correo", c.getCorreo()
+                "correo", c.getCorreo(),
+                "rol", c.getRol().name()
         ));
     }
 

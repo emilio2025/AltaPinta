@@ -227,6 +227,16 @@ class CompraCompletaTest {
         JsonNode nodo = json.readTree(cuerpo);
         String token = nodo.get("token").asText();
         assertThat(token).isNotBlank();
+
+        // El rol tiene que venir en la respuesta: de el depende que la
+        // interfaz muestre o no el panel de administracion. Cuando no se
+        // enviaba, el frontend guardaba undefined y decidia quien era
+        // administrador comparando el correo con una constante suya.
+        assertThat(nodo.hasNonNull("rol"))
+                .as("el login debe devolver el rol; si no, la interfaz no sabe que mostrar")
+                .isTrue();
+        assertThat(nodo.get("rol").asText()).isIn("USER", "ADMIN");
+
         return token;
     }
 

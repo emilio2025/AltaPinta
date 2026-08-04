@@ -102,14 +102,19 @@ describe('AuthService', () => {
   // ============================================================
   describe('isAdmin', () => {
 
-    it('reconoce el correo de administrador', () => {
-      localStorage.setItem('correo', ADMIN);
+    // Ahora manda el rol que devuelve el backend, no el correo. Antes se
+    // comparaba contra una constante escrita en el propio servicio: ascender
+    // a alguien en la base de datos le daba permisos en la API mientras la
+    // interfaz seguia tratandolo como cliente, sin ningun aviso.
+
+    it('reconoce al administrador por su rol', () => {
+      localStorage.setItem('rol', 'ADMIN');
 
       expect(service.isAdmin()).toBeTrue();
     });
 
     it('un cliente normal no es administrador', () => {
-      localStorage.setItem('correo', 'cliente@unamba.edu.pe');
+      localStorage.setItem('rol', 'USER');
 
       expect(service.isAdmin()).toBeFalse();
     });
@@ -118,8 +123,16 @@ describe('AuthService', () => {
       expect(service.isAdmin()).toBeFalse();
     });
 
-    it('un correo parecido al del admin no cuela', () => {
-      localStorage.setItem('correo', 'altapintaunamba@gmail.com.attacker.com');
+    it('el correo ya no decide nada', () => {
+      // Estar registrado con el correo historico del administrador no basta
+      localStorage.setItem('correo', ADMIN);
+      localStorage.setItem('rol', 'USER');
+
+      expect(service.isAdmin()).toBeFalse();
+    });
+
+    it('un rol con otro texto no cuela', () => {
+      localStorage.setItem('rol', 'ADMINISTRADOR');
 
       expect(service.isAdmin()).toBeFalse();
     });

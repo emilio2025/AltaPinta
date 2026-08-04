@@ -9,8 +9,7 @@ import { environment } from '../environments/environment';
 })
 export class AuthService {
 
-  private apiUrl = `${environment.apiUrl}/api/auth`; 
-  private readonly ADMIN_EMAIL = 'altapintaunamba@gmail.com';
+  private apiUrl = `${environment.apiUrl}/api/auth`;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -71,9 +70,20 @@ export class AuthService {
     return localStorage.getItem('rol');
   }
 
-  // Verificar si es admin (por correo)
+  /**
+   * Administrador segun el rol que devolvio el backend al iniciar sesion.
+   *
+   * Antes se comparaba el correo con una constante escrita aqui mismo, lo
+   * que dejaba dos fuentes de verdad: ascender a alguien en la base de datos
+   * le daba permisos en la API pero la interfaz seguia tratandolo como
+   * cliente, sin ningun aviso.
+   *
+   * Esto solo decide que se muestra. Quien autoriza de verdad es el backend,
+   * que relee el rol de la base en cada peticion: cambiar este valor a mano
+   * en el navegador no da acceso a nada.
+   */
   isAdmin(): boolean {
-    return this.getEmail() === this.ADMIN_EMAIL;
+    return this.getRol() === 'ADMIN';
   }
 
   // RECUPERAR CONTRASEÑA
