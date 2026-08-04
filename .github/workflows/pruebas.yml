@@ -120,4 +120,9 @@ jobs:
         working-directory: Practica
         # Compilar con la configuración de producción detecta errores que
         # el modo desarrollo deja pasar, como un environment mal resuelto.
-        run: npm run build
+        run: |
+          if npm run build 2>&1 | tee compilacion.log; then
+            exit 0
+          fi
+          echo "::error title=Fallo la compilacion::$(grep -iE 'error|not found|ENOENT|cannot' compilacion.log | head -20 | tr '\n' '|' | cut -c1-1500)"
+          exit 1
