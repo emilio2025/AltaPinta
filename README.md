@@ -48,7 +48,8 @@ panel de administración.
 
 - **JDK 17** — el proyecto compila y corre con Java 17.
 - **MySQL 8 o superior**, escuchando en el puerto 3306.
-- **Node.js 20+** para el frontend.
+- **Node.js 20.19 o superior** para el frontend. El proyecto se desarrolla
+  y se verifica en integración continua sobre Node 24.
 
 > **Importante sobre el JDK.** Si en tu máquina el `java` del PATH es un JDK
 > más nuevo (24, 25…), no lo uses para este proyecto: Spring Boot 3.3.5 es

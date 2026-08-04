@@ -57,7 +57,16 @@ jobs:
       - name: Preparar Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # Node 24, la misma version con la que se desarrolla.
+          #
+          # Con Node 20 el paso fallaba: su npm 10 rechazaba el
+          # package-lock.json generado por el npm 11 de Node 24, porque
+          # resuelven el arbol de dependencias de forma distinta. El lock
+          # estaba bien; lo que no encajaba eran las dos versiones de npm.
+          #
+          # La integracion continua debe correr sobre lo mismo que la maquina
+          # de desarrollo, o comprueba una combinacion que nadie usa.
+          node-version: '24'
           cache: npm
           cache-dependency-path: Practica/package-lock.json
 
