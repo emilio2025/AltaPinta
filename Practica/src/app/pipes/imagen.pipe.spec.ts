@@ -43,6 +43,21 @@ describe('ImagenPipe', () => {
     expect(pipe.transform(dataUri)).toBe(dataUri);
   });
 
+  it('no toca las vistas previas de un archivo recien elegido', () => {
+    // Al elegir una foto en el panel de administracion, el componente hace
+    // URL.createObjectURL(file), que devuelve una direccion "blob:". La
+    // plantilla la pasa por este pipe porque el operador | tiene menos
+    // precedencia que ||:
+    //
+    //     [src]="slot.preview || slot.url | imagen"   ->   (a || b) | imagen
+    //
+    // Sin este caso, el pipe le anteponia la direccion del backend y salia
+    // "http://localhost:8080/blob:http://localhost:4200/...", que no existe:
+    // se elegia la foto y no aparecia nada.
+    const blob = 'blob:http://localhost:4200/9f1c-4a2b-8e77';
+    expect(pipe.transform(blob)).toBe(blob);
+  });
+
   it('devuelve la imagen de repuesto cuando no hay valor', () => {
     expect(pipe.transform(null)).toBe('assets/altaPinta.jpg');
     expect(pipe.transform(undefined)).toBe('assets/altaPinta.jpg');

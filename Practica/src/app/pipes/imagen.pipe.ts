@@ -33,6 +33,20 @@ export class ImagenPipe implements PipeTransform {
       return valor;
     }
 
+    // Vista previa de un archivo recién elegido en el panel de
+    // administración: URL.createObjectURL(file) devuelve una dirección
+    // "blob:" que ya resuelve sola. La plantilla la pasa por aquí porque el
+    // operador | tiene menos precedencia que ||:
+    //
+    //     [src]="slot.preview || slot.url | imagen"   ->   (a || b) | imagen
+    //
+    // Anteponerle la dirección del backend producía
+    // "http://localhost:8080/blob:http://localhost:4200/…", que no existe:
+    // se elegía la foto y no se veía nada.
+    if (valor.startsWith('blob:')) {
+      return valor;
+    }
+
     const ruta = valor.startsWith('/') ? valor : '/' + valor;
     return environment.apiUrl + ruta;
   }

@@ -239,9 +239,35 @@
   font-size: 1.5rem;
 }
 
+/* El control nativo de archivo se salia del ancho del hueco y su texto
+   ("Elegir archivo — No se eligió archivo") quedaba cortado a media palabra.
+   Se oculta el nombre del archivo, que no aporta nada teniendo la vista
+   previa encima, y se le da al boton el aspecto del resto de la interfaz. */
 .ap-imagen-slot input[type="file"] {
-  font-size: 0.72rem;
+  width: 100%;
+  font-size: 0;                    /* oculta el "no se eligió archivo" */
   font-family: inherit;
+  cursor: pointer;
+}
+
+.ap-imagen-slot input[type="file"]::file-selector-button {
+  width: 100%;
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ap-negro);
+  background: var(--ap-blanco);
+  color: var(--ap-negro);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--ap-transicion), color var(--ap-transicion);
+}
+.ap-imagen-slot input[type="file"]::file-selector-button:hover {
+  background: var(--ap-negro);
+  color: var(--ap-blanco);
 }
 
 .ap-mensaje-error {
