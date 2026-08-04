@@ -78,11 +78,16 @@ jobs:
         # Si npm falla, su mensaje se publica como anotacion del flujo.
         # Sin esto, el fallo llega como un escueto "exit code 1" y hay que
         # entrar al registro completo para saber que paso.
+        #
+        # El if no es adorno: GitHub ejecuta cada run con "bash -e", asi que
+        # una forma tipo "npm ci && exit 0" aborta el script en cuanto npm
+        # falla y nunca llega a publicar el mensaje. Dentro de un if, bash
+        # no aplica -e y el fallo si se puede capturar.
         run: |
-          set -o pipefail
-          npm ci 2>&1 | tee npm-salida.log && exit 0
-          echo "::error title=npm ci fallo::$(grep -iE 'npm error' npm-salida.log | head -20 | tr '
-' ' | ' | cut -c1-1800)"
+          if npm ci 2>&1 | tee npm-salida.log; then
+            exit 0
+          fi
+          echo "::error title=Fallo npm ci::$(grep -iE 'npm (error|warn EBADENGINE)' npm-salida.log | head -25 | tr '\n' '|' | cut -c1-1500)"
           exit 1
 
       - name: Ejecutar las pruebas
