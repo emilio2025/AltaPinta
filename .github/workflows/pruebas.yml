@@ -75,7 +75,15 @@ jobs:
       # misma combinación de versiones que tienes en tu máquina.
       - name: Instalar dependencias
         working-directory: Practica
-        run: npm ci
+        # Si npm falla, su mensaje se publica como anotacion del flujo.
+        # Sin esto, el fallo llega como un escueto "exit code 1" y hay que
+        # entrar al registro completo para saber que paso.
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee npm-salida.log && exit 0
+          echo "::error title=npm ci fallo::$(grep -iE 'npm error' npm-salida.log | head -20 | tr '
+' ' | ' | cut -c1-1800)"
+          exit 1
 
       - name: Ejecutar las pruebas
         working-directory: Practica
