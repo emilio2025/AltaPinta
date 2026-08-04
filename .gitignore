@@ -75,6 +75,18 @@ testem.log
 /typings
 
 # ------------------------------------------------------------
+# PYTHON - utilidades de docs/ (generador de diagramas, cuestionarios)
+# ------------------------------------------------------------
+__pycache__/
+*.py[cod]
+
+# Salida de los generadores: se regenera con un comando y lo que se
+# versiona son los SVG ya publicados en docs/diagramas/.
+docs/diagramas/generador/bpmn/
+docs/diagramas/generador/bpmn_modulos/
+docs/diagramas/generador/png*/
+
+# ------------------------------------------------------------
 # IDEs y editores
 # ------------------------------------------------------------
 .idea/
